@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.4.1] — 01-11-2026
+
+### Fixed
+- **Action Row Button Binding**: Resolved critical issue where `[swac_action_row]` quantity controls (`.swac-qty-btn`) and Add to Order buttons (`.swac-single-add-btn`) were inert in `assets/js/wa_cart.js`. Added complete click listeners, data attribute extraction, and quantity clamping.
+- **Product Data Attributes in Action Row**: Emitted full `data-product-*` attributes on `.swac-single-add-btn` so `[swac_action_row]` operates standalone in any page builder without requiring WooCommerce template hooks.
+- **Single Product Add-to-Cart Label Filter**: Added `woocommerce_product_single_add_to_cart_text` filter to ensure standard WooCommerce single product pages display "Add to Order", matching archive loop buttons.
+- **Page Builder Context Resolution in Pharmacy Tags**: Hardened `swac_composition_tag_shortcode` in `modules/pharmacy/product-meta.php` with queried object and `get_the_ID()` fallbacks when global `$post` is null.
+- **PHP CLI Test Runner Detection**: Enhanced `tests/php/runner.js` to auto-detect Windows XAMPP PHP installations (`K:\xampp\php\php.exe`) and run full `php -l` syntax checking across all PHP files.
+
+### Added
+- **Configurable Product Editor Tab Streamlining**: Introduced `SWAC_STREAMLINE_PRODUCT_TABS` feature flag (default `false`), preserving `attribute` and `variations` tabs by default so standard stores selling variable products are not impaired.
+- **Non-Destructive Taxonomy Select2 Overrides**: Introduced `SWAC_SELECT2_TAXONOMIES` feature flag (default `['product_brand']`), ensuring WooCommerce's native hierarchical category checklist (`product_catdiv`) is preserved by default.
+
+---
+
 All notable changes to **Stateless WhatsApp Commerce for WooCommerce** will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),

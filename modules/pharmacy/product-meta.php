@@ -24,14 +24,15 @@ function swac_composition_tag_shortcode() {
     }
 
     global $post;
-    if (!$post) {
+    $post_id = !empty($post->ID) ? (int)$post->ID : (int)(get_the_ID() ?: get_queried_object_id());
+    if (!$post_id) {
         return '';
     }
 
     $salt_tax = defined('SWAC_TAX_SALT') ? SWAC_TAX_SALT : 'composition';
     $terms = function_exists('swac_get_product_terms_memoized')
-        ? swac_get_product_terms_memoized($post->ID, $salt_tax)
-        : get_the_terms($post->ID, $salt_tax);
+        ? swac_get_product_terms_memoized($post_id, $salt_tax)
+        : get_the_terms($post_id, $salt_tax);
 
     if (empty($terms) || is_wp_error($terms)) {
         return '';

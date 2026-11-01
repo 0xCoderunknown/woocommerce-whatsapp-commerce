@@ -158,7 +158,7 @@ if (!defined('SWAC_URL')) {
     define('SWAC_URL', plugin_dir_url(dirname(__FILE__)) . '/');
 }
 if (!defined('SWAC_VERSION')) {
-    define('SWAC_VERSION', '1.4.0');
+    define('SWAC_VERSION', '1.4.1');
 }
 
 if (!function_exists('swac_get_config')) {

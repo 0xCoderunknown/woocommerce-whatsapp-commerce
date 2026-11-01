@@ -13,7 +13,8 @@ if (!defined('ABSPATH')) {
 }
 
 add_action('add_meta_boxes', function () {
-    $taxonomies = (array)apply_filters('swac_select2_taxonomies', ['product_cat', 'product_brand']);
+    $default_taxonomies = defined('SWAC_SELECT2_TAXONOMIES') ? (array)SWAC_SELECT2_TAXONOMIES : ['product_brand'];
+    $taxonomies = (array)apply_filters('swac_select2_taxonomies', $default_taxonomies);
 
     foreach ($taxonomies as $tax_slug) {
         $tax_obj = get_taxonomy($tax_slug);
@@ -98,7 +99,8 @@ add_action('save_post_product', function ($post_id) {
         return;
     }
 
-    $allowed_taxonomies = (array) apply_filters('swac_select2_taxonomies', ['product_cat', 'product_brand']);
+    $default_taxonomies = defined('SWAC_SELECT2_TAXONOMIES') ? (array)SWAC_SELECT2_TAXONOMIES : ['product_brand'];
+    $allowed_taxonomies = (array)apply_filters('swac_select2_taxonomies', $default_taxonomies);
 
     foreach ($allowed_taxonomies as $taxonomy) {
         if (!taxonomy_exists($taxonomy) || !isset($raw_input[$taxonomy])) {
@@ -132,7 +134,8 @@ $swac_search_terms_handler = function () {
         wp_send_json_error('Unauthorized', 403);
     }
 
-    $allowed_taxonomies = (array)apply_filters('swac_select2_taxonomies', ['product_cat', 'product_brand']);
+    $default_taxonomies = defined('SWAC_SELECT2_TAXONOMIES') ? (array)SWAC_SELECT2_TAXONOMIES : ['product_brand'];
+    $allowed_taxonomies = (array)apply_filters('swac_select2_taxonomies', $default_taxonomies);
     $taxonomy = isset($_GET['taxonomy']) ? sanitize_key($_GET['taxonomy']) : '';
 
     if (!in_array($taxonomy, $allowed_taxonomies, true)) {

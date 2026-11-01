@@ -59,6 +59,28 @@ define('SWAC_DISABLE_BLOG', false);
  */
 define('SWAC_DISABLE_BLOCK_EDITOR', false);
 
+/**
+ * Streamline product editor tabs in wp-admin.
+ *
+ * When TRUE, removes unused product data tabs (shipping, linked products,
+ * attributes, variations, advanced) for simple physical-only catalogs.
+ *
+ * ✅ Enable if: pure simple-product catalog without variations or attributes.
+ * ❌ Leave OFF (default) if: you sell variable products (sizes, colors) or use product attributes.
+ */
+define('SWAC_STREAMLINE_PRODUCT_TABS', false);
+
+/**
+ * Enable AJAX Select2 dropdowns for taxonomies in wp-admin product editor.
+ *
+ * Array of taxonomy slugs to enhance with Select2 AJAX dropdowns.
+ * Defaults to ['product_brand'] so standard stores retain native multi-category
+ * checkboxes for 'product_cat'.
+ *
+ * Add 'product_cat' only if your catalog strictly assigns a single category per product.
+ */
+define('SWAC_SELECT2_TAXONOMIES', ['product_brand']);
+
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // ZONE 2 │ CATALOG LOCKDOWN FEATURE GROUPS

@@ -1626,6 +1626,80 @@
         });
     }
 
+    function bindActionRowButtons() {
+        document.addEventListener('click', function (e) {
+            // 1. Quantity Plus / Minus inside .swac-qty-selector
+            const qtyBtn = e.target.closest('.swac-qty-selector .swac-qty-btn');
+            if (qtyBtn) {
+                e.preventDefault();
+                const selector = qtyBtn.closest('.swac-qty-selector');
+                const input = selector ? selector.querySelector('.swac-qty-input') : null;
+                if (!input) return;
+
+                let val = parseInt(input.value, 10) || 1;
+                if (qtyBtn.classList.contains('swac-qty-plus')) {
+                    if (val >= CONFIG.maxQtyPerItem) {
+                        showToast(`Maximum ${CONFIG.maxQtyPerItem} units allowed per item.`);
+                        return;
+                    }
+                    val++;
+                } else if (qtyBtn.classList.contains('swac-qty-minus')) {
+                    if (val > 1) {
+                        val--;
+                    }
+                }
+                input.value = val;
+                return;
+            }
+
+            // 2. Add to Order Click on .swac-single-add-btn
+            const addBtn = e.target.closest('.swac-single-add-btn');
+            if (addBtn) {
+                e.preventDefault();
+                const actionRow = addBtn.closest('.swac-action-row');
+                const qtyInput = actionRow ? actionRow.querySelector('.swac-qty-input') : null;
+                let qty = qtyInput ? (parseInt(qtyInput.value, 10) || 1) : 1;
+                if (qty > CONFIG.maxQtyPerItem) {
+                    qty = CONFIG.maxQtyPerItem;
+                    if (qtyInput) qtyInput.value = qty;
+                    showToast(`Maximum ${CONFIG.maxQtyPerItem} units allowed per item.`);
+                }
+
+                const dataEl = document.getElementById('swac-product-data');
+                const titleEl = document.querySelector('.product_title, h1');
+                const defaultTitle = titleEl ? titleEl.textContent.trim() : 'Product';
+
+                const item = {
+                    id: addBtn.dataset.productId || dataEl?.dataset.productId || Date.now(),
+                    name: addBtn.dataset.productName || dataEl?.dataset.productName || defaultTitle,
+                    url: addBtn.dataset.productUrl || dataEl?.dataset.productUrl || window.location.href,
+                    price: addBtn.dataset.productPrice || dataEl?.dataset.productPrice || '',
+                    mrp: parseFloat(addBtn.dataset.productMrp) || parseFloat(dataEl?.dataset.productMrp) || 0,
+                    salePrice: parseFloat(addBtn.dataset.productSalePrice) || parseFloat(dataEl?.dataset.productSalePrice) || 0,
+                    qty: qty,
+                    isRx: (addBtn.dataset.isRx === '1') || (dataEl?.dataset.isRx === '1'),
+                };
+
+                addToCart(item, addBtn);
+            }
+        });
+
+        // 3. Clamp quantity inputs on manual typing
+        document.addEventListener('change', function (e) {
+            const input = e.target.closest('.swac-qty-selector .swac-qty-input');
+            if (input) {
+                let val = parseInt(input.value, 10);
+                if (isNaN(val) || val < 1) {
+                    val = 1;
+                } else if (val > CONFIG.maxQtyPerItem) {
+                    val = CONFIG.maxQtyPerItem;
+                    showToast(`Maximum ${CONFIG.maxQtyPerItem} units allowed per item.`);
+                }
+                input.value = val;
+            }
+        });
+    }
+
     // ── Catalog Ordering: Auto-Submit on Selection / Click ───────────────────
     // Custom builders and stripped WooCommerce templates lack the auto-submit JS
     // for .woocommerce-ordering. This ensures selecting an option reloads the page.

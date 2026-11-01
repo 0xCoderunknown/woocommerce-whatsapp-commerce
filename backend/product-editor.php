@@ -33,7 +33,10 @@ add_action('admin_init', function () {
     /**
      * 2. Streamline Product Data Tabs (toggleable via filter)
      */
-    $streamline_enabled = apply_filters('swac_streamline_product_editor', true);
+    $streamline_enabled = apply_filters(
+        'swac_streamline_product_editor',
+        defined('SWAC_STREAMLINE_PRODUCT_TABS') ? SWAC_STREAMLINE_PRODUCT_TABS : false
+    );
     if ($streamline_enabled) {
         add_filter('woocommerce_product_data_tabs', function ($tabs) {
             $tabs_to_remove = [

@@ -120,6 +120,13 @@ if (!function_exists('swac_action_row_shortcode')) {
             );
         }
 
+        $price = $product->get_price() ? strip_tags((string)wc_price($product->get_price())) : '';
+        $mrp = (float)$product->get_regular_price();
+        $sale_price = (float)$product->get_sale_price();
+        if ($sale_price <= 0) {
+            $sale_price = (float)$product->get_price();
+        }
+        $is_rx = (bool)apply_filters('swac_product_is_rx', false, $product);
         $icon = function_exists('swac_icon_svg') ? swac_icon_svg() : '';
 
         ob_start();
@@ -134,6 +141,12 @@ if (!function_exists('swac_action_row_shortcode')) {
                 type="button"
                 class="button swac-single-add-btn"
                 data-product-id="<?php echo esc_attr($product->get_id()); ?>"
+                data-product-name="<?php echo esc_attr($product->get_name()); ?>"
+                data-product-url="<?php echo esc_url($product->get_permalink()); ?>"
+                data-product-price="<?php echo esc_attr($price); ?>"
+                data-product-mrp="<?php echo esc_attr($mrp); ?>"
+                data-product-sale-price="<?php echo esc_attr($sale_price); ?>"
+                data-is-rx="<?php echo $is_rx ? '1' : '0'; ?>"
             >
                 <?php echo $icon; ?>
                 <span><?php esc_html_e('Add to Order', 'stateless-wa-commerce'); ?></span>
@@ -144,3 +157,11 @@ if (!function_exists('swac_action_row_shortcode')) {
     }
 }
 add_shortcode('swac_action_row', 'swac_action_row_shortcode');
+
+/**
+ * 5. Single Product Add-to-Cart Button Label Filter
+ * Ensures standard WooCommerce templates display "Add to Order" rather than "Add to cart".
+ */
+add_filter('woocommerce_product_single_add_to_cart_text', function ($text, $product = null) {
+    return (string)apply_filters('swac_single_button_text', __('Add to Order', 'stateless-wa-commerce'), $product);
+}, 10, 2);

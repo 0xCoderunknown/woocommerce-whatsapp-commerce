@@ -152,11 +152,18 @@ function runPhpVerification() {
     }
 
     // 4. Optional php -l if PHP binary is installed
-    const hasPhpCli = spawnSync('php', ['-v'], { encoding: 'utf8' }).status === 0;
+    let phpBin = 'php';
+    if (fs.existsSync('K:\\xampp\\php\\php.exe')) {
+        phpBin = 'K:\\xampp\\php\\php.exe';
+    } else if (process.env.PHP_BINARY && fs.existsSync(process.env.PHP_BINARY)) {
+        phpBin = process.env.PHP_BINARY;
+    }
+
+    const hasPhpCli = spawnSync(phpBin, ['-v'], { encoding: 'utf8' }).status === 0;
     if (hasPhpCli) {
-        console.log('PHP CLI detected. Running syntax lint (`php -l`)...');
+        console.log(`PHP CLI detected (${phpBin}). Running syntax lint (php -l)...\n`);
         for (const filePath of phpFiles) {
-            const res = spawnSync('php', ['-l', filePath], { encoding: 'utf8' });
+            const res = spawnSync(phpBin, ['-l', filePath], { encoding: 'utf8' });
             if (res.status !== 0) {
                 errors.push(`PHP Syntax Error in ${path.relative(ROOT_DIR, filePath)}: ${res.stderr || res.stdout}`);
             }
