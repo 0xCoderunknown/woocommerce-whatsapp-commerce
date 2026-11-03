@@ -97,6 +97,7 @@ Customer cart items, address details, and delivery zone serviceability run in th
   - `modules/pharmacy/`: Chemical compositions (`composition`), pack sizes (`pack_size`), and generic alternate price comparisons.
   - `modules/explore/`: High-speed directory exploration for brands and categories with instant live client search.
   - `modules/seo/`: Dynamic OpenGraph headers, taxonomy titles, and Schema.org JSON-LD metadata without external SEO plugins.
+  - `modules/wholesale/`: B2B Wholesale & schemes engine with PTR pricing, dynamic retailer margin badges (₹ & %), active promotional schemes (12+1 free goods, volume slab tiers, CD %), carton packing guides, direct shop-page bulk ordering, and zero-cost phone + 4-digit PIN rate gating.
   - `integrations/`: Streaming low-memory XML sitemap generator (`/sitemap.xml`) and reverse-proxy SSL enforcer.
 - **HPOS & Modern Block Ready**:
   Compatibility for High-Performance Order Storage (`custom_order_tables`) and Cart/Checkout Blocks declared via `FeaturesUtil::declare_compatibility()` on `before_woocommerce_init`.
@@ -171,7 +172,8 @@ define('SWAC_LOCKDOWN_SCRIPT_DEQUEUE',     true);
 // ZONE 3: Modules (OFF by default)
 define('SWAC_MODULE_PHARMACY', false);
 define('SWAC_MODULE_EXPLORE',  false);
-define('SWAC_MODULE_SEO',      false);
+define('SWAC_MODULE_SEO',       false);
+define('SWAC_MODULE_WHOLESALE', true);  // B2B wholesale pricing, schemes & PIN login
 ```
 
 > [!NOTE]

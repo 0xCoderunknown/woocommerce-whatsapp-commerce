@@ -81,3 +81,31 @@ LiteSpeed Cache and reverse proxies allow surgical invalidation:
   - Its direct category and brand archive URLs
   - The homepage and `/sitemap.xml`
 - Entire site cache wipes are strictly avoided, eliminating cache stampedes.
+
+---
+
+## 5. Wholesale B2B Schemes & Zero-Cost Gating Architecture
+
+When `SWAC_MODULE_WHOLESALE` is active (`modules/wholesale/`), the catalog serves high-volume B2B trade between stockists and retail stores while adhering to the core zero-session philosophy:
+
+### 5.1. Dual-State Gated View Without Cache Busting
+Unlike traditional B2B plugins that rely on server-side `is_user_logged_in()` checks (which force private caching or cache-bypass headers), Stateless WhatsApp Commerce renders both states in static HTML:
+- `.swac-b2b-locked-view` / `.swac-b2b-locked-action`: Default state seen by public visitors and search engine bots. Rates, schemes, and margin calculations are masked behind a `[ 🔒 Retailer PIN to View Rate ]` trigger.
+- `.swac-b2b-unlocked-view` / `.swac-b2b-unlocked-action`: Unlocked state containing PTR rates, MRP comparison, calculated margin percentages, promotional scheme badges, carton packing guide (`1 Carton = X pcs`), and inline quantity controls.
+
+When an approved retailer authenticates:
+1. Credentials are verified against the approved retailer registry via `POST /wp-json/swac/v1/retailer-login`.
+2. On 200 OK, the retailer's authenticated profile is persisted in `localStorage['swac_b2b_retailer']`.
+3. Client-side JavaScript adds `.swac-retailer-auth` to `document.documentElement` and `document.body` within 1 millisecond, unveiling wholesale pricing without requiring PHP execution or page reloads.
+
+### 5.2. WhatsApp Trade Order Serialization
+Wholesale orders serialize both piece counts and whole carton packing conversions:
+```text
+1. *Rin Bar 250g* — Qty: 144 (1 Carton)
+   Scheme: 12 + 1 FREE
+   Price: ₹24.50 × 144 = ₹3,528.00
+
+🏪 *Retailer:* Shree Ganesh Stores (9876543210)
+📍 *Route / Area:* Fancy Bazar
+```
+Warehouse dispatch clerks can read carton and scheme totals instantly without manual packing math.

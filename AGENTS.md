@@ -91,3 +91,21 @@ npm test
   - Validates structural PHP token balance.
 
 Before submitting any changes, execute `npm test` and verify that all test suites pass with 0 failures.
+
+---
+
+## 5. Wholesale B2B Architecture & Zero-Cost Retailer Authentication
+
+The wholesale engine (`modules/wholesale/`) enables B2B trade between stockists/distributors and retail stores without violating stateless or cache invariants:
+
+### 5.1. Stateless Client-Side Rate Masking
+- Public HTML catalog loops remain **100% full-page static cacheable** on LiteSpeed / CDN layers.
+- For guest visitors, rates, schemes, and margins are masked behind `.swac-b2b-locked-view` and `.swac-b2b-locked-action`.
+- When an approved retailer logs in, the authenticated session token is preserved in `localStorage['swac_b2b_retailer']`.
+- JavaScript instantly applies `.swac-retailer-auth` to `document.documentElement` and `document.body`, revealing PTR rates, margin badges, and direct ordering controls without page reloads.
+
+### 5.2. Zero-Cost Phone + 4-Digit PIN Authentication
+- **No Paid SMS Gateways**: Never introduce third-party SMS OTP gateways (Twilio, MSG91, Firebase) that incur per-message costs or DLT friction.
+- Authentication relies on the approved retailer directory (`swac_b2b_approved_retailers` option) and the REST endpoint `/wp-json/swac/v1/retailer-login`.
+- New retailer registration is handled via zero-cost WhatsApp handshake: unapproved retailers click "Apply for Retailer Account via WhatsApp", dispatching pre-filled store details directly to the distributor.
+- Wholesalers manage, approve, and assign PINs via the **Products → Approved Retailers** wp-admin screen.
