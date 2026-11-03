@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * ⚙️ DEVELOPER FEATURE FLAGS — Stateless WhatsApp Commerce
  * ─────────────────────────────────────────────────────────
@@ -221,6 +221,15 @@ define('SWAC_MODULE_EXPLORE', false);
  */
 define('SWAC_MODULE_SEO', false);
 
+/**
+ * Wholesale / B2B Schemes module  →  /modules/wholesale/
+ *
+ * Adds: Wholesale PTR pricing, MRP-to-PTR retailer margin badges,
+ * active scheme tags (free goods, volume tier slabs, cash discount),
+ * carton packing guide labels, and direct shop-page bulk ordering.
+ */
+define('SWAC_MODULE_WHOLESALE', true);
+
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // WIRING — translates constants → filters (do not edit below this line)
@@ -254,6 +263,9 @@ add_filter('swac_active_modules', function (array $modules): array {
     }
     if (SWAC_MODULE_SEO && !in_array('seo', $modules, true)) {
         $modules[] = 'seo';
+    }
+    if (SWAC_MODULE_WHOLESALE && !in_array('wholesale', $modules, true)) {
+        $modules[] = 'wholesale';
     }
     return $modules;
 }, 5);

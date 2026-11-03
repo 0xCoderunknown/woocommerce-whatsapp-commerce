@@ -1,10 +1,20 @@
-# Changelog
+﻿# Changelog
 
-## [1.4.1] — 01-11-2026
+## [1.5.0] — 03-11-2026
+
+### Added
+- **Wholesale & Schemes B2B Module** (modules/wholesale/):
+  - **Wholesale PTR & Schemes Meta**: Added _swac_b2b_ptr, _swac_b2b_carton_pack, and flexible promotional scheme rules (free goods e.g. 12+1, volume tier slabs, cash discount %, custom text).
+  - **Dynamic Margin Calculation**: Automatically computes retailer margin amount and percentage relative to MRP on loop cards.
+  - **Carton Packing Guide**: Displays informative carton reference labels (1 Carton = X pcs) to streamline order sizing.
+  - **Direct Shop-Page Ordering**: Added inline quantity selector and bulk-order action button directly on catalog cards.
+  - **WhatsApp Order Compilation**: Enhanced order payload to itemize cartons, loose units, and active schemes for warehouse dispatch.
+
+## [1.4.1] $([char]0x2014) 01-11-2026
 
 ### Fixed
 - **Action Row Button Binding**: Resolved critical issue where `[swac_action_row]` quantity controls (`.swac-qty-btn`) and Add to Order buttons (`.swac-single-add-btn`) were inert in `assets/js/wa_cart.js`. Added complete click listeners, data attribute extraction, and quantity clamping.
-- **Product Data Attributes in Action Row**: Emitted full `data-product-*` attributes on `.swac-single-add-btn` so `[swac_action_row]` operates standalone in any page builder without requiring WooCommerce template hooks.
+## [1.4.1] — 01-11-2026
 - **Single Product Add-to-Cart Label Filter**: Added `woocommerce_product_single_add_to_cart_text` filter to ensure standard WooCommerce single product pages display "Add to Order", matching archive loop buttons.
 - **Page Builder Context Resolution in Pharmacy Tags**: Hardened `swac_composition_tag_shortcode` in `modules/pharmacy/product-meta.php` with queried object and `get_the_ID()` fallbacks when global `$post` is null.
 - **PHP CLI Test Runner Detection**: Enhanced `tests/php/runner.js` to auto-detect Windows XAMPP PHP installations (`K:\xampp\php\php.exe`) and run full `php -l` syntax checking across all PHP files.
@@ -23,8 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 All release dates follow the Indian date standard format: **`DD-MM-YYYY`**.
 
 ---
-
 ## [1.4.0] — 10-10-2026
+## [1.4.0] $([char]0x2014) 10-10-2026
 
 ### Added
 - **Multi-Tier Always-Free Postal Code Support** (`core/config.php`, `core/delivery-zones.php`, `frontend/enqueue.php`, `assets/js/wa_cart.js`, `assets/css/cart-drawer.css`):
@@ -51,7 +61,7 @@ All release dates follow the Indian date standard format: **`DD-MM-YYYY`**.
 
 ---
 
-## [1.3.2] — 05-10-2026
+## [1.3.2] $([char]0x2014) 05-10-2026
 
 ### Fixed
 - **403 Intercept on `wc-admin` (Menu Capability Check)**: Hooked WooCommerce Admin routes (`page=wc-admin`) to `admin_page_access_denied` in addition to `admin_init`. WordPress core validates menu capabilities inside `wp-admin/includes/menu.php` and executes `wp_die(..., 403)` before `admin_init` is ever called; intercepting `admin_page_access_denied` catches the access denial before headers are closed and seamlessly redirects to the classic product editor (`post-new.php?post_type=product`).
@@ -65,7 +75,7 @@ All release dates follow the Indian date standard format: **`DD-MM-YYYY`**.
 
 ---
 
-## [1.3.1] — 05-10-2026
+## [1.3.1] $([char]0x2014) 05-10-2026
 
 ### Fixed
 - **Sitemap Activation Hook**: Moved `register_activation_hook()` and `register_deactivation_hook()` from `integrations/sitemap-generator.php` to `stateless-wa-commerce.php` to ensure `/sitemap.xml` rewrite rules flush properly on activation.
@@ -83,7 +93,7 @@ All release dates follow the Indian date standard format: **`DD-MM-YYYY`**.
 
 ---
 
-## [1.3.0] — 05-10-2026
+## [1.3.0] $([char]0x2014) 05-10-2026
 
 ### Added
 - **Developer Feature Flag Control Panel** (`features.php`):
@@ -95,30 +105,30 @@ All release dates follow the Indian date standard format: **`DD-MM-YYYY`**.
 
 ---
 
-## [1.2.2] — 03-10-2026
+## [1.2.2] $([char]0x2014) 03-10-2026
 - Added `(j M)` calendar date stamping to delivery cutoffs and WhatsApp estimates.
 - Added `icon="yes|no"` toggle to `[swac_button]`.
 - Normalized loyalty gift emoji spacing and clean markup for generic/composition tags.
 - Added backward-compatibility aliases for legacy `g1_` and `cdr_` shortcodes/functions.
 
-## [1.2.1] — 30-09-2026
+## [1.2.1] $([char]0x2014) 30-09-2026
 - Added canonical WhatsApp URL builder `swac_build_whatsapp_url()` handling query parameters safely.
 - Added concise delivery estimate day labels (`getDeliveryEstimate()`).
 - Streamlined WhatsApp delivery details and totals formatting.
 
-## [1.2.0] — 29-09-2026
+## [1.2.0] $([char]0x2014) 29-09-2026
 - Declared HPOS (`custom_order_tables`) and Cart/Checkout Blocks compatibility.
 - Fault-tolerant module loading with existence guards.
 - Namespaced core PHP functions, constants, filters, CSS classes, and text domain to `swac_` / `stateless-wa-commerce`.
 - Unconfigured phone number safeguards.
 
-## [1.1.0] — 26-09-2024
+## [1.1.0] $([char]0x2014) 26-09-2024
 - Added configurable cart ceilings (`max_cart_items`, `max_qty_per_item`) to prevent WhatsApp deep-link URL truncation.
 - Added floating toast notifications for user quota limits.
 - Decoupled pharmaceutical Rx tagging and prescription disclaimer notes.
 - Resolved WhatsApp emoji encoding across redirects.
 
-## [1.0.0] — 26-09-2024
+## [1.0.0] $([char]0x2014) 26-09-2024
 - Initial release of the Stateless Zero-Session WhatsApp Commerce engine for WooCommerce.
 - Suppression of guest sessions, cart fragments, and tracking cookies for LiteSpeed full-page caching.
 - Client-side LocalStorage cart drawer with real-time DOM price reconciliation and order serializer.

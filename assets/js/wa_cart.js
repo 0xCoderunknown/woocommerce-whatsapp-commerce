@@ -471,6 +471,8 @@
                     <div class="swac-item-info">
                         <span class="swac-item-name">${escHtml(item.name)}</span>
                         ${item.price ? `<span class="swac-item-price">${escHtml(item.price)}</span>` : ''}
+                        ${item.schemeBadge ? `<span class="swac-drawer-scheme-tag">🎁 ${escHtml(item.schemeBadge)}</span>` : ''}
+                        ${item.cartonPack > 0 ? `<span class="swac-drawer-carton-note">📦 1 Ctn = ${item.cartonPack} pcs</span>` : ''}
                     </div>
                     <div class="swac-item-controls">
                         <button class="swac-qty-btn swac-qty-minus" data-id="${escHtml(String(item.id))}" aria-label="Decrease quantity of ${escHtml(item.name)}">−</button>
@@ -1310,6 +1312,18 @@
             if (item.qty > 1) {
                 line += ` — Qty: ${item.qty}`;
             }
+            if (item.cartonPack > 0) {
+                const fullCartons = Math.floor(item.qty / item.cartonPack);
+                const loosePcs = item.qty % item.cartonPack;
+                if (fullCartons > 0 && loosePcs > 0) {
+                    line += ` (${fullCartons} Ctn + ${loosePcs} pcs)`;
+                } else if (fullCartons > 0) {
+                    line += ` (${fullCartons} Carton${fullCartons > 1 ? 's' : ''})`;
+                }
+            }
+            if (item.schemeBadge) {
+                line += `\n   Scheme: ${item.schemeBadge}`;
+            }
             const unitPriceNum = parseFloat(item.salePrice) || 0;
             if (unitPriceNum > 0) {
                 if (item.qty > 1) {
@@ -1611,6 +1625,12 @@
             if (!btn) return;
             e.preventDefault();
 
+            const parentAction = btn.closest('.swac-b2b-loop-action, .swac-b2b-loop-wrapper, .swac-action-row');
+            const qtyInput = parentAction ? parentAction.querySelector('.swac-qty-input') : null;
+            let qty = qtyInput ? (parseInt(qtyInput.value, 10) || 1) : 1;
+            if (qty < 1) qty = 1;
+            if (qty > CONFIG.maxQtyPerItem) qty = CONFIG.maxQtyPerItem;
+
             const item = {
                 id: btn.dataset.productId || btn.href,
                 name: btn.dataset.productName || 'Product',
@@ -1618,7 +1638,9 @@
                 price: btn.dataset.productPrice || '',
                 mrp: parseFloat(btn.dataset.productMrp) || 0,
                 salePrice: parseFloat(btn.dataset.productSalePrice) || 0,
-                qty: 1,
+                qty: qty,
+                cartonPack: parseInt(btn.dataset.cartonPack, 10) || 0,
+                schemeBadge: btn.dataset.schemeBadge || '',
                 isRx: btn.dataset.isRx === '1',
             };
 

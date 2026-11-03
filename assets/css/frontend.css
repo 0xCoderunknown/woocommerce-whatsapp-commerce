@@ -533,3 +533,205 @@ div.stock.out-of-stock {
 .swac-shortcode-wrapper:empty {
     display: none;
 }
+
+
+
+/* =========================================
+   8. WHOLESALE & B2B SCHEME STYLES
+   ========================================= */
+
+.swac-b2b-price-block {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 6px 0 10px 0;
+}
+
+.swac-b2b-rate-row {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.swac-b2b-ptr {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--wa-brand-darker, #075E54);
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.swac-b2b-ptr-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--wa-ink-muted, #667670);
+    letter-spacing: 0.03em;
+}
+
+.swac-b2b-mrp {
+    font-size: 0.82rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.swac-b2b-mrp-strike {
+    text-decoration: line-through;
+}
+
+.swac-b2b-margin-row {
+    display: flex;
+    align-items: center;
+}
+
+.swac-b2b-margin-badge {
+    display: inline-flex;
+    align-items: center;
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.01em;
+}
+
+.swac-b2b-scheme-row {
+    margin-top: 2px;
+}
+
+.swac-b2b-scheme-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.swac-b2b-loop-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.swac-b2b-carton-guide {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 5px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #475569;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.swac-b2b-loop-action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.swac-b2b-loop-action .swac-qty-selector {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #ffffff;
+    height: 38px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.swac-b2b-loop-action .swac-qty-btn {
+    width: 32px;
+    height: 100%;
+    border: none;
+    background: #f8fafc;
+    color: #334155;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.swac-b2b-loop-action .swac-qty-btn:hover {
+    background: #e2e8f0;
+}
+
+.swac-b2b-loop-action .swac-qty-input {
+    width: 52px;
+    height: 100%;
+    border: none;
+    border-left: 1px solid #e2e8f0;
+    border-right: 1px solid #e2e8f0;
+    text-align: center;
+    font-weight: 700;
+    font-size: 13px;
+    color: #0f172a;
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+.swac-b2b-loop-action .swac-qty-input::-webkit-outer-spin-button,
+.swac-b2b-loop-action .swac-qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.swac-b2b-loop-action a.button.swac-b2b-add-btn,
+.woocommerce ul.products li.product a.button.swac-b2b-add-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 38px;
+    padding: 0 12px;
+    font-size: 13px;
+    font-weight: 700;
+    background-color: var(--wa-brand-dark, #128C7E);
+    color: #ffffff;
+    border-radius: 6px;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.swac-b2b-loop-action a.button.swac-b2b-add-btn:hover,
+.woocommerce ul.products li.product a.button.swac-b2b-add-btn:hover {
+    background-color: var(--wa-brand-darker, #075E54);
+    color: #ffffff;
+}
+
+.swac-drawer-scheme-tag {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #b45309;
+    margin-top: 2px;
+}
+
+.swac-drawer-carton-note {
+    display: block;
+    font-size: 0.70rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-top: 1px;
+}
