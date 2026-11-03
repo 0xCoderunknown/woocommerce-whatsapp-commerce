@@ -735,3 +735,310 @@ div.stock.out-of-stock {
     color: #64748b;
     margin-top: 1px;
 }
+
+
+/* =========================================
+   9. B2B RETAILER GATE & LOGIN MODAL
+   ========================================= */
+
+/* Default: Locked View */
+.swac-b2b-unlocked-view,
+.swac-b2b-unlocked-action {
+    display: none;
+}
+
+.swac-b2b-locked-view,
+.swac-b2b-locked-action {
+    display: block;
+}
+
+/* Authenticated: Unlocked View */
+.swac-retailer-auth .swac-b2b-unlocked-view,
+.swac-retailer-auth .swac-b2b-unlocked-action {
+    display: block;
+}
+
+.swac-retailer-auth .swac-b2b-locked-view,
+.swac-retailer-auth .swac-b2b-locked-action {
+    display: none;
+}
+
+/* Gate Trigger Button (Inline Price & Action) */
+.swac-b2b-gate-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f8fafc;
+    color: #475569;
+    border: 1px dashed #cbd5e1;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    justify-content: center;
+}
+
+.swac-b2b-gate-trigger:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #94a3b8;
+}
+
+.swac-b2b-locked-order-btn {
+    width: 100%;
+    height: 38px;
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.swac-b2b-locked-order-btn:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+/* Modal Backdrop */
+.swac-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.swac-modal-backdrop.swac-b2b-modal-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Modal Card */
+.swac-modal-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    animation: swacModalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes swacModalPop {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.swac-modal-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    background: #f8fafc;
+}
+
+.swac-modal-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.swac-modal-title h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.swac-modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #64748b;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    line-height: 1;
+}
+
+.swac-modal-close-btn:hover {
+    color: #0f172a;
+    background: #e2e8f0;
+}
+
+.swac-modal-card-body {
+    padding: 20px;
+}
+
+.swac-modal-subtitle {
+    font-size: 0.82rem;
+    color: #64748b;
+    line-height: 1.45;
+    margin: 0 0 16px 0;
+}
+
+.swac-form-row {
+    margin-bottom: 14px;
+}
+
+.swac-form-row label {
+    display: block;
+    font-size: 0.80rem;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.swac-modal-input {
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 15px;
+    color: #0f172a;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.swac-modal-input:focus {
+    outline: none;
+    border-color: var(--wa-brand-dark, #128C7E);
+    box-shadow: 0 0 0 3px rgba(18, 140, 126, 0.15);
+}
+
+.swac-login-alert {
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-bottom: 14px;
+    line-height: 1.4;
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.swac-login-alert.swac-b2b-modal-hidden {
+    display: none;
+}
+
+.swac-modal-submit-btn {
+    width: 100%;
+    height: 44px;
+    background: var(--wa-brand-dark, #128C7E);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.swac-modal-submit-btn:hover {
+    background: var(--wa-brand-darker, #075E54);
+}
+
+.swac-modal-card-footer {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+    text-align: center;
+}
+
+.swac-footer-note {
+    display: block;
+    font-size: 0.78rem;
+    color: #64748b;
+    margin-bottom: 8px;
+}
+
+.swac-wa-register-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--wa-brand-darker, #075E54);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: underline;
+    transition: color 0.15s ease;
+}
+
+.swac-wa-register-link:hover {
+    color: var(--wa-brand, #25D366);
+}
+
+/* Floating Retailer Status Pill */
+.swac-retailer-status-pill {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 99990;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    background: #0f172a;
+    color: #ffffff;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+.swac-retailer-auth .swac-retailer-status-pill {
+    display: inline-flex;
+}
+
+.swac-pill-store {
+    color: #f8fafc;
+}
+
+.swac-pill-logout-btn {
+    background: #334155;
+    border: none;
+    color: #f1f5f9;
+    font-size: 0.70rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.swac-pill-logout-btn:hover {
+    background: #ef4444;
+    color: #ffffff;
+}

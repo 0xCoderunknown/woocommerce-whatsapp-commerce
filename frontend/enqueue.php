@@ -81,6 +81,7 @@ add_action('wp_enqueue_scripts', function () {
             'free_shipping_at'           => $cfg['free_shipping_at'],
             'shipping_charge'            => $cfg['shipping_charge'],
             'always_free_shipping_codes' => $always_free_codes,
+            'rest_url'                   => esc_url_raw(rest_url()),
             'is_admin'                   => is_user_logged_in(),
             'prescription_note_enabled'  => (bool)$cfg['prescription_note_enabled'],
             'prescription_note'          => $cfg['prescription_note'],

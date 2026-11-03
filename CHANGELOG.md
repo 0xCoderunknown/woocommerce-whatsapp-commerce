@@ -8,9 +8,13 @@
   - **Dynamic Margin Calculation**: Automatically computes retailer margin amount and percentage relative to MRP on loop cards.
   - **Carton Packing Guide**: Displays informative carton reference labels (1 Carton = X pcs) to streamline order sizing.
   - **Direct Shop-Page Ordering**: Added inline quantity selector and bulk-order action button directly on catalog cards.
-  - **WhatsApp Order Compilation**: Enhanced order payload to itemize cartons, loose units, and active schemes for warehouse dispatch.
+  - **Zero-Cost Retailer Login Gate**: Implemented mobile + 4-digit PIN authentication (modules/wholesale/retailer-auth.php) with zero SMS gateway costs.
+  - **Client-Side Wholesale Price Masking**: Gated wholesale rates, schemes, and margins behind client-side verification, keeping the public storefront 100% full-page cacheable.
+  - **WhatsApp Retailer Registration Handshake**: Integrated 1-tap WhatsApp account application (modules/wholesale/login-modal.php) for unapproved retailers.
+  - **Approved Retailers Admin Directory**: Added CRUD management screen in WordPress admin under Products to manage retailer PINs and accounts.
+  - **WhatsApp Order Compilation**: Enhanced order payload to itemize cartons, loose units, active schemes, and retailer store identification for warehouse dispatch.
 
-## [1.4.1] $([char]0x2014) 01-11-2026
+## [1.4.1] — 01-11-2026
 
 ### Fixed
 - **Action Row Button Binding**: Resolved critical issue where `[swac_action_row]` quantity controls (`.swac-qty-btn`) and Add to Order buttons (`.swac-single-add-btn`) were inert in `assets/js/wa_cart.js`. Added complete click listeners, data attribute extraction, and quantity clamping.
