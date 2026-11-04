@@ -1,7 +1,13 @@
-# Shortcodes Documentation
+# Shortcodes Reference Manual
 
-This document describes all shortcodes available in **Stateless WhatsApp Commerce for WooCommerce**.
-It serves as the definitive reference for page builders, theme templates, and developers.
+This document is the **authoritative single source of truth** for all shortcodes available in **Stateless WhatsApp Commerce for WooCommerce**.
+It serves as the definitive reference for visual page builders (Breakdance, Elementor, Bricks), theme templates, and developers.
+
+> 📖 **Related Documentation**:
+> - Technical Architecture: [docs/architecture.md](architecture.md)
+> - Store Configuration & Setup: [README.md](../README.md)
+> - Maintainer & AI Operating Manual: [AGENTS.md](../AGENTS.md)
+
 
 ---
 

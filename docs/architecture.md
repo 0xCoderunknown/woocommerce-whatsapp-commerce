@@ -1,7 +1,8 @@
 # Stateless WhatsApp Commerce: Architecture Deep Dive
 
-This document details the architectural mechanisms that enable **Stateless WhatsApp Commerce for WooCommerce** to run as
-a session-free public catalog optimized for full-page static caching under LiteSpeed Web Server, Nginx, or Edge CDNs.
+This document is the **definitive architectural source of truth** for **Stateless WhatsApp Commerce for WooCommerce**.
+It details the internal design, caching mechanics, client-side state machine, and B2B wholesale extensions that enable
+the plugin to operate as a high-speed, zero-session catalog.
 
 ---
 
@@ -9,8 +10,8 @@ a session-free public catalog optimized for full-page static caching under LiteS
 
 Standard WooCommerce is engineered around stateful server sessions:
 
-1. Every guest request initializes `WC_Session_Handler`, assigning a unique session cookie (`wp_woocommerce_session_*`).
-2. Even browsing products causes database writes to `wp_woocommerce_sessions`.
+1. Every guest request initializes `WC_Session_Handler`, dispatching a session cookie (`wp_woocommerce_session_*`).
+2. Even passive product browsing triggers database writes to `wp_woocommerce_sessions`.
 3. Every page load fires an uncacheable AJAX request (`wc-ajax=get_refreshed_fragments`) to populate server-side cart
    fragments.
 4. Edge caches (Cloudflare, LiteSpeed, Varnish) bypass full-page static caching whenever WooCommerce session cookies are
@@ -70,7 +71,7 @@ add_filter('swac_lockdown_features', function ($features) {
 
 Since the server maintains zero cart state, all cart interactions are executed entirely in the visitor's browser:
 
-### 3.1. LocalStorage CRUD
+### 3.1. LocalStorage State Storage
 
 - Cart items are stored under the localStorage key `swac_cart`.
 - Customer address metadata is stored under `swac_customer_details`.
@@ -117,12 +118,42 @@ LiteSpeed Cache and reverse proxies allow surgical invalidation:
 
 ---
 
-## 5. Wholesale B2B Schemes & Zero-Cost Gating Architecture
+## 5. Delivery Zones & Dynamic Dispatch Windows
+
+The delivery engine (`core/delivery-zones.php` and `core/delivery-cutoff.php`) manages postal code validation and order
+cutoff scheduling without database lookups on page loads:
+
+### 5.1. Open vs. Gated Postal Modes
+
+- **Open Mode** (default): Any valid postal code is accepted. Shipping fees apply based on `SWAC_FREE_SHIPPING_AT` and
+  `SWAC_SHIPPING_CHARGE`.
+- **Gated Mode**: Only postal codes registered in `swac_delivery_zones` are serviceable. Unregistered postal codes
+  render a clear "out of delivery area" notice and prevent order dispatch.
+
+### 5.2. Always-Free Postal Code Subsystem
+
+Store owners can designate specific postal codes that permanently receive free delivery regardless of cart subtotal:
+
+- Configured via `SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES` in `core/config.php` or the `swac_always_free_shipping_postal_codes` filter.
+- Localized to the browser at `window.swacZones.always_free_shipping_codes`.
+- The client engine (`computeCartTotals`) evaluates postal codes and waives delivery charges (`shipping = 0`, `isAlwaysFree = true`).
+
+### 5.3. Timezone-Aware Cutoff Scheduling
+
+Calculates dispatch estimates using WordPress `wp_timezone()` (Asia/Kolkata default):
+
+- **Weekday Morning** (< 12:00 PM): Same-day dispatch.
+- **Weekday Afternoon** (>= 12:00 PM): Next-day dispatch with formatted calendar date stamping `(j M)`.
+- **Weekend Windows**: Orders placed after Saturday 12:00 PM or on Sunday are stamped for Monday dispatch.
+
+---
+
+## 6. Wholesale B2B Schemes & Zero-Cost Gating Architecture
 
 When `SWAC_MODULE_WHOLESALE` is active (`modules/wholesale/`), the catalog serves high-volume B2B trade between
 stockists and retail stores while adhering to the core zero-session philosophy:
 
-### 5.1. Dual-State Gated View Without Cache Busting
+### 6.1. Dual-State Gated View Without Cache Busting
 
 Unlike traditional B2B plugins that rely on server-side `is_user_logged_in()` checks (which force private caching or
 cache-bypass headers), Stateless WhatsApp Commerce renders both states in static HTML:
@@ -140,25 +171,25 @@ When an approved retailer authenticates:
 3. Client-side JavaScript adds `.swac-retailer-auth` to `document.documentElement` and `document.body` within 1
    millisecond, unveiling wholesale pricing without requiring PHP execution or page reloads.
 
-### 5.2. WhatsApp Trade Order Serialization
+### 6.2. WhatsApp Trade Order Serialization
 
 Wholesale orders serialize both piece counts and whole carton packing conversions:
 
 ```text
-1. *Rin Bar 250g* — Qty: 144 (1 Carton)
+1. *Premium Detergent Bar 250g* — Qty: 144 (1 Carton)
    Scheme: 12 + 1 FREE
    Price: ₹24.50 × 144 = ₹3,528.00
 
-🏪 *Retailer:* Shree Ganesh Stores (9876543210)
-📍 *Route / Area:* Fancy Bazar
+🏪 *Retailer:* Apex Wholesale Mart (9876543210)
+📍 *Route / Area:* Central Market Route
 ```
 
 Warehouse dispatch clerks can read carton and scheme totals instantly without manual packing math.
 
-### 5.3. Frontend Distributor Desk & CSV Rate Synchronization
+### 6.3. Frontend Distributor Desk & CSV Rate Synchronization
 
-To eliminate the friction of navigating WordPress admin screens on mobile phones, `modules/wholesale/frontend-desk.php`
-exposes the `[swac_distributor_portal]` shortcode:
+To eliminate the friction of navigating WordPress admin screens on mobile phones, `modules/wholesale/` exposes the
+`[swac_distributor_portal]` shortcode:
 
 1. **Master PIN Authentication**: Phone access is authenticated via a 4-to-8 digit master
    passcode (`swac_b2b_master_pin`). Successful entry returns a cryptographically secure token checked on subsequent
@@ -170,3 +201,22 @@ exposes the `[swac_distributor_portal]` shortcode:
       Excel.
     - `POST /wp-json/swac/v1/desk/import-csv`: Bulk updates product rates, carton packs, and stock states idempotently,
       triggering automatic cache invalidation.
+
+---
+
+## 7. Shikhar-Style Walled Garden & Search Engine Stealth Shield
+
+For distributors requiring complete privacy from competing wholesalers and public visitors:
+
+### 7.1. Walled Garden Mode (`SWAC_CATALOG_MODE = 'walled_garden'`)
+
+- The entire catalog, product pages, pricing, and search are hidden behind a full-screen B2B Wholesale PIN login gate.
+- Authenticated retailers see the catalog immediately with zero layout flash (FOUC) thanks to a synchronous `<head>` script.
+- WhatsApp 1-Tap Auto-Login links (`?b2b_login=PHONE&pin=PIN`) allow distributors to onboard retailers with a single WhatsApp tap.
+
+### 7.2. Search Engine Stealth Shield (`SWAC_PRIVATE_CATALOG = true`)
+
+- Emits `X-Robots-Tag: noindex, nofollow, noarchive` on all catalog headers.
+- Outputs `<meta name="robots" content="noindex, nofollow">` in the HTML head.
+- Intercepts `/robots.txt` with strict `Disallow: /` directives.
+- Responds with HTTP 404 on `/sitemap.xml` to prevent automated inventory discovery.

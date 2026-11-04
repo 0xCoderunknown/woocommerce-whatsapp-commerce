@@ -22,7 +22,7 @@ All release dates strictly follow the Indian standard date format: **`DD-MM-YYYY
 - **WhatsApp 1-Tap Direct-Invite Auto-Login**:
   - Wholesalers can share direct WhatsApp login links (?b2b_login=PHONE&pin=PIN) that automatically verify and authenticate the retailer on link click, instantly revealing the catalog and cleaning credentials from the browser address bar.
 - **B2B Route-Based Dispatch**:
-  - Replaces residential address, apartment number, and postal code requirements with verified store name, mobile number, and delivery route / area (Fancy Bazar route, transport builty).
+  - Replaces residential address, apartment number, and postal code requirements with verified store name, mobile number, and delivery route / area (e.g. Central Wholesale Route, Transport Bilty).
   - Added optional B2B dispatch note/remarks field in cart drawer.
 
 ---

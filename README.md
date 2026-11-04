@@ -33,8 +33,8 @@ directly from full-page static cache (e.g. LiteSpeed Cache, Nginx fastcgi_cache,
 execution overhead on cache hits.
 
 Customer cart items, address details, and delivery zone serviceability run in the browser using vanilla JavaScript
-and `localStorage`. When the user is ready, the cart compiles into an itemized, structured **WhatsApp message link
-** (`wa.me`) where the customer reviews and transmits the order directly to your dispatch team.
+and `localStorage`. When the user is ready, the cart compiles into an itemized, structured **WhatsApp message link**
+(`wa.me`) where the customer reviews and transmits the order directly to your dispatch team.
 
 ---
 
@@ -131,8 +131,8 @@ WordPress theme or visual page builder:
 
 - **100% Theme Agnostic**: Leaves all site layout, typography, branding, headers, footers, and product grid designs
   completely untouched. The plugin does not override your theme's archive or single-product templates.
-- **Tested with Visual Page Builders**: Works seamlessly with **Breakdance Builder**, **Elementor**, **Bricks**, **Divi
-  **, and modern **WordPress Block Themes** (Full Site Editing).
+- **Tested with Visual Page Builders**: Works seamlessly with **Breakdance Builder**, **Elementor**, **Bricks**, **Divi**,
+  and modern **WordPress Block Themes** (Full Site Editing).
 - **Automatic "Add to Cart" Transformation**:
     - **Catalog & Archive Loops**: Automatically hooks into `woocommerce_loop_add_to_cart_link` to transform standard
       server-side buttons into client-side WhatsApp order actions.
@@ -250,29 +250,37 @@ add_filter('swac_commerce_config', function ($config) {
 
 ---
 
-## 📋 Shortcode Reference
+## 📚 Documentation Matrix
 
-Standard shortcodes use the unique `[swac_*]` prefix:
+This repository maintains a strict **single source of truth** architecture across all documentation files:
 
-| Shortcode                      | Purpose                                                                               | Example                                            |
-|:-------------------------------|:--------------------------------------------------------------------------------------|:---------------------------------------------------|
-| `[swac_button]`                | Standalone WhatsApp order/contact button (supports `icon="yes\|no"`)                  | `[swac_button text="Order Now" icon="yes"]`        |
-| `[swac_price_block]`           | Hero price block with regular price & discount %                                      | `[swac_price_block context="single"]`              |
-| `[swac_pack_size]`             | Product pack size badge                                                               | `[swac_pack_size]`                                 |
-| `[swac_price_pack_hierarchy]`  | Unified price and pack size container                                                 | `[swac_price_pack_hierarchy context="single"]`     |
-| `[swac_action_row]`            | Add to Order button with quantity controls                                            | `[swac_action_row]`                                |
-| `[swac_delivery_notice]`       | Dynamic dispatch cutoff notice with date stamping                                     | `[swac_delivery_notice]`                           |
-| `[swac_stock_status]`          | Single product out-of-stock safety net badge                                          | `[swac_stock_status]`                              |
-| `[swac_explore_brands]`        | A-Z brand directory with live search                                                  | `[swac_explore_brands hide_empty="true"]`          |
-| `[swac_categories_grid]`       | Grid of child categories under a parent slug                                          | `[swac_categories_grid parent_slug="electronics"]` |
-| `[swac_missing_images_finder]` | Admin audit tool for products missing images                                          | `[swac_missing_images_finder]`                     |
-| `[swac_distributor_portal]`    | Frontend distributor desk (daily rate tweaks, product entry, retailer PINs, CSV sync) | `[swac_distributor_portal]`                        |
+| Document | Primary Audience | Authoritative Scope / Single Source of Truth |
+|:---|:---|:---|
+| **[README.md](README.md)** | Store Owners & Admins | Project overview, key value proposition, quick-start configuration, theme compatibility, and test launcher. |
+| **[docs/shortcodes.md](docs/shortcodes.md)** | Page Builders & Devs | **Definitive Shortcode Reference**: Exhaustive attribute lists, default parameters, visual examples, and aliases. |
+| **[docs/architecture.md](docs/architecture.md)** | Software Architects | **Definitive Architecture Deep Dive**: Zero-session caching, DOM state machine, delivery engine, and B2B wholesale gating. |
+| **[AGENTS.md](AGENTS.md)** | AI Agents & Maintainers | **Maintainer & AI Operating Manual**: Non-negotiable code invariants, state schemas, subsystem ownership, and REST API matrix. |
+| **[CONTRIBUTING.md](CONTRIBUTING.md)** | Open Source Contributors | Community contribution guidelines, coding standards, branch workflow, and automated test requirements. |
+| **[SECURITY.md](SECURITY.md)** | Security Researchers | Supported versions matrix, vulnerability disclosure process, and plugin security model. |
+| **[CHANGELOG.md](CHANGELOG.md)** | Release Auditors | Chronological release history following the Keep a Changelog standard and Indian standard date format (`DD-MM-YYYY`). |
 
-> 📖 **Full Documentation**:
-> - [docs/shortcodes.md](docs/shortcodes.md) — Comprehensive shortcode dictionary (including pharmacy module
-    shortcodes `[swac_generic_box]`, `[swac_size_chart]`, `[swac_explore_salts]`).
-> - [docs/architecture.md](docs/architecture.md) — Architectural deep-dive on zero-session caching and client-side
-    reconciliation.
+---
+
+## 📋 Shortcode System
+
+Stateless WhatsApp Commerce provides a modular suite of shortcodes designed for visual page builders (Breakdance, Elementor, Bricks) and theme templates. All shortcodes use the unique `[swac_*]` prefix:
+
+- **Storefront & Ordering**: `[swac_button]`, `[swac_action_row]`
+- **Pricing & Packaging**: `[swac_price_block]`, `[swac_pack_size]`, `[swac_price_pack_hierarchy]`
+- **Product Meta & Delivery**: `[swac_delivery_notice]`, `[swac_stock_status]`
+- **Catalogs & Directories**: `[swac_explore_brands]`, `[swac_categories_grid]`, `[swac_directory_search]`
+- **B2B Wholesale Portal**: `[swac_distributor_portal]`
+- **Pharmacy & Clinical**: `[swac_generic_box]`, `[swac_composition_tag]`, `[swac_rx_badge]`, `[swac_size_chart]`, `[swac_explore_salts]`
+- **Catalog Health**: `[swac_missing_images_finder]`
+
+> 📖 **Definitive Shortcode Reference**:  
+> For complete attribute specifications, defaults, visual examples, and legacy aliases, consult the single source of truth:  
+> 👉 **[docs/shortcodes.md](docs/shortcodes.md)**
 
 ---
 
@@ -301,6 +309,18 @@ npm test
 # Windows 1-Click Launcher (no Node on PATH required)
 run-tests.cmd
 ```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please review [CONTRIBUTING.md](CONTRIBUTING.md) for coding standards, pull request processes, and invariant verification steps.
+
+---
+
+## 🔒 Security
+
+For security vulnerabilities and disclosure policies, please refer to [SECURITY.md](SECURITY.md).
 
 ---
 
