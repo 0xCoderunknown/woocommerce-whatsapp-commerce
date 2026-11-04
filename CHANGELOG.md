@@ -1,23 +1,33 @@
 # Changelog
 
+All notable changes to **Stateless WhatsApp Commerce for WooCommerce** will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+All release dates strictly follow the Indian standard date format: **`DD-MM-YYYY`**.
+
+---
+
 ## [1.5.0] — 03-11-2026
 
 ### Added
-- **Wholesale & Schemes B2B Module** (modules/wholesale/):
-  - **Wholesale PTR & Schemes Meta**: Added _swac_b2b_ptr, _swac_b2b_carton_pack, and flexible promotional scheme rules (free goods e.g. 12+1, volume tier slabs, cash discount %, custom text).
+- **Wholesale & Schemes B2B Module** (`modules/wholesale/`):
+  - **Wholesale PTR & Schemes Meta**: Added `_swac_b2b_ptr`, `_swac_b2b_carton_pack`, and flexible promotional scheme rules (free goods e.g. `12+1`, volume tier slabs, cash discount %, custom text).
   - **Dynamic Margin Calculation**: Automatically computes retailer margin amount and percentage relative to MRP on loop cards and single product pages.
-  - **Carton Packing Guide**: Displays informative carton reference labels (1 Carton = X pcs) to streamline bulk order sizing.
+  - **Carton Packing Guide**: Displays informative carton reference labels (`1 Carton = X pcs`) to streamline bulk order sizing.
   - **Direct Shop-Page & Single-Page Ordering**: Added inline quantity selector and bulk-order action button across both catalog cards and single product views.
-  - **Zero-Cost Retailer Login Gate**: Implemented mobile + 4-digit PIN authentication (modules/wholesale/retailer-auth.php) with zero SMS gateway costs.
+  - **Zero-Cost Retailer Login Gate**: Implemented mobile + 4-digit PIN authentication (`modules/wholesale/retailer-auth.php`) with zero SMS gateway costs.
   - **Client-Side Wholesale Price Masking**: Gated wholesale rates, schemes, and margins behind client-side verification, keeping the public storefront 100% full-page static cacheable.
-  - **WhatsApp Retailer Registration Handshake**: Integrated 1-tap WhatsApp account application (modules/wholesale/login-modal.php) for unapproved retailers.
+  - **WhatsApp Retailer Registration Handshake**: Integrated 1-tap WhatsApp account application (`modules/wholesale/login-modal.php`) for unapproved retailers.
   - **Approved Retailers Admin Directory**: Added CRUD management screen in WordPress admin under Products to manage retailer PINs and accounts.
-  - **Frontend Distributor Desk ([swac_distributor_portal] / [swac_frontend_admin])**: Mobile-first workspace with live-search rate tweaker, single-screen product entry with direct camera photo upload, and retailer PIN desk.
+  - **Frontend Distributor Desk (`[swac_distributor_portal]` / `[swac_frontend_admin]`)**: Mobile-first workspace with live-search rate tweaker, single-screen product entry with direct camera photo upload, and retailer PIN desk.
   - **1-Click CSV Rate Sync**: Added one-click CSV export and upload to sync hundreds of product rates and stock states instantly.
   - **WhatsApp Order Compilation**: Enhanced order payload to itemize cartons, loose units, active schemes, and retailer store identification for warehouse dispatch.
 
-## [1.4.1] — 01-11-2026
+---
 
+## [1.4.1] — 01-11-2026
 
 ### Fixed
 - **Action Row Button Binding**: Resolved critical issue where `[swac_action_row]` quantity controls (`.swac-qty-btn`) and Add to Order buttons (`.swac-single-add-btn`) were inert in `assets/js/wa_cart.js`. Added complete click listeners, data attribute extraction, and quantity clamping.
@@ -31,16 +41,7 @@
 
 ---
 
-All notable changes to **Stateless WhatsApp Commerce for WooCommerce** will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-All release dates follow the Indian date standard format: **`DD-MM-YYYY`**.
-
----
 ## [1.4.0] — 10-10-2026
-
 
 ### Added
 - **Multi-Tier Always-Free Postal Code Support** (`core/config.php`, `core/delivery-zones.php`, `frontend/enqueue.php`, `assets/js/wa_cart.js`, `assets/css/cart-drawer.css`):
@@ -48,12 +49,12 @@ All release dates follow the Indian date standard format: **`DD-MM-YYYY`**.
   - Added helper function `swac_is_always_free_shipping_postal_code($code)` with `swac_always_free_shipping_postal_codes` filter.
   - Localized `always_free_shipping_codes` to both `window.swacZones` and `window.swacConfig` / `window.swacCommerce`.
   - Added client-side `isAlwaysFreePincode(pincode)` and made `computeCartTotals()` postal-code aware to automatically waive shipping (`shipping = 0`, `isAlwaysFree: true`).
-  - Made `renderLoyaltyUI()` display a distinct green `.swac-loyalty-card--free-zone` badge ("ðŸŽ‰ Free Delivery Unlocked!") while bypassing shipping gap nudges.
+  - Made `renderLoyaltyUI()` display a distinct green `.swac-loyalty-card--free-zone` badge ("🎉 Free Delivery Unlocked!") while bypassing shipping gap nudges.
   - Added real-time postal code `input` and `blur` event triggers to dynamically recalculate drawer totals and loyalty cards as the customer types.
 - **Background Cron Cleanup Guard** (`core/catalog-lockdown.php`):
   - Added a persistent one-time option guard (`swac_cron_cleaned`) on `init` that unschedules and clears unused WooCommerce background cron events (`woocommerce_cleanup_sessions`, `woocommerce_cleanup_personal_data`, `woocommerce_cancel_unpaid_orders`, `woocommerce_tracker_send_event`) to eliminate needless PHP wakeups.
 - **0-Dependency Automated Testing Suite & CommonJS Export Parity** (`package.json`, `tests/`, `assets/js/wa_cart.js`):
-  - Created root `package.json` with native Node.js test script (`node --test tests/**/*.test.js && node tests/php/runner.js`).
+  - Created root `package.json` with native Node.js test script (`node --test tests/unit/*.test.js && node tests/php/runner.js`).
   - Added Node runtime environment guards (`typeof window`, `typeof document`, `typeof localStorage`) inside `assets/js/wa_cart.js`.
   - Exported core calculation helpers via CommonJS (`module.exports = { computeCartTotals, evaluateDeliveryZone, isAlwaysFreePincode, ... }`).
   - Added unit test suites under `tests/unit/` covering cart math, shipping thresholds, delivery cutoff windows, and delimiter safety.
@@ -67,7 +68,7 @@ All release dates follow the Indian date standard format: **`DD-MM-YYYY`**.
 
 ---
 
-## [1.3.2] $([char]0x2014) 05-10-2026
+## [1.3.2] — 05-10-2026
 
 ### Fixed
 - **403 Intercept on `wc-admin` (Menu Capability Check)**: Hooked WooCommerce Admin routes (`page=wc-admin`) to `admin_page_access_denied` in addition to `admin_init`. WordPress core validates menu capabilities inside `wp-admin/includes/menu.php` and executes `wp_die(..., 403)` before `admin_init` is ever called; intercepting `admin_page_access_denied` catches the access denial before headers are closed and seamlessly redirects to the classic product editor (`post-new.php?post_type=product`).
@@ -81,7 +82,7 @@ All release dates follow the Indian date standard format: **`DD-MM-YYYY`**.
 
 ---
 
-## [1.3.1] $([char]0x2014) 05-10-2026
+## [1.3.1] — 05-10-2026
 
 ### Fixed
 - **Sitemap Activation Hook**: Moved `register_activation_hook()` and `register_deactivation_hook()` from `integrations/sitemap-generator.php` to `stateless-wa-commerce.php` to ensure `/sitemap.xml` rewrite rules flush properly on activation.
@@ -99,7 +100,7 @@ All release dates follow the Indian date standard format: **`DD-MM-YYYY`**.
 
 ---
 
-## [1.3.0] $([char]0x2014) 05-10-2026
+## [1.3.0] — 05-10-2026
 
 ### Added
 - **Developer Feature Flag Control Panel** (`features.php`):
@@ -111,30 +112,30 @@ All release dates follow the Indian date standard format: **`DD-MM-YYYY`**.
 
 ---
 
-## [1.2.2] $([char]0x2014) 03-10-2026
+## [1.2.2] — 03-10-2026
 - Added `(j M)` calendar date stamping to delivery cutoffs and WhatsApp estimates.
 - Added `icon="yes|no"` toggle to `[swac_button]`.
 - Normalized loyalty gift emoji spacing and clean markup for generic/composition tags.
 - Added backward-compatibility aliases for legacy `g1_` and `cdr_` shortcodes/functions.
 
-## [1.2.1] $([char]0x2014) 30-09-2026
+## [1.2.1] — 30-09-2026
 - Added canonical WhatsApp URL builder `swac_build_whatsapp_url()` handling query parameters safely.
 - Added concise delivery estimate day labels (`getDeliveryEstimate()`).
 - Streamlined WhatsApp delivery details and totals formatting.
 
-## [1.2.0] $([char]0x2014) 29-09-2026
+## [1.2.0] — 29-09-2026
 - Declared HPOS (`custom_order_tables`) and Cart/Checkout Blocks compatibility.
 - Fault-tolerant module loading with existence guards.
 - Namespaced core PHP functions, constants, filters, CSS classes, and text domain to `swac_` / `stateless-wa-commerce`.
 - Unconfigured phone number safeguards.
 
-## [1.1.0] $([char]0x2014) 26-09-2024
+## [1.1.0] — 26-09-2024
 - Added configurable cart ceilings (`max_cart_items`, `max_qty_per_item`) to prevent WhatsApp deep-link URL truncation.
 - Added floating toast notifications for user quota limits.
 - Decoupled pharmaceutical Rx tagging and prescription disclaimer notes.
 - Resolved WhatsApp emoji encoding across redirects.
 
-## [1.0.0] $([char]0x2014) 26-09-2024
+## [1.0.0] — 26-09-2024
 - Initial release of the Stateless Zero-Session WhatsApp Commerce engine for WooCommerce.
 - Suppression of guest sessions, cart fragments, and tracking cookies for LiteSpeed full-page caching.
 - Client-side LocalStorage cart drawer with real-time DOM price reconciliation and order serializer.

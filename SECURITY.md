@@ -4,6 +4,7 @@
 
 | Version | Supported |
 | :------ | :-------- |
+| 1.5.x   | ✅ Yes     |
 | 1.4.x   | ✅ Yes     |
 | 1.3.x   | ✅ Yes     |
 | < 1.3.0 | ❌ No      |
@@ -37,6 +38,7 @@ This plugin is a frontend-heavy, zero-session WooCommerce extension. Key areas o
 - `localStorage` cart data handling in `wa_cart.js`
 - WhatsApp URL construction and customer-entered data encoding
 - Capability checks on admin-only shortcodes and tools
+- Master PIN authentication and SHA-256 tokens in `modules/wholesale/`
 - `$wpdb` query safety in the sitemap generator and uninstall routine
 
 ## Out of Scope

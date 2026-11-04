@@ -111,9 +111,9 @@ Wholesale orders serialize both piece counts and whole carton packing conversion
 Warehouse dispatch clerks can read carton and scheme totals instantly without manual packing math.
 
 ### 5.3. Frontend Distributor Desk & CSV Rate Synchronization
-To eliminate the friction of navigating WordPress admin screens on mobile phones, modules/wholesale/frontend-desk.php exposes the [swac_distributor_portal] shortcode:
-1. **Master PIN Authentication**: Phone access is authenticated via a 4-to-8 digit master passcode (swac_b2b_master_pin). Successful entry returns a cryptographically secure token checked on subsequent REST calls via X-SWAC-Master-Token.
-2. **Instant Rate Tweaker**: An in-memory search spreadsheet table allows dispatchers to update PTR, MRP, Carton pack, scheme rules, and stock status (instock/outofstock) inline.
+To eliminate the friction of navigating WordPress admin screens on mobile phones, `modules/wholesale/frontend-desk.php` exposes the `[swac_distributor_portal]` shortcode:
+1. **Master PIN Authentication**: Phone access is authenticated via a 4-to-8 digit master passcode (`swac_b2b_master_pin`). Successful entry returns a cryptographically secure token checked on subsequent REST calls via `X-SWAC-Master-Token`.
+2. **Instant Rate Tweaker**: An in-memory search spreadsheet table allows dispatchers to update PTR, MRP, Carton pack, scheme rules, and stock status (`instock`/`outofstock`) inline.
 3. **1-Click CSV Sync**:
-   - GET /wp-json/swac/v1/desk/export-csv: Streams catalog rates as a UTF-8 BOM CSV, directly editable in Excel.
-   - POST /wp-json/swac/v1/desk/import-csv: Bulk updates product rates, carton packs, and stock states idempotently, triggering automatic cache invalidation.
+   - `GET /wp-json/swac/v1/desk/export-csv`: Streams catalog rates as a UTF-8 BOM CSV, directly editable in Microsoft Excel.
+   - `POST /wp-json/swac/v1/desk/import-csv`: Bulk updates product rates, carton packs, and stock states idempotently, triggering automatic cache invalidation.

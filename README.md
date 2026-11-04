@@ -97,7 +97,7 @@ Customer cart items, address details, and delivery zone serviceability run in th
   - `modules/pharmacy/`: Chemical compositions (`composition`), pack sizes (`pack_size`), and generic alternate price comparisons.
   - `modules/explore/`: High-speed directory exploration for brands and categories with instant live client search.
   - `modules/seo/`: Dynamic OpenGraph headers, taxonomy titles, and Schema.org JSON-LD metadata without external SEO plugins.
-  - `modules/wholesale/`: B2B Wholesale & schemes engine with PTR pricing, dynamic retailer margin badges (₹ & %), active promotional schemes (12+1 free goods, volume slab tiers, CD %), carton packing guides, direct shop-page bulk ordering, and zero-cost phone + 4-digit PIN rate gating.
+  - `modules/wholesale/`: B2B Wholesale & schemes engine with PTR pricing, dynamic retailer margin badges (₹ & %), active promotional schemes (12+1 free goods, volume slab tiers, CD %), carton packing guides, direct shop-page bulk ordering, zero-cost phone + 4-digit PIN rate gating, and mobile frontend distributor desk with 1-click CSV synchronization.
   - `integrations/`: Streaming low-memory XML sitemap generator (`/sitemap.xml`) and reverse-proxy SSL enforcer.
 - **HPOS & Modern Block Ready**:
   Compatibility for High-Performance Order Storage (`custom_order_tables`) and Cart/Checkout Blocks declared via `FeaturesUtil::declare_compatibility()` on `before_woocommerce_init`.
@@ -214,7 +214,6 @@ add_filter('swac_commerce_config', function ($config) {
 });
 ```
 
-
 ---
 
 ## 📋 Shortcode Reference
@@ -232,8 +231,8 @@ Standard shortcodes use the unique `[swac_*]` prefix:
 | `[swac_stock_status]` | Single product out-of-stock safety net badge | `[swac_stock_status]` |
 | `[swac_explore_brands]` | A-Z brand directory with live search | `[swac_explore_brands hide_empty="true"]` |
 | `[swac_categories_grid]`| Grid of child categories under a parent slug | `[swac_categories_grid parent_slug="electronics"]`|
-| [swac_missing_images_finder] | Admin audit tool for products missing images | [swac_missing_images_finder] |
-| [swac_distributor_portal] | Frontend distributor desk (daily rate tweaks, product entry, retailer PINs) | [swac_distributor_portal] |
+| `[swac_missing_images_finder]` | Admin audit tool for products missing images | `[swac_missing_images_finder]` |
+| `[swac_distributor_portal]` | Frontend distributor desk (daily rate tweaks, product entry, retailer PINs, CSV sync) | `[swac_distributor_portal]` |
 
 > 📖 **Full Documentation**:
 > - [docs/shortcodes.md](docs/shortcodes.md) — Comprehensive shortcode dictionary (including pharmacy module shortcodes `[swac_generic_box]`, `[swac_size_chart]`, `[swac_explore_salts]`).
@@ -260,6 +259,9 @@ The repository includes a 0-dependency automated testing suite powered by Node.j
 ```bash
 # Run unit tests and PHP invariant/domain verification
 npm test
+
+# Windows 1-Click Launcher (no Node on PATH required)
+run-tests.cmd
 ```
 
 ---
@@ -273,4 +275,3 @@ This plugin is an independent open-source project and is not affiliated with, en
 ## 📄 License
 
 Stateless WhatsApp Commerce for WooCommerce is licensed under the [GNU General Public License v2.0 or later](LICENSE).
-

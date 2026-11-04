@@ -39,8 +39,8 @@ Before writing or submitting code, please understand the non-negotiable architec
    - Follow WordPress Coding Standards (WPCS) and WordPress VIP guidelines.
    - Ensure all output is properly escaped (`esc_html`, `esc_attr`, `esc_url`, `wp_kses_post`).
    - Ensure all user inputs are sanitized (`sanitize_text_field`, `sanitize_key`).
-3. **Testing**:
-   - Run the automated test suite: `npm test` (executes client-side unit tests and PHP invariant/syntax verification).
+3. **Testing & Invariant Verification**:
+   - Run the automated test suite: `npm test` or `run-tests.cmd` on Windows (executes 0-dependency client-side unit tests and PHP invariant/syntax verification).
    - Validate PHP syntax: `php -l <file>` on modified files.
    - Test compatibility with active caching plugins (LiteSpeed Cache, WP Super Cache, Cloudflare APO).
 4. **Submitting a Pull Request**:
