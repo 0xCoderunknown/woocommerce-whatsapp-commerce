@@ -4,7 +4,7 @@
     "description":  "Zero-session catalog lockdown and client-side WhatsApp commerce engine for WooCommerce",
     "main":  "assets/js/wa_cart.js",
     "scripts":  {
-                    "test":  "node --test tests/**/*.test.js \u0026\u0026 node tests/php/runner.js"
+                    "test":  "node --test tests/unit/*.test.js \u0026\u0026 node tests/php/runner.js"
                 },
     "keywords":  [
                      "woocommerce",
