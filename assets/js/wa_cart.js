@@ -2,21 +2,20 @@
     'use strict';
 
     /**
-     * 🧭 ARCHITECTURAL SECTION INDEX
+     * 🧭 STATELESS WHATSAPP COMMERCE: CORE CART ENGINE & ORCHESTRATOR
      * -------------------------------------------------------------------------
-     * § 01. Customer Metadata Storage  : getCustomerDetails(), saveCustomerDetails()
-     * § 02. Delivery Zones & Gates     : evaluateDeliveryZone(), getZoneSets()
-     * § 03. Configuration & Bridge     : CONFIG (window.swacCommerce), formatters
-     * § 04. Cart LocalStorage CRUD     : getCart(), saveCart(), addToCart(), removeFromCart()
-     * § 05. UI Floating Bubble Counter : refreshUI(), updateCounter()
-     * § 06. Cart Drawer & Address UI   : openDrawer(), closeDrawer(), renderAddressSection()
-     * § 07. Cart Math & Reconciliation : computeCartTotals(), DOM price reconciliation
-     * § 08. Loyalty State Machine      : loyaltyChoice, banner rendering
-     * § 09. Pincode & Form Validation  : runPincodeValidation(), validateAddress()
-     * § 10. Order Builder & Serializer : buildOrderMessage(), sendOrderToWhatsApp()
-     * § 11. Add-to-Cart Interception   : interceptAddToCart(), bindLoopButtons()
-     * § 12. Catalog Ordering Autosubmit: bindCatalogOrdering()
-     * § 13. Initialization             : initAddressState(), refreshUI(), interceptAddToCart()
+     * § 01. Submodule Resolvers       : getDeliveryEngine(), getCartMath(), getOrderSerializer(), getDrawerUI()
+     * § 02. Customer Metadata Storage : getCustomerDetails(), saveCustomerDetails()
+     * § 03. Delivery Zones & Gates    : evaluateDeliveryZone(), isAlwaysFreePincode(), getZoneSets()
+     * § 04. Configuration & Bridge    : CONFIG (window.swacCommerce), fmtPrice, showToast
+     * § 05. Cart LocalStorage CRUD    : getCart(), saveCart(), addToCart(), removeFromCart(), clearCart()
+     * § 06. Floating Bubble & Counter : refreshUI(), openDrawer(), closeDrawer()
+     * § 07. Cart Math & Calculations  : computeCartTotals(), isLoyaltyActive()
+     * § 08. Order Builder & Dispatch  : buildOrderMessage(), sendOrderToWhatsApp()
+     * § 09. Add-to-Cart Interception  : interceptAddToCart(), bindLoopButtons(), bindActionRowButtons()
+     * § 10. Catalog Ordering Auto-Sub : bindCatalogOrdering()
+     * § 11. Delivery Cutoff Hydration : hydrateDeliveryNotice(), getDeliveryCutoffMessage()
+     * § 12. Initialization & Exports  : window.swacCart, module.exports parity
      * -------------------------------------------------------------------------
      */
 
@@ -50,6 +49,7 @@
 
     const STORAGE_KEY = 'swac_cart';
     const CUSTOMER_STORAGE_KEY = 'swac_customer_details';
+    const RETAILER_STORAGE_KEY = 'swac_b2b_retailer';
 
     // ── Submodule Resolvers (Zero-build modular architecture) ─────────────────
     function getDeliveryEngine() {
@@ -68,6 +68,26 @@
         }
         if (typeof require === 'function') {
             try { return require('./cart-math.js'); } catch (e) {}
+        }
+        return null;
+    }
+
+    function getOrderSerializer() {
+        if (typeof window !== 'undefined' && window.swacOrderSerializer) {
+            return window.swacOrderSerializer;
+        }
+        if (typeof require === 'function') {
+            try { return require('./order-serializer.js'); } catch (e) {}
+        }
+        return null;
+    }
+
+    function getDrawerUI() {
+        if (typeof window !== 'undefined' && window.swacDrawer) {
+            return window.swacDrawer;
+        }
+        if (typeof require === 'function') {
+            try { return require('./drawer-ui.js'); } catch (e) {}
         }
         return null;
     }
@@ -91,7 +111,7 @@
             }
 
             // Fallback / enrich with authenticated B2B retailer identity
-            const retailer = typeof getSavedRetailer === 'function' ? getSavedRetailer() : null;
+            const retailer = getSavedRetailer();
             if (retailer && retailer.store_name) {
                 if (!details) {
                     details = {name: '', address: '', landmark: '', area: '', pincode: ''};
@@ -126,143 +146,21 @@
         }
     }
 
-    // ── Delivery Service Zones & Pincode Gate ────────────────────────────────
-    let sameDaySet = null;
-    let outskirtsSet = null;
-    let alwaysFreeSet = null;
-
+    // ── Delivery Service Zones & Pincode Gate (Delegated to delivery-engine.js) ──
     function getZoneSets() {
         const engine = getDeliveryEngine();
-        if (engine && typeof engine.getZoneSets === 'function') {
-            return engine.getZoneSets(safeWindow.swacZones, typeof CONFIG !== 'undefined' ? CONFIG : safeWindow.swacCommerce);
-        }
-        if (!sameDaySet || sameDaySet.size === 0 || !alwaysFreeSet) {
-            const zonesData = safeWindow.swacZones || {};
-            const configData = safeWindow.swacCommerce || safeWindow.swacConfig || {};
-            const rawSameDay = zonesData.same_day_pins || (zonesData.zones && zonesData.zones.standard && zonesData.zones.standard.pincodes ? Object.keys(zonesData.zones.standard.pincodes) : []) || [];
-            const rawOutskirts = zonesData.outskirts_pins || [];
-            const rawAlwaysFree = zonesData.always_free_shipping_codes || configData.always_free_shipping_codes || (typeof CONFIG !== 'undefined' && CONFIG.alwaysFreeShippingCodes) || [];
-
-            sameDaySet = new Set(rawSameDay.map(String));
-            outskirtsSet = new Set(rawOutskirts.map(String));
-            alwaysFreeSet = new Set((Array.isArray(rawAlwaysFree) ? rawAlwaysFree : []).map(String).map(s => s.replace(/\D/g, '')).filter(Boolean));
-        }
-        return {sameDaySet, outskirtsSet, alwaysFreeSet};
+        return engine ? engine.getZoneSets(safeWindow.swacZones, typeof CONFIG !== 'undefined' ? CONFIG : safeWindow.swacCommerce) : {sameDaySet: new Set(), outskirtsSet: new Set(), alwaysFreeSet: new Set()};
     }
 
     function isAlwaysFreePincode(pincode) {
         const engine = getDeliveryEngine();
-        if (engine && typeof engine.isAlwaysFreePincode === 'function') {
-            return engine.isAlwaysFreePincode(pincode, safeWindow.swacZones, typeof CONFIG !== 'undefined' ? CONFIG : safeWindow.swacCommerce);
-        }
-        if (!pincode) return false;
-        const clean = String(pincode).replace(/\D/g, '');
-        if (!clean) return false;
-        const {alwaysFreeSet: freeSet} = getZoneSets();
-        return Boolean(freeSet && freeSet.has(clean));
+        return engine ? engine.isAlwaysFreePincode(pincode, safeWindow.swacZones, typeof CONFIG !== 'undefined' ? CONFIG : safeWindow.swacCommerce) : false;
     }
 
     function evaluateDeliveryZone(pincode) {
         const engine = getDeliveryEngine();
-        if (engine && typeof engine.evaluateDeliveryZone === 'function') {
-            return engine.evaluateDeliveryZone(pincode, safeWindow.swacZones, typeof CONFIG !== 'undefined' ? CONFIG : safeWindow.swacCommerce);
-        }
-        if (!pincode) return null;
-        const clean = String(pincode).replace(/\D/g, '');
-        if (clean.length < 3) return null;
-
-        const zonesData = safeWindow.swacZones || {};
-        const isGated = Boolean(zonesData.gated || (zonesData.same_day_pins && zonesData.same_day_pins.length > 0));
-
-        // Always-free postal codes are always allowed for delivery
-        if (isAlwaysFreePincode(clean)) {
-            const msgs = zonesData.messages || {};
-            return {
-                allowOrder: true,
-                statusClass: 'swac-pin-success',
-                message: msgs.available || msgs.same_day || '✓ Delivery is available to your location'
-            };
-        }
-
-        // In Open Mode (default), any valid postal code format is accepted
-        if (!isGated) {
-            return {
-                allowOrder: true,
-                statusClass: 'swac-pin-success',
-                message: (zonesData.messages && (zonesData.messages.available || zonesData.messages.same_day)) || '✓ Delivery is available to your location'
-            };
-        }
-
-        const {sameDaySet: sDays, outskirtsSet: oSkirts} = getZoneSets();
-        const msgs = zonesData.messages || {};
-
-        if (sDays.has(clean)) {
-            return {
-                allowOrder: true,
-                statusClass: 'swac-pin-success',
-                message: msgs.available || msgs.same_day || '✓ Delivery available to your location'
-            };
-        }
-        if (oSkirts.has(clean)) {
-            return {
-                allowOrder: false,
-                statusClass: 'swac-pin-warning',
-                message: msgs.unsupported || msgs.outskirts || '⚠️ We do not deliver to this location yet.'
-            };
-        }
-        return {
-            allowOrder: false,
-            statusClass: 'swac-pin-error',
-            message: msgs.invalid || msgs.outside || '❌ We do not deliver to this location.'
-        };
+        return engine ? engine.evaluateDeliveryZone(pincode, safeWindow.swacZones, typeof CONFIG !== 'undefined' ? CONFIG : safeWindow.swacCommerce) : null;
     }
-
-
-    let addressMode = null; // 'preview' or 'edit'
-    let addressCollapsed = false;
-    let addressDraft = {
-        name: '',
-        address: '',
-        landmark: '',
-        area: '',
-        pincode: '',
-        saveDefault: true
-    };
-
-    function initAddressState() {
-        const saved = getCustomerDetails();
-        const zoneRes = (saved && saved.pincode) ? evaluateDeliveryZone(saved.pincode) : null;
-        const isValid = Boolean(saved && saved.name && saved.address && saved.pincode && zoneRes && zoneRes.allowOrder);
-
-        if (isValid) {
-            addressMode = 'preview';
-            addressCollapsed = false;
-            addressDraft = {
-                name: saved.name,
-                address: saved.address,
-                landmark: saved.landmark || '',
-                area: saved.area || '',
-                pincode: saved.pincode || '',
-                saveDefault: true
-            };
-        } else {
-            addressMode = 'edit';
-            // If stored address exists but fails pincode validation, expand form to force correction
-            addressCollapsed = !(saved && (saved.name || saved.address || saved.pincode));
-            addressDraft = {
-                name: saved?.name || '',
-                address: saved?.address || '',
-                landmark: saved?.landmark || '',
-                area: saved?.area || '',
-                pincode: saved?.pincode || '',
-                saveDefault: true
-            };
-        }
-    }
-
-    // ── Cached DOM references (script is footer-enqueued — DOM already parsed) ─
-    const _bubble = safeDoc ? safeDoc.getElementById('swac-cart-bubble') : null;
-    const _counter = safeDoc ? safeDoc.getElementById('swac-cart-count') : null;
 
     // ── Configuration ────────────────────────────────────────────────────────
     const CONFIG = (function () {
@@ -313,34 +211,40 @@
         };
     })();
 
-    const fmtPrice = n => (CONFIG.currencySymbol ? CONFIG.currencySymbol + ' ' : '') + n.toLocaleString(undefined, {
+    const fmtPrice = n => (CONFIG.currencySymbol ? CONFIG.currencySymbol + ' ' : '') + Number(n).toLocaleString(undefined, {
         minimumFractionDigits: 0,
         maximumFractionDigits: 2
     });
     const fmtInr = fmtPrice;
 
-    function isLoyaltyActive(saleTotal) {
-        const math = getCartMath();
-        if (math && typeof math.isLoyaltyActive === 'function') {
-            return math.isLoyaltyActive(saleTotal, CONFIG);
-        }
-        return CONFIG.loyalty.enabled && CONFIG.loyalty.itemLabel.length > 0 && CONFIG.loyalty.threshold > 0 && saleTotal >= CONFIG.loyalty.threshold;
+    function escHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 
-    let loyaltyChoice = null;
+    function isLoyaltyActive(saleTotal) {
+        const math = getCartMath();
+        return math ? math.isLoyaltyActive(saleTotal, CONFIG) : false;
+    }
 
     let _toastTimer = null;
     safeWindow.swacShowToast = showToast;
 
     function showToast(msg) {
-        let toast = document.getElementById('swac-toast');
+        if (!safeDoc) return;
+        let toast = safeDoc.getElementById('swac-toast');
         if (!toast) {
-            toast = document.createElement('div');
+            toast = safeDoc.createElement('div');
             toast.id = 'swac-toast';
             toast.className = 'swac-toast';
             toast.setAttribute('role', 'status');
             toast.setAttribute('aria-live', 'polite');
-            document.body.appendChild(toast);
+            safeDoc.body.appendChild(toast);
         }
         toast.textContent = msg;
         toast.classList.add('swac-toast--visible');
@@ -375,603 +279,113 @@
     function saveCart(cart) {
         try {
             const payload = {
-                items: cart,
-                updatedAt: Date.now()
+                updatedAt: Date.now(),
+                items: cart
             };
             safeStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
         } catch (e) {
-            // QuotaExceededError — storage is full (common in private/incognito browsing).
-            // Cart data is not persisted but the in-memory session continues to work.
         }
     }
 
     function addToCart(item, btn) {
         const cart = getCart();
         const existing = cart.find(i => String(i.id) === String(item.id));
-        if (!existing) {
-            if (cart.length >= CONFIG.maxCartItems) {
-                showToast(`Cart limit reached (max ${CONFIG.maxCartItems} different items). Please place this order first.`);
+        const currentTotalUnits = cart.reduce((sum, i) => sum + (parseInt(i.qty, 10) || 1), 0);
+        const addQty = parseInt(item.qty, 10) || 1;
+
+        if (!existing && cart.length >= CONFIG.maxCartItems) {
+            showToast(`Order limit reached! You can order up to ${CONFIG.maxCartItems} distinct products per WhatsApp order.`);
+            return;
+        }
+
+        if (existing) {
+            const nextItemQty = existing.qty + addQty;
+            if (nextItemQty > CONFIG.maxQtyPerItem) {
+                showToast(`Maximum ${CONFIG.maxQtyPerItem} units allowed per item for retail orders.`);
                 return;
             }
-            if (item.qty > CONFIG.maxQtyPerItem) {
-                item.qty = CONFIG.maxQtyPerItem;
-                showToast(`Maximum ${CONFIG.maxQtyPerItem} units allowed per item.`);
+            existing.qty = nextItemQty;
+            existing.price = item.price || existing.price;
+            existing.mrp = item.mrp || existing.mrp;
+            existing.salePrice = item.salePrice || existing.salePrice;
+            existing.cartonPack = item.cartonPack || existing.cartonPack;
+            existing.schemeBadge = item.schemeBadge || existing.schemeBadge;
+        } else {
+            if (addQty > CONFIG.maxQtyPerItem) {
+                showToast(`Maximum ${CONFIG.maxQtyPerItem} units allowed per item for retail orders.`);
+                return;
             }
             cart.push(item);
-        } else {
-            if (existing.qty >= CONFIG.maxQtyPerItem) {
-                showToast(`Maximum limit of ${CONFIG.maxQtyPerItem} units already in cart for this item.`);
-                return;
-            }
-            if (existing.qty + item.qty > CONFIG.maxQtyPerItem) {
-                existing.qty = CONFIG.maxQtyPerItem;
-                showToast(`Quantity adjusted to maximum allowed (${CONFIG.maxQtyPerItem} units).`);
-            } else {
-                existing.qty += item.qty;
-            }
-            if (item.price) existing.price = item.price;
-            if (typeof item.mrp !== 'undefined' && item.mrp > 0) existing.mrp = item.mrp;
-            if (typeof item.salePrice !== 'undefined' && item.salePrice > 0) existing.salePrice = item.salePrice;
-            if (typeof item.isRx !== 'undefined') existing.isRx = item.isRx;
-            if (item.name) existing.name = item.name;
-            if (item.url) existing.url = item.url;
         }
+
         saveCart(cart);
-        loyaltyChoice = null;
         refreshUI();
-        showAddedFeedback(btn);
+
+        if (btn) {
+            showAddedFeedback(btn);
+        }
+
+        openDrawer();
     }
 
     function removeFromCart(productId) {
-        // Use String() on both sides — item.id may be stored as a number in legacy carts
-        // while productId always arrives as a string from dataset.id.
-        const cart = getCart().filter(i => String(i.id) !== String(productId));
+        let cart = getCart();
+        cart = cart.filter(i => String(i.id) !== String(productId));
         saveCart(cart);
-        loyaltyChoice = null;
         refreshUI();
+        getDrawerUI()?.renderDrawerItems();
     }
 
     function clearCart() {
-        safeStorage.removeItem(STORAGE_KEY);
-        loyaltyChoice = null;
-        hideClearConfirm();
+        saveCart([]);
         refreshUI();
+        getDrawerUI()?.renderDrawerItems();
     }
 
-    function showClearConfirm() {
-        const clearConfirm = document.getElementById('swac-clear-confirm');
-        const clearBtn = document.getElementById('swac-clear-cart');
-        if (clearConfirm) clearConfirm.style.display = 'flex';
-        if (clearBtn) clearBtn.style.display = 'none';
-    }
-
-    function hideClearConfirm() {
-        const clearConfirm = document.getElementById('swac-clear-confirm');
-        const clearBtn = document.getElementById('swac-clear-cart');
-        if (clearConfirm) clearConfirm.style.display = 'none';
-        if (clearBtn) clearBtn.style.display = '';
-    }
-
-    // ── UI Updates ───────────────────────────────────────────────────────────
+    // ── UI Updates & Drawer Coordination ─────────────────────────────────────
     function refreshUI() {
+        if (!safeDoc) return;
+        const _bubble = safeDoc.getElementById('swac-cart-bubble');
+        const _counter = safeDoc.getElementById('swac-cart-count');
         const cart = getCart();
-        const total = cart.reduce((sum, i) => sum + i.qty, 0);
+        const count = cart.reduce((sum, item) => sum + (parseInt(item.qty, 10) || 1), 0);
 
-        if (!_bubble) return;
-
-        if (total > 0) {
-            _bubble.style.display = 'flex';
-            if (_counter) _counter.textContent = total;
-        } else {
-            _bubble.style.display = 'none';
-            closeDrawer();
+        if (_counter) _counter.textContent = count;
+        if (_bubble) {
+            if (count > 0) {
+                _bubble.classList.add('swac-cart-bubble--visible');
+            } else {
+                _bubble.classList.remove('swac-cart-bubble--visible');
+            }
         }
 
-        renderDrawerItems();
+        const drawer = safeDoc.getElementById('swac-drawer');
+        if (drawer && drawer.classList.contains('swac-drawer--open')) {
+            getDrawerUI()?.renderDrawerItems();
+        }
     }
 
-    // ── Drawer Management ────────────────────────────────────────────────────
     function openDrawer() {
-        const drawer = document.getElementById('swac-drawer');
-        const overlay = document.getElementById('swac-drawer-overlay');
-        if (!drawer) return;
-        drawer.removeAttribute('inert');
-        drawer.setAttribute('aria-hidden', 'false');
-        drawer.style.visibility = 'visible';
-        drawer.classList.add('swac-drawer--open');
-        if (overlay) overlay.style.display = 'block';
-        hideClearConfirm();
-        renderDrawerItems();
-        hydrateDeliveryNotice();
-
-        setTimeout(() => {
-            document.getElementById('swac-drawer-close')?.focus();
-        }, 50);
+        getDrawerUI()?.openDrawer();
     }
 
     function closeDrawer() {
-        const drawer = document.getElementById('swac-drawer');
-        const overlay = document.getElementById('swac-drawer-overlay');
-        if (!drawer) return;
-        drawer.classList.remove('swac-drawer--open');
-        drawer.setAttribute('aria-hidden', 'true');
-        drawer.setAttribute('inert', '');
-        if (overlay) overlay.style.display = 'none';
-        hideClearConfirm();
-
-        setTimeout(() => {
-            if (!drawer.classList.contains('swac-drawer--open')) {
-                drawer.style.visibility = 'hidden';
-            }
-        }, 300);
-    }
-
-    function ensureDrawerBodyStructure(body) {
-        if (!body.querySelector('#swac-items-list')) {
-            body.innerHTML = `
-                <div id="swac-items-list" class="swac-items-list"></div>
-                <div id="swac-loyalty-section"></div>
-                <div id="swac-totals-section"></div>
-                <div id="swac-address-section" class="swac-address-section"></div>
-            `;
-        }
-    }
-
-    function renderDrawerItems() {
-        const body = document.getElementById('swac-drawer-body');
-        if (!body) return;
-
-        const cart = getCart();
-
-        if (cart.length === 0) {
-            body.innerHTML = '<p class="swac-drawer-empty">Your order list is empty.</p>';
-            updateSendButton();
-            hideClearConfirm();
-            return;
-        }
-
-        ensureDrawerBodyStructure(body);
-
-        const itemsContainer = document.getElementById('swac-items-list');
-        if (itemsContainer) {
-            itemsContainer.innerHTML = cart.map(item => {
-                const isMax = item.qty >= CONFIG.maxQtyPerItem;
-                return `
-                <div class="swac-drawer-item" data-id="${escHtml(String(item.id))}">
-                    <div class="swac-item-info">
-                        <span class="swac-item-name">${escHtml(item.name)}</span>
-                        ${item.price ? `<span class="swac-item-price">${escHtml(item.price)}</span>` : ''}
-                        ${item.schemeBadge ? `<span class="swac-drawer-scheme-tag">🎁 ${escHtml(item.schemeBadge)}</span>` : ''}
-                        ${item.cartonPack > 0 ? `<span class="swac-drawer-carton-note">📦 1 Ctn = ${item.cartonPack} pcs</span>` : ''}
-                    </div>
-                    <div class="swac-item-controls">
-                        <button class="swac-qty-btn swac-qty-minus" data-id="${escHtml(String(item.id))}" aria-label="Decrease quantity of ${escHtml(item.name)}">−</button>
-                        <span class="swac-item-qty" aria-label="Current quantity: ${item.qty}">${item.qty}</span>
-                        <button class="swac-qty-btn swac-qty-plus ${isMax ? 'swac-qty-btn--disabled' : ''}" data-id="${escHtml(String(item.id))}" ${isMax ? 'disabled title="Max units reached"' : ''} aria-label="Increase quantity of ${escHtml(item.name)}">+</button>
-                        <button class="swac-remove-btn" data-id="${escHtml(String(item.id))}" aria-label="Remove ${escHtml(item.name)} from order">✕</button>
-                    </div>
-                </div>
-            `;
-            }).join('');
-        }
-
-        refreshLoyaltySection();
-        renderAddressSection();
-        updateSendButton();
-    }
-
-    function refreshLoyaltySection() {
-        const section = document.getElementById('swac-loyalty-section');
-        const totalsSection = document.getElementById('swac-totals-section');
-        if (!section) return;
-        section.innerHTML = '';
-        const cart = getCart();
-        const totals = computeCartTotals(cart);
-        renderLoyaltyUI(section, cart, totals);
-        if (totalsSection) {
-            totalsSection.innerHTML = '';
-            renderTotals(totalsSection, cart, totals);
-        }
-        updateSendButton();
-    }
-
-    function renderAddressSection(force, justSaved) {
-        const container = document.getElementById('swac-address-section');
-        if (!container) return;
-
-        const retailer = typeof getSavedRetailer === 'function' ? getSavedRetailer() : null;
-        if (retailer && retailer.store_name) {
-            container.innerHTML = `
-                <div class="swac-address-card swac-b2b-route-card" id="swac-address-card">
-                    <div class="swac-address-card-header">
-                        <span class="swac-address-card-badge">
-                            🚚 Wholesale Route Dispatch
-                        </span>
-                        <span style="font-size:11px; font-weight:700; color:#15803d;">✓ Route Verified</span>
-                    </div>
-                    <div class="swac-address-card-body" style="padding:10px 12px; font-size:12px; line-height:1.5;">
-                        <div style="font-weight:700; color:#0f172a; font-size:13px;">🏪 ${escHtml(retailer.store_name)}</div>
-                        <div style="color:#475569;">📍 Route / Area: <strong>${escHtml(retailer.area || 'Wholesale Delivery Route')}</strong></div>
-                        <div style="color:#475569;">📞 Mobile: <code>${escHtml(retailer.phone)}</code></div>
-                        <div style="margin-top:8px;">
-                            <input type="text" id="swac-b2b-remarks" class="swac-addr-input" style="font-size:12px; height:34px; width:100%; box-sizing:border-box;" placeholder="Optional dispatch note (e.g. transport builty, carton mark)...">
-                        </div>
-                    </div>
-                </div>
-            `;
-            return;
-        }
-
-        const saved = getCustomerDetails();
-
-        // Guard: initAddressState() owns the initial addressMode decision at boot.
-        // Here we only correct preview → edit if saved data has since become invalid
-        // (missing required fields or unserviceable pincode).
-        if (addressMode === 'preview') {
-            const zoneRes = (saved && saved.pincode) ? evaluateDeliveryZone(saved.pincode) : null;
-            if (!saved || !saved.name || !saved.address || !zoneRes || !zoneRes.allowOrder) {
-                addressMode = 'edit';
-                addressCollapsed = false;
-            }
-        }
-
-        if (addressMode === 'preview' && saved) {
-            container.innerHTML = `
-                <div class="swac-address-card" id="swac-address-card">
-                    <div class="swac-address-card-header">
-                        <span class="swac-address-card-badge">
-                            &#127968; Delivery Details
-                            ${justSaved ? '<span class="swac-address-saved-pill" id="swac-address-saved-pill">&#10003; Saved</span>' : ''}
-                        </span>
-                        <button type="button" class="swac-address-edit-btn" id="swac-addr-edit-btn" aria-label="Edit delivery address">
-                            Change / Edit
-                        </button>
-                    </div>
-                    <div class="swac-address-card-body">
-                        <div class="swac-address-card-sub">${saved.area ? escHtml(saved.area) + ', ' : ''}${saved.pincode ? 'PIN: ' + escHtml(saved.pincode) : ''}${CONFIG.cityName ? ', ' + escHtml(CONFIG.cityName) : ''}</div>
-                    </div>
-                </div>
-            `;
-            document.getElementById('swac-addr-edit-btn')?.addEventListener('click', function () {
-                addressMode = 'edit';
-                renderAddressSection(true);
-                setTimeout(() => {
-                    document.getElementById('swac-addr-name')?.focus();
-                }, 50);
-            });
-        } else {
-            // Edit / First-Time Form
-            const hasSaved = Boolean(saved && saved.name && saved.address);
-
-            // If first-time and collapsed, show the "+ Add Delivery Address" prompt
-            if (!hasSaved && addressCollapsed) {
-                container.innerHTML = `
-                    <div class="swac-address-add-prompt">
-                        <button type="button" class="swac-address-add-btn" id="swac-addr-add-btn" aria-label="Add Delivery Address">
-                            <span class="swac-address-add-icon">&#128205; +</span>
-                            <span class="swac-address-add-text">Add Delivery Address</span>
-                        </button>
-                    </div>
-                `;
-                document.getElementById('swac-addr-add-btn')?.addEventListener('click', function () {
-                    addressCollapsed = false;
-                    renderAddressSection(true);
-                    setTimeout(() => {
-                        document.getElementById('swac-addr-name')?.focus();
-                    }, 50);
-                });
-                return;
-            }
-
-            // If already displaying form and not force-updating, preserve user typing
-            if (!force && container.querySelector('.swac-address-form')) {
-                return;
-            }
-
-            const current = {
-                name: addressDraft.name || saved?.name || '',
-                address: addressDraft.address || saved?.address || '',
-                landmark: addressDraft.landmark || saved?.landmark || '',
-                area: addressDraft.area || saved?.area || '',
-                pincode: addressDraft.pincode || saved?.pincode || '',
-                saveDefault: typeof addressDraft.saveDefault === 'boolean' ? addressDraft.saveDefault : true
-            };
-
-            container.innerHTML = `
-                <div class="swac-address-form" id="swac-address-form">
-                    <div class="swac-address-form-header">
-                        <span class="swac-address-form-title">&#128205; Delivery Address</span>
-                        ${hasSaved ? `<button type="button" class="swac-address-cancel-btn" id="swac-addr-cancel-btn" aria-label="Cancel editing">Cancel</button>` : `<button type="button" class="swac-address-collapse-btn" id="swac-addr-collapse-btn" aria-label="Collapse address form">Collapse</button>`}
-                    </div>
-                    <div class="swac-form-group">
-                        <label for="swac-addr-name" class="swac-form-label">Full Name <span class="swac-form-req">*</span></label>
-                        <input type="text" id="swac-addr-name" class="swac-form-input" placeholder="e.g. Rahul Sharma" value="${escHtml(current.name)}" autocomplete="name" />
-                        <div id="swac-addr-name-err" class="swac-form-error-msg" style="display:none;"></div>
-                    </div>
-                    <div class="swac-form-group">
-                        <label for="swac-addr-address" class="swac-form-label">Delivery Address &amp; Street <span class="swac-form-req">*</span></label>
-                        <input type="text" id="swac-addr-address" class="swac-form-input" placeholder="House/Flat No, Building, Street / Bylane" value="${escHtml(current.address)}" autocomplete="street-address" />
-                        <div id="swac-addr-address-err" class="swac-form-error-msg" style="display:none;"></div>
-                    </div>
-                    <div class="swac-form-group">
-                        <label for="swac-addr-landmark" class="swac-form-label">Landmark <span style="font-weight:400;color:#64748b;">(Optional)</span></label>
-                        <input type="text" id="swac-addr-landmark" class="swac-form-input" placeholder="e.g. Near Central Park" value="${escHtml(current.landmark)}" />
-                    </div>
-                    <div class="swac-form-group">
-                        <label for="swac-addr-area" class="swac-form-label">Area / Locality <span style="font-weight:400;color:#64748b;">(Optional)</span></label>
-                        <input type="text" id="swac-addr-area" class="swac-form-input" placeholder="e.g. Downtown" value="${escHtml(current.area)}" />
-                    </div>
-                    <div class="swac-form-group">
-                        <label for="swac-addr-pincode" class="swac-form-label">Postal / Pincode <span class="swac-form-req">*</span></label>
-                        <input type="text" id="swac-addr-pincode" class="swac-form-input" placeholder="e.g. Postal code" value="${escHtml(current.pincode)}" inputmode="numeric" maxlength="10" autocomplete="postal-code" />
-                        <div id="swac-pincode-status" class="swac-pincode-status" style="display:none;"></div>
-                        <div id="swac-addr-pincode-err" class="swac-form-error-msg" style="display:none;"></div>
-                    </div>
-                    <label class="swac-form-checkbox-label">
-                        <input type="checkbox" id="swac-addr-save-default" ${current.saveDefault ? 'checked' : ''} />
-                        <span>Save as my default delivery address</span>
-                    </label>
-                    <div class="swac-address-form-actions">
-                        <button type="button" class="swac-btn-save-address" id="swac-btn-save-address">Save Address</button>
-                        ${hasSaved ? `<button type="button" class="swac-btn-cancel-address" id="swac-btn-cancel-address">Cancel</button>` : ''}
-                    </div>
-                </div>
-            `;
-
-            const nameInput = document.getElementById('swac-addr-name');
-            const addrInput = document.getElementById('swac-addr-address');
-            const landmarkInput = document.getElementById('swac-addr-landmark');
-            const areaInput = document.getElementById('swac-addr-area');
-            const pincodeInput = document.getElementById('swac-addr-pincode');
-            const saveCheck = document.getElementById('swac-addr-save-default');
-
-            const syncDraft = () => {
-                addressDraft.name = nameInput ? nameInput.value : '';
-                addressDraft.address = addrInput ? addrInput.value : '';
-                addressDraft.landmark = landmarkInput ? landmarkInput.value : '';
-                addressDraft.area = areaInput ? areaInput.value : '';
-                addressDraft.pincode = pincodeInput ? pincodeInput.value : '';
-                addressDraft.saveDefault = saveCheck ? saveCheck.checked : true;
-            };
-
-            function applyPincodeGating(pincodeVal, isBlur) {
-                const statusEl = document.getElementById('swac-pincode-status');
-                const errEl = document.getElementById('swac-addr-pincode-err');
-                const pinInput = document.getElementById('swac-addr-pincode');
-                const saveBtn = document.getElementById('swac-btn-save-address');
-                const sendBtn = document.getElementById('swac-send-order');
-
-                const clean = String(pincodeVal || '').replace(/\D/g, '');
-
-                if (clean.length === 6) {
-                    const res = evaluateDeliveryZone(clean);
-                    if (!res) return null;
-
-                    if (statusEl) {
-                        statusEl.className = 'swac-pincode-status ' + res.statusClass;
-                        statusEl.textContent = res.message;
-                        statusEl.style.display = 'flex';
-                    }
-                    if (errEl) errEl.style.display = 'none';
-
-                    if (res.allowOrder) {
-                        if (pinInput) pinInput.classList.remove('swac-input-error');
-                        if (saveBtn) {
-                            saveBtn.disabled = false;
-                            saveBtn.style.opacity = '';
-                            saveBtn.style.pointerEvents = '';
-                        }
-                        updateSendButton();
-                    } else {
-                        if (pinInput) pinInput.classList.add('swac-input-error');
-                        if (saveBtn) {
-                            saveBtn.disabled = true;
-                            saveBtn.style.opacity = '0.5';
-                            saveBtn.style.pointerEvents = 'none';
-                        }
-                        if (sendBtn) {
-                            sendBtn.disabled = true;
-                            sendBtn.style.opacity = '0.5';
-                            sendBtn.style.pointerEvents = 'none';
-                        }
-                    }
-                    return res;
-                }
-
-                // Pin is fewer than 6 digits — clear the zone badge in all cases.
-                if (statusEl) {
-                    statusEl.style.display = 'none';
-                    statusEl.className = 'swac-pincode-status';
-                    statusEl.textContent = '';
-                }
-
-                if (clean.length > 0) {
-                    // Partially typed: always keep Save/Send disabled—wrong-length pin.
-                    if (saveBtn) {
-                        saveBtn.disabled = true;
-                        saveBtn.style.opacity = '0.5';
-                        saveBtn.style.pointerEvents = 'none';
-                    }
-                    if (sendBtn) {
-                        sendBtn.disabled = true;
-                        sendBtn.style.opacity = '0.5';
-                        sendBtn.style.pointerEvents = 'none';
-                    }
-                    // Show format error only on blur to avoid an instant red flash while typing.
-                    if (isBlur) {
-                        if (pinInput) pinInput.classList.add('swac-input-error');
-                        if (errEl) {
-                            errEl.textContent = 'Pincode must be 6 digits';
-                            errEl.style.display = 'block';
-                        }
-                    } else {
-                        if (pinInput) pinInput.classList.remove('swac-input-error');
-                        if (errEl) errEl.style.display = 'none';
-                    }
-                } else {
-                    // Empty field: clear errors; Save is accessible until the user tries to submit.
-                    if (pinInput) pinInput.classList.remove('swac-input-error');
-                    if (errEl) errEl.style.display = 'none';
-                    if (saveBtn) {
-                        saveBtn.disabled = false;
-                        saveBtn.style.opacity = '';
-                        saveBtn.style.pointerEvents = '';
-                    }
-                    updateSendButton();
-                }
-
-                return null;
-            }
-
-            [nameInput, addrInput, landmarkInput, areaInput].forEach(el => {
-                el?.addEventListener('input', function () {
-                    syncDraft();
-                    if (this.classList.contains('swac-input-error')) {
-                        this.classList.remove('swac-input-error');
-                        const errEl = document.getElementById(this.id + '-err');
-                        if (errEl) errEl.style.display = 'none';
-                    }
-                });
-            });
-
-            pincodeInput?.addEventListener('input', function () {
-                syncDraft();
-                applyPincodeGating(this.value, false);
-                refreshLoyaltySection();
-            });
-
-            pincodeInput?.addEventListener('blur', function () {
-                syncDraft();
-                applyPincodeGating(this.value, true);
-                refreshLoyaltySection();
-            });
-
-            if (current.pincode) {
-                applyPincodeGating(current.pincode, false);
-            }
-
-            saveCheck?.addEventListener('change', syncDraft);
-
-            const handleCancel = function () {
-                if (saved) {
-                    addressDraft = {
-                        name: saved.name || '',
-                        address: saved.address || '',
-                        landmark: saved.landmark || '',
-                        area: saved.area || '',
-                        pincode: saved.pincode || '',
-                        saveDefault: true
-                    };
-                    // Only restore preview if the saved pincode is actually serviceable.
-                    // If not, leave the form open so the user is forced to correct it.
-                    const cancelZoneRes = saved.pincode ? evaluateDeliveryZone(saved.pincode) : null;
-                    if (saved.name && saved.address && cancelZoneRes && cancelZoneRes.allowOrder) {
-                        addressMode = 'preview';
-                    } else {
-                        addressMode = 'edit';
-                        addressCollapsed = false;
-                    }
-                } else {
-                    addressMode = 'edit';
-                    addressCollapsed = true;
-                }
-                renderAddressSection(true);
-            };
-
-            document.getElementById('swac-addr-cancel-btn')?.addEventListener('click', handleCancel);
-            document.getElementById('swac-btn-cancel-address')?.addEventListener('click', handleCancel);
-
-            document.getElementById('swac-addr-collapse-btn')?.addEventListener('click', function () {
-                addressCollapsed = true;
-                renderAddressSection(true);
-            });
-
-            document.getElementById('swac-btn-save-address')?.addEventListener('click', function () {
-                let isValid = true;
-                let firstInvalid = null;
-
-                const nameVal = nameInput ? nameInput.value.trim() : '';
-                const addrVal = addrInput ? addrInput.value.trim() : '';
-                const landmarkVal = landmarkInput ? landmarkInput.value.trim() : '';
-                const areaVal = areaInput ? areaInput.value.trim() : '';
-                const pincodeVal = pincodeInput ? pincodeInput.value.trim() : '';
-                const shouldSave = saveCheck ? saveCheck.checked : true;
-
-                if (!nameVal) {
-                    isValid = false;
-                    if (nameInput) {
-                        nameInput.classList.add('swac-input-error');
-                        const errEl = document.getElementById('swac-addr-name-err');
-                        if (errEl) {
-                            errEl.textContent = 'Please enter your full name';
-                            errEl.style.display = 'block';
-                        }
-                        if (!firstInvalid) firstInvalid = nameInput;
-                    }
-                }
-
-                if (!addrVal) {
-                    isValid = false;
-                    if (addrInput) {
-                        addrInput.classList.add('swac-input-error');
-                        const errEl = document.getElementById('swac-addr-address-err');
-                        if (errEl) {
-                            errEl.textContent = 'Please enter your delivery address';
-                            errEl.style.display = 'block';
-                        }
-                        if (!firstInvalid) firstInvalid = addrInput;
-                    }
-                }
-
-                const {isValid: pinIsValid, cleanPin} = runPincodeValidation(pincodeInput);
-                if (!pinIsValid) {
-                    isValid = false;
-                    if (!firstInvalid) firstInvalid = pincodeInput;
-                }
-
-                if (!isValid) {
-                    if (firstInvalid) {
-                        firstInvalid.scrollIntoView({behavior: 'smooth', block: 'center'});
-                        setTimeout(() => firstInvalid.focus(), 150);
-                    }
-                    return;
-                }
-
-                const details = {
-                    name: nameVal,
-                    address: addrVal,
-                    landmark: landmarkVal,
-                    area: areaVal,
-                    pincode: cleanPin
-                };
-
-                saveCustomerDetails(details);
-                addressDraft = {...details, saveDefault: shouldSave};
-                addressMode = 'preview';
-                renderAddressSection(true, true);
-            });
-        }
+        getDrawerUI()?.closeDrawer();
     }
 
     function getCurrentPincode() {
-        if (addressDraft && addressDraft.pincode) {
-            return String(addressDraft.pincode).trim();
-        }
-        const pinInput = safeDoc ? safeDoc.getElementById('swac-addr-pincode') : null;
-        if (pinInput && pinInput.value) {
-            return String(pinInput.value).trim();
-        }
-        const saved = getCustomerDetails();
-        if (saved && saved.pincode) {
-            return String(saved.pincode).trim();
-        }
-        return '';
+        return getDrawerUI()?.getCurrentPincode() || '';
     }
 
-    // ── Calculations ─────────────────────────────────────────────────────────
+    function validateAddress() {
+        return getDrawerUI()?.validateAddress() || getCustomerDetails();
+    }
+
+    // ── Calculations (Delegated to cart-math.js) ──────────────────────────────
     function computeCartTotals(cart, pincode) {
         const math = getCartMath();
         const code = pincode !== undefined ? pincode : getCurrentPincode();
+        const loyaltyChoice = getDrawerUI()?.getLoyaltyChoice() || null;
         if (math && typeof math.computeCartTotals === 'function') {
             return math.computeCartTotals(cart, code, {
                 config: CONFIG,
@@ -979,462 +393,13 @@
                 loyaltyChoice: loyaltyChoice,
             });
         }
-        const isAlwaysFree = isAlwaysFreePincode(code);
-
-        const freeAt = CONFIG.freeShippingAt;
-        const shipCharge = CONFIG.shippingCharge;
-
-        let totalMrp = 0;
-        let saleTotal = 0;
-
-        (cart || []).forEach(function (item) {
-            const sale = parseFloat(item.salePrice) || 0;
-            let mrp = parseFloat(item.mrp) || 0;
-
-            if (mrp <= 0) {
-                mrp = sale;
-            }
-            if (mrp < sale) {
-                mrp = sale;
-            }
-
-            const qty = parseInt(item.qty, 10) || 1;
-            totalMrp += mrp * qty;
-            saleTotal += sale * qty;
-        });
-
-        let youSave = totalMrp - saleTotal;
-        let savePct = totalMrp > 0 ? Math.round(youSave / totalMrp * 100) : 0;
-        const shipping = isAlwaysFree ? 0 : (saleTotal < freeAt ? shipCharge : 0);
-        let amountPayable = saleTotal + shipping;
-
-        if (loyaltyChoice === 'yes' && isLoyaltyActive(saleTotal)) {
-            const loyaltyDiscount = CONFIG.loyalty.itemWorth - CONFIG.loyalty.itemPrice;
-            youSave = youSave + loyaltyDiscount;
-            savePct = Math.round(youSave / (totalMrp + CONFIG.loyalty.itemWorth) * 100);
-            amountPayable += CONFIG.loyalty.itemPrice;
-        }
-
-        return {totalMrp, saleTotal, youSave, savePct, shipping, amountPayable, isAlwaysFree};
+        return {totalMrp: 0, saleTotal: 0, youSave: 0, savePct: 0, shipping: 0, amountPayable: 0, isAlwaysFree: false};
     }
 
-    // ── Loyalty & Delivery Offer State Machine ──────────────────────────────
-    function renderLoyaltyUI(container, cart, totals, pincode) {
-        if (!container) return;
-        const code = pincode !== undefined ? pincode : getCurrentPincode();
-        const isAlwaysFree = Boolean((totals && totals.isAlwaysFree) || isAlwaysFreePincode(code));
-
-        // Always-Free Postal Code Badge
-        if (isAlwaysFree && code) {
-            const freeZoneCard = document.createElement('div');
-            freeZoneCard.className = 'swac-loyalty-card swac-loyalty-card--free-zone';
-            freeZoneCard.innerHTML = `
-                <div class="swac-loyalty-body">
-                    &#127881; <strong>Free Delivery Unlocked!</strong>
-                    <div style="font-size:11px;color:#047857;margin-top:3px;">
-                        Special free delivery zone applied for your postal code (${escHtml(code)}).
-                    </div>
-                </div>
-            `;
-            container.appendChild(freeZoneCard);
-        }
-
-        const freeAt = CONFIG.freeShippingAt;
-        const shipCharge = CONFIG.shippingCharge;
-
-        // Stage 1: Free Delivery Nudge (orders below free shipping minimum, only if NOT already free delivery)
-        if (!isAlwaysFree && freeAt > 0 && shipCharge > 0 && totals.saleTotal < freeAt) {
-            loyaltyChoice = null;
-            const shipGap = Math.ceil(freeAt - totals.saleTotal);
-            const card = document.createElement('div');
-            card.className = 'swac-loyalty-card swac-loyalty-card--shipping';
-            card.innerHTML = `
-                <div class="swac-loyalty-body">
-                    &#128666; Add <strong>&#8377;${shipGap}</strong> more to get <strong>FREE Delivery</strong>!
-                    <div style="font-size:11px;color:#0369a1;margin-top:3px;">
-                        Standard delivery fee is &#8377;${shipCharge} for orders under &#8377;${freeAt}.
-                    </div>
-                </div>
-            `;
-            container.appendChild(card);
-            return;
-        }
-
-        const loy = CONFIG.loyalty;
-        let disabledReason = null;
-        if (!loy.enabled) {
-            disabledReason = 'SWAC_LOYALTY_ENABLED';
-        } else if (!loy.itemLabel) {
-            disabledReason = 'SWAC_LOYALTY_ITEM_LABEL';
-        } else if (loy.threshold <= 0) {
-            disabledReason = 'SWAC_LOYALTY_THRESHOLD';
-        }
-
-        if (disabledReason) {
-            loyaltyChoice = null;
-            if (CONFIG.isAdmin) {
-                const card = document.createElement('div');
-                card.className = 'swac-loyalty-card swac-loyalty-card--admin-disabled';
-                card.innerHTML = `
-                    <div class="swac-loyalty-heading">🔒 Admin Notice</div>
-                    <div class="swac-loyalty-body">
-                        Loyalty offer is currently <strong>turned off</strong> via <code>${disabledReason}</code> in <code>core/config.php</code>. Visitors see nothing.
-                    </div>
-                `;
-                container.appendChild(card);
-            }
-            return;
-        }
-
-        const threshold = loy.threshold;
-        const itemLabel = loy.itemLabel;
-        const itemWorth = loy.itemWorth;
-        const itemPrice = loy.itemPrice;
-
-        const card = document.createElement('div');
-
-        if (totals.saleTotal < threshold) {
-            loyaltyChoice = null;
-            const gap = Math.ceil(threshold - totals.saleTotal);
-            card.className = 'swac-loyalty-card swac-loyalty-card--nudge';
-            card.innerHTML = `
-                <div class="swac-loyalty-body">
-                    &#128138; Add <strong>&#8377;${gap}</strong> more to unlock
-                    <strong>${escHtml(itemLabel)}</strong>
-                    worth &#8377;${itemWorth} for just &#8377;${itemPrice}!
-                </div>
-            `;
-            container.appendChild(card);
-
-        } else if (loyaltyChoice === 'yes') {
-            card.className = 'swac-loyalty-card swac-loyalty-card--confirmed';
-            card.innerHTML = `
-                <div class="swac-loyalty-heading">&#127881; Loyalty offer added.</div>
-                <div class="swac-loyalty-body">
-                    <strong>${escHtml(itemLabel)}</strong> added for &#8377;${itemPrice}.
-                </div>
-                <div class="swac-loyalty-actions">
-                    <button id="swac-loyalty-remove" class="swac-loyalty-btn swac-loyalty-btn--remove" aria-label="Remove loyalty offer">Remove</button>
-                </div>
-            `;
-            container.appendChild(card);
-
-            document.getElementById('swac-loyalty-remove')?.addEventListener('click', function () {
-                loyaltyChoice = null;
-                refreshLoyaltySection();
-            });
-
-        } else {
-            card.className = 'swac-loyalty-card swac-loyalty-card--offer';
-            card.innerHTML = `
-                <div class="swac-loyalty-heading">&#127873; Loyalty Offer Unlocked!</div>
-                <div class="swac-loyalty-body">
-                    Add <strong>${escHtml(itemLabel)}</strong>
-                    worth ${fmtInr(itemWorth)} for just ${fmtInr(itemPrice)}?
-                </div>
-                <div class="swac-loyalty-actions">
-                    <button id="swac-loyalty-yes" class="swac-loyalty-btn swac-loyalty-btn--yes" aria-label="Accept loyalty offer">Yes, add it!</button>
-                </div>
-            `;
-            container.appendChild(card);
-
-            document.getElementById('swac-loyalty-yes')?.addEventListener('click', function () {
-                loyaltyChoice = 'yes';
-                refreshLoyaltySection();
-            });
-        }
-    }
-
-    function renderTotals(container, cart, totals) {
-        const loy = CONFIG.loyalty;
-        const {totalMrp, saleTotal, youSave, savePct, shipping, amountPayable} = totals;
-        const loyaltyActive = isLoyaltyActive(saleTotal);
-
-        const shipLabel = shipping === 0 ? '<span class="swac-totals-free">FREE</span>' : fmtInr(shipping);
-
-        const block = document.createElement('div');
-        block.className = 'swac-totals-block';
-        block.innerHTML = `
-            <div class="swac-totals-row"><span>Total MRP</span><span>${fmtInr(totalMrp)}</span></div>
-            <div class="swac-totals-row swac-totals-save"><span>Discount</span><span>${fmtInr(youSave)} (${savePct}% off)</span></div>
-            <div class="swac-totals-row"><span>Shipping</span><span>${shipLabel}</span></div>
-            ${loyaltyChoice === 'yes' && loyaltyActive
-            ? `<div class="swac-totals-row swac-totals-loyalty cdr-totals-loyalty"><span><span class="cdr-loyalty-gift-icon" aria-hidden="true">&#127873;</span>${escHtml(loy.itemLabel)} (worth ${fmtInr(loy.itemWorth)})</span><span>+${fmtInr(loy.itemPrice)}</span></div>`
-            : ''}
-            <div class="swac-totals-row swac-totals-payable"><span>To Pay</span><span>${fmtInr(amountPayable)}</span></div>
-            <div class="swac-drawer-delivery-info">
-                ${CONFIG.cityName ? `<span class="swac-drawer-area-badge">&#128205; Delivering in ${escHtml(CONFIG.cityName)}</span>` : ''}
-                <span class="swac-drawer-delivery-cutoff">&#9889; <span class="swac-drawer-cutoff-text">${escHtml(getDeliveryCutoffMessage())}</span></span>
-            </div>
-        `;
-        container.appendChild(block);
-    }
-
-    function updateSendButton() {
-        const btn = document.getElementById('swac-send-order');
-        const note = document.getElementById('swac-order-note');
-        if (!btn) return;
-        const cart = getCart();
-        if (cart.length === 0) {
-            btn.disabled = true;
-            btn.style.opacity = '0.5';
-            btn.style.pointerEvents = 'none';
-            btn.title = 'Your order list is empty';
-            if (note) note.style.display = 'none';
-            return;
-        }
-
-        if (note) note.style.display = '';
-
-        // ── Phone number configuration check ──────────────────────────────────
-        if (!CONFIG.baseUrl && !CONFIG.number) {
-            btn.disabled = true;
-            btn.style.opacity = '0.5';
-            btn.style.pointerEvents = 'none';
-            btn.title = 'WhatsApp ordering is not configured yet';
-            if (note) {
-                note.textContent = CONFIG.isAdmin
-                    ? '⚠️ Admin Notice: No phone number configured. Set phone_number in swac_commerce_config.'
-                    : 'WhatsApp ordering is currently unavailable.';
-            }
-            return;
-        }
-
-        // ── Pincode serviceability gate ───────────────────────────────────────
-        if (addressMode === 'preview') {
-            // Preview card: validate the saved/confirmed pincode
-            const saved = getCustomerDetails();
-            if (!saved || !saved.pincode) {
-                // Saved data missing pincode — treat as not ready
-                btn.disabled = true;
-                btn.style.opacity = '0.5';
-                btn.style.pointerEvents = 'none';
-                btn.title = 'Please add a valid delivery address to continue';
-                return;
-            }
-            const zoneRes = evaluateDeliveryZone(saved.pincode);
-            if (!zoneRes || !zoneRes.allowOrder) {
-                btn.disabled = true;
-                btn.style.opacity = '0.5';
-                btn.style.pointerEvents = 'none';
-                btn.title = (zoneRes && zoneRes.message) || 'Pincode is outside our delivery area';
-                return;
-            }
-        } else {
-            // Edit mode: check the live DOM input when available, otherwise fall
-            // back to the draft (covers the "collapsed" state where the form is not
-            // rendered and #swac-addr-pincode does not exist in the DOM).
-            const pincodeInput = document.getElementById('swac-addr-pincode');
-            const pinVal = pincodeInput ? pincodeInput.value : (addressDraft.pincode || '');
-            const cleanPin = String(pinVal).replace(/\D/g, '');
-
-            if (cleanPin.length !== 6) {
-                // Incomplete or missing pin — disable until the user fills the form
-                btn.disabled = true;
-                btn.style.opacity = '0.5';
-                btn.style.pointerEvents = 'none';
-                btn.title = 'Please complete your delivery address to continue';
-                return;
-            }
-            const zoneRes = evaluateDeliveryZone(cleanPin);
-            if (!zoneRes || !zoneRes.allowOrder) {
-                btn.disabled = true;
-                btn.style.opacity = '0.5';
-                btn.style.pointerEvents = 'none';
-                btn.title = (zoneRes && zoneRes.message) || 'Pincode is outside our delivery area';
-                return;
-            }
-        }
-
-        btn.disabled = false;
-        btn.style.opacity = '';
-        btn.style.pointerEvents = '';
-        btn.title = '';
-    }
-
-    function escHtml(str) {
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
-    }
-
-    // ── Pincode Validation Helper ─────────────────────────────────────────────
-    /**
-     * Validates the pincode input element, updates all related DOM feedback
-     * (error class on input, status badge, inline error message), and returns
-     * the result. Centralises logic that was previously duplicated in the
-     * Save Address handler and validateAddress().
-     *
-     * @param {HTMLElement|null} pincodeInput
-     * @returns {{ isValid: boolean, cleanPin: string, zoneRes: object|null }}
-     */
-    function runPincodeValidation(pincodeInput) {
-        const pincodeVal = pincodeInput ? pincodeInput.value.trim() : '';
-        const cleanPin = pincodeVal.replace(/\D/g, '');
-        const zoneRes = evaluateDeliveryZone(cleanPin);
-        const isValid = Boolean(cleanPin && cleanPin.length === 6 && zoneRes && zoneRes.allowOrder);
-
-        if (pincodeInput) {
-            pincodeInput.classList.toggle('swac-input-error', !isValid);
-        }
-
-        const statusEl = document.getElementById('swac-pincode-status');
-        if (statusEl) {
-            if (cleanPin.length === 6 && zoneRes) {
-                statusEl.className = 'swac-pincode-status ' + zoneRes.statusClass;
-                statusEl.textContent = zoneRes.message;
-                statusEl.style.display = 'flex';
-            } else {
-                statusEl.style.display = 'none';
-                statusEl.className = 'swac-pincode-status';
-                statusEl.textContent = '';
-            }
-        }
-
-        const errEl = document.getElementById('swac-addr-pincode-err');
-        if (errEl) {
-            if (!isValid) {
-                errEl.textContent = (zoneRes && !zoneRes.allowOrder)
-                    ? zoneRes.message
-                    : 'Please enter a valid postal code';
-                errEl.style.display = 'block';
-            } else {
-                errEl.style.display = 'none';
-            }
-        }
-
-        return {isValid, cleanPin, zoneRes};
-    }
-
-    // ── Form Validation ──────────────────────────────────────────────────────
-    function validateAddress() {
-        const retailer = typeof getSavedRetailer === 'function' ? getSavedRetailer() : null;
-        if (retailer && retailer.store_name) {
-            const remarksInput = document.getElementById('swac-b2b-remarks');
-            const remarks = remarksInput ? remarksInput.value.trim() : '';
-            return {
-                name: retailer.store_name + (retailer.owner_name ? ' (' + retailer.owner_name + ')' : ''),
-                phone: retailer.phone,
-                area: retailer.area || 'Wholesale Delivery Route',
-                address: 'Wholesale Route Dispatch',
-                pincode: '000000',
-                remarks: remarks,
-                isB2B: true
-            };
-        }
-
-        if (addressMode === 'preview') {
-            const saved = getCustomerDetails();
-            if (saved && saved.name && saved.address && saved.pincode) {
-                const zoneRes = evaluateDeliveryZone(saved.pincode);
-                if (zoneRes && zoneRes.allowOrder) {
-                    return saved;
-                }
-            }
-            addressMode = 'edit';
-            addressCollapsed = false;
-            renderAddressSection(true);
-        } else if (addressCollapsed) {
-            addressCollapsed = false;
-            renderAddressSection(true);
-        }
-
-        const nameInput = document.getElementById('swac-addr-name');
-        const addrInput = document.getElementById('swac-addr-address');
-        const landmarkInput = document.getElementById('swac-addr-landmark');
-        const areaInput = document.getElementById('swac-addr-area');
-        const pincodeInput = document.getElementById('swac-addr-pincode');
-        const saveCheck = document.getElementById('swac-addr-save-default');
-
-        let isValid = true;
-        let firstInvalid = null;
-
-        const nameVal = nameInput ? nameInput.value.trim() : '';
-        const addrVal = addrInput ? addrInput.value.trim() : '';
-        const landmarkVal = landmarkInput ? landmarkInput.value.trim() : '';
-        const areaVal = areaInput ? areaInput.value.trim() : '';
-        const pincodeVal = pincodeInput ? pincodeInput.value.trim() : '';
-        const shouldSave = saveCheck ? saveCheck.checked : true;
-
-        if (!nameVal) {
-            isValid = false;
-            if (nameInput) {
-                nameInput.classList.add('swac-input-error');
-                const errEl = document.getElementById('swac-addr-name-err');
-                if (errEl) {
-                    errEl.textContent = 'Please enter your full name';
-                    errEl.style.display = 'block';
-                }
-                if (!firstInvalid) firstInvalid = nameInput;
-            }
-        }
-
-        if (!addrVal) {
-            isValid = false;
-            if (addrInput) {
-                addrInput.classList.add('swac-input-error');
-                const errEl = document.getElementById('swac-addr-address-err');
-                if (errEl) {
-                    errEl.textContent = 'Please enter your delivery address';
-                    errEl.style.display = 'block';
-                }
-                if (!firstInvalid) firstInvalid = addrInput;
-            }
-        }
-
-        const {isValid: pinIsValid, cleanPin} = runPincodeValidation(pincodeInput);
-        if (!pinIsValid) {
-            isValid = false;
-            if (!firstInvalid) firstInvalid = pincodeInput;
-        }
-
-        if (!isValid) {
-            if (firstInvalid) {
-                firstInvalid.scrollIntoView({behavior: 'smooth', block: 'center'});
-                setTimeout(() => firstInvalid.focus(), 150);
-            }
-            return null;
-        }
-
-        const details = {
-            name: nameVal,
-            address: addrVal,
-            landmark: landmarkVal,
-            area: areaVal,
-            pincode: cleanPin
-        };
-
-        if (shouldSave) {
-            saveCustomerDetails(details);
-            addressDraft = {...details, saveDefault: true};
-            addressMode = 'preview';
-            renderAddressSection(true);
-        } else {
-            addressDraft = {...details, saveDefault: false};
-        }
-
-        return details;
-    }
-
-    // ── Order Submission ─────────────────────────────────────────────────────
-    function getOrderSerializer() {
-        if (typeof window !== 'undefined' && window.swacOrderSerializer) {
-            return window.swacOrderSerializer;
-        }
-        if (typeof require === 'function') {
-            try {
-                return require('./order-serializer.js');
-            } catch (e) {
-                // Fallback
-            }
-        }
-        return null;
-    }
-
+    // ── Order Submission (Delegated to order-serializer.js) ───────────────────
     function buildOrderMessage(cart, details) {
         const serializer = getOrderSerializer();
+        const loyaltyChoice = getDrawerUI()?.getLoyaltyChoice() || null;
         if (serializer && typeof serializer.buildOrderMessage === 'function') {
             return serializer.buildOrderMessage(cart, details, {
                 config: CONFIG,
@@ -1443,47 +408,10 @@
                 isLoyaltyActive: isLoyaltyActive,
                 loyaltyChoice: loyaltyChoice,
                 getDeliveryEstimate: getDeliveryEstimate,
-                getSavedRetailer: (typeof getSavedRetailer === 'function') ? getSavedRetailer : null,
+                getSavedRetailer: getSavedRetailer,
             });
         }
-
-        // Inline fallback if serializer script is not loaded
-        const safeStr = (val) => (val || '').replace(/[\r\n]+/g, ' ').trim();
-        const lines = (cart || []).map((item, idx) => {
-            const rxTag = item.isRx ? '[Rx] ' : '';
-            let line = `${idx + 1}. ${rxTag}*${item.name}*`;
-            if (item.qty > 1) line += ` — Qty: ${item.qty}`;
-            const unitPriceNum = parseFloat(item.salePrice) || 0;
-            if (unitPriceNum > 0) {
-                line += `\n   Price: ${fmtInr(unitPriceNum)}${item.qty > 1 ? ' × ' + item.qty + ' = ' + fmtInr(unitPriceNum * item.qty) : ''}`;
-            } else if (item.price) {
-                line += `\n   Price: ${item.price}${item.qty > 1 ? ' × ' + item.qty : ''}`;
-            }
-            return line;
-        });
-        const totals = computeCartTotals(cart, details ? details.pincode : undefined);
-        const sep = '─────────────────';
-        let msg = `Hello ${CONFIG.name}, I'd like to order:\n\n`
-            + lines.join('\n\n')
-            + `\n\n${sep}`
-            + `\nTotal MRP:      ${fmtInr(totals.totalMrp)}`
-            + `\nDiscount:       ${fmtInr(totals.youSave)} (${totals.savePct}% off)`
-            + `\nShipping:       ${totals.shipping === 0 ? 'FREE' : fmtInr(totals.shipping)}`
-            + `\nTo Pay:         ${fmtInr(totals.amountPayable)}`
-            + `\n${sep}`;
-        if (details && details.isB2B) {
-            msg += `\n\n🚚 *Dispatch Route:* ${safeStr(details.area || 'Wholesale Delivery Route')}`;
-            if (details.remarks) msg += `\n📝 *Dispatch Note:* ${safeStr(details.remarks)}`;
-            msg += `\n${sep}`;
-        } else if (details) {
-            msg += `\n\n*Delivery Details:*\nName: ${safeStr(details.name)}\nAddress: ${safeStr(details.address)}`;
-            if (details.landmark) msg += `\nLandmark: ${safeStr(details.landmark)}`;
-            if (details.area) msg += `\nArea: ${safeStr(details.area)}`;
-            if (details.pincode) msg += `\nPostal Code: ${details.pincode}` + (CONFIG.cityName ? `, ${CONFIG.cityName}` : '');
-            msg += `\n${sep}`;
-        }
-        msg += `\n\nPlease confirm my order.`;
-        return msg;
+        return '';
     }
 
     function sendOrderToWhatsApp(e) {
@@ -1516,205 +444,88 @@
         window.open(url, '_blank', 'noopener,noreferrer');
     }
 
-    // Direct single-product WhatsApp button handler removed.
-
-    // ── Cart Interception ────────────────────────────────────────────────────
+    // ── Cart Interception & Product Page Buttons ──────────────────────────────
     function interceptAddToCart() {
-        const form = document.querySelector('form.cart');
+        if (!safeDoc) return;
+        const form = safeDoc.querySelector('form.cart');
         if (!form) return;
 
-        const qtyInput = form.querySelector('input[name="quantity"], .qty');
-        if (qtyInput) {
-            qtyInput.setAttribute('max', String(CONFIG.maxQtyPerItem));
-            qtyInput.addEventListener('change', function () {
-                if (parseInt(this.value, 10) > CONFIG.maxQtyPerItem) {
-                    this.value = CONFIG.maxQtyPerItem;
-                    showToast(`Maximum ${CONFIG.maxQtyPerItem} units allowed per item.`);
-                }
-            });
-        }
-
-        let isProcessing = false;
+        const defaultBtn = form.querySelector('button[type="submit"][name="add-to-cart"], button.single_add_to_cart_button');
+        if (!defaultBtn) return;
 
         form.addEventListener('submit', function (e) {
             e.preventDefault();
-            e.stopImmediatePropagation();
+            e.stopPropagation();
 
-            if (isProcessing) return;
-            isProcessing = true;
+            const nameEl = safeDoc.querySelector('.product_title, h1.entry-title');
+            const priceEl = safeDoc.querySelector('.woocommerce-Price-amount, .price');
+            const qty = getSelectedQty();
 
-            try {
-                const dataEl = form.querySelector('#swac-product-data, .swac-product-data') || document.getElementById('swac-product-data');
-                let item;
+            const hiddenId = form.querySelector('input[name="add-to-cart"]');
+            const btnVal = defaultBtn.value;
+            const fallbackId = (hiddenId ? hiddenId.value : '') || btnVal || window.location.pathname;
 
-                if (dataEl) {
-                    item = {
-                        id: dataEl.dataset.productId || Date.now(),
-                        name: dataEl.dataset.productName || 'Product',
-                        url: dataEl.dataset.productUrl || window.location.href,
-                        price: dataEl.dataset.productPrice || '',
-                        mrp: parseFloat(dataEl.dataset.productMrp) || 0,
-                        salePrice: parseFloat(dataEl.dataset.productSalePrice) || 0,
-                        qty: getSelectedQty(),
-                        isRx: dataEl.dataset.isRx === '1',
-                    };
-                } else {
-                    const btnVal = form.querySelector('[name="add-to-cart"]')?.value || form.querySelector('.single_add_to_cart_button')?.value;
-                    const titleEl = document.querySelector('.product_title, h1');
-                    const title = titleEl ? titleEl.textContent.trim() : 'Product';
-                    item = {
-                        id: btnVal || Date.now(),
-                        name: title,
-                        url: window.location.href,
-                        price: '',
-                        mrp: 0,
-                        salePrice: 0,
-                        qty: getSelectedQty(),
-                        isRx: false,
-                    };
-                }
-
-                const submitBtn = form.querySelector('.single_add_to_cart_button') || form.querySelector('button[type="submit"]');
-                addToCart(item, submitBtn);
-            } finally {
-                // Always clear the lock — even if saveCart throws a QuotaExceededError.
-                setTimeout(() => {
-                    isProcessing = false;
-                }, 300);
+            let priceFormatted = '';
+            let unitPrice = 0;
+            if (priceEl) {
+                const insEl = priceEl.querySelector('ins .woocommerce-Price-amount') || priceEl;
+                priceFormatted = insEl.textContent.trim();
+                const num = parseFloat(priceFormatted.replace(/[^0-9.]/g, ''));
+                if (!isNaN(num)) unitPrice = num;
             }
+
+            const delivEl = safeDoc.querySelector('.swac-action-row');
+            const mrpRaw = delivEl ? delivEl.dataset.productMrp : null;
+            const salePriceRaw = delivEl ? delivEl.dataset.productSalePrice : null;
+            const cartonPackRaw = delivEl ? delivEl.dataset.cartonPack : null;
+            const schemeBadgeRaw = delivEl ? delivEl.dataset.schemeBadge : null;
+            const isRxRaw = delivEl ? delivEl.dataset.isRx : null;
+
+            const mrp = mrpRaw ? parseFloat(mrpRaw) : unitPrice;
+            const salePrice = salePriceRaw ? parseFloat(salePriceRaw) : unitPrice;
+            const cartonPack = cartonPackRaw ? parseInt(cartonPackRaw, 10) : 0;
+            const schemeBadge = schemeBadgeRaw || '';
+            const isRx = isRxRaw === '1';
+
+            const item = {
+                id: fallbackId,
+                name: nameEl ? nameEl.textContent.trim() : 'Product',
+                url: window.location.href,
+                price: priceFormatted,
+                mrp: mrp,
+                salePrice: salePrice,
+                qty: qty,
+                cartonPack: cartonPack,
+                schemeBadge: schemeBadge,
+                isRx: isRx,
+            };
+
+            addToCart(item, defaultBtn);
         });
     }
 
     function getSelectedQty() {
-        const qtyInput = document.querySelector('form.cart .qty, form.cart input[name="quantity"]');
-        if (qtyInput) {
-            const parsed = parseInt(qtyInput.value, 10);
-            if (!isNaN(parsed) && parsed > 0) {
-                if (parsed > CONFIG.maxQtyPerItem) {
-                    qtyInput.value = CONFIG.maxQtyPerItem;
-                    showToast(`Maximum ${CONFIG.maxQtyPerItem} units allowed per item.`);
-                    return CONFIG.maxQtyPerItem;
-                }
-                return parsed;
-            }
-        }
-        return 1;
+        if (!safeDoc) return 1;
+        const input = safeDoc.querySelector('form.cart input[name="quantity"]');
+        if (!input) return 1;
+        const val = parseInt(input.value, 10);
+        return isNaN(val) || val < 1 ? 1 : val;
     }
-
-    // WeakMaps avoid expando properties on DOM nodes, preventing naming
-    // collisions with future browser-native properties.
-    const _feedbackTimers = new WeakMap();
-    const _feedbackOrigHtml = new WeakMap();
 
     function showAddedFeedback(btn) {
-        const addBtn = btn || document.querySelector('form.cart .single_add_to_cart_button');
-        if (!addBtn) return;
-
-        if (_feedbackTimers.has(addBtn)) {
-            clearTimeout(_feedbackTimers.get(addBtn));
-        } else {
-            _feedbackOrigHtml.set(addBtn, addBtn.innerHTML);
-        }
-
-        addBtn.textContent = 'Added to Cart';
-        addBtn.classList.add('swac-btn-added');
-        _feedbackTimers.set(addBtn, setTimeout(() => {
-            const origHtml = _feedbackOrigHtml.get(addBtn);
-            if (origHtml) {
-                addBtn.innerHTML = origHtml;
-                _feedbackOrigHtml.delete(addBtn);
-            }
-            addBtn.classList.remove('swac-btn-added');
-            _feedbackTimers.delete(addBtn);
-        }, 1800));
-    }
-
-    // ── Event Bindings ───────────────────────────────────────────────────────
-    function bindDrawerEvents() {
-        document.getElementById('swac-cart-bubble')?.addEventListener('click', openDrawer);
-        document.getElementById('swac-drawer-close')?.addEventListener('click', closeDrawer);
-        document.getElementById('swac-drawer-overlay')?.addEventListener('click', closeDrawer);
-        document.getElementById('swac-send-order')?.addEventListener('click', sendOrderToWhatsApp);
-        document.getElementById('swac-clear-cart')?.addEventListener('click', showClearConfirm);
-        document.getElementById('swac-clear-cancel')?.addEventListener('click', hideClearConfirm);
-        document.getElementById('swac-clear-proceed')?.addEventListener('click', function () {
-            hideClearConfirm();
-            clearCart();
-        });
-
-        // Close on Escape key press and maintain keyboard Tab focus trap inside modal drawer
-        document.addEventListener('keydown', function (e) {
-            const drawer = document.getElementById('swac-drawer');
-            const isOpen = drawer && drawer.classList.contains('swac-drawer--open');
-            if (!isOpen) return;
-
-            if (e.key === 'Escape') {
-                closeDrawer();
-                _bubble?.focus();
-                return;
-            }
-
-            if (e.key === 'Tab') {
-                const focusables = Array.from(drawer.querySelectorAll(
-                    'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-                )).filter(el => el.offsetParent !== null || window.getComputedStyle(el).display !== 'none');
-
-                if (focusables.length === 0) {
-                    e.preventDefault();
-                    return;
-                }
-
-                const firstEl = focusables[0];
-                const lastEl = focusables[focusables.length - 1];
-
-                if (e.shiftKey) {
-                    if (document.activeElement === firstEl || !drawer.contains(document.activeElement)) {
-                        e.preventDefault();
-                        lastEl.focus();
-                    }
-                } else {
-                    if (document.activeElement === lastEl || !drawer.contains(document.activeElement)) {
-                        e.preventDefault();
-                        firstEl.focus();
-                    }
-                }
-            }
-        });
-
-        const drawerBody = document.getElementById('swac-drawer-body');
-        drawerBody?.addEventListener('click', function (e) {
-            const btn = e.target.closest('button[data-id]');
-            if (!btn) return;
-
-            const id = btn.dataset.id;
-            const cart = getCart();
-            const item = cart.find(i => String(i.id) === String(id));
-            if (!item) return;
-
-            if (btn.classList.contains('swac-qty-plus')) {
-                if (item.qty >= CONFIG.maxQtyPerItem) {
-                    showToast(`Maximum ${CONFIG.maxQtyPerItem} units allowed per item for retail orders.`);
-                    return;
-                }
-                item.qty++;
-                saveCart(cart);
-                renderDrawerItems();
-            } else if (btn.classList.contains('swac-qty-minus')) {
-                if (item.qty > 1) {
-                    item.qty--;
-                    saveCart(cart);
-                    renderDrawerItems();
-                } else {
-                    removeFromCart(id);
-                }
-            } else if (btn.classList.contains('swac-remove-btn')) {
-                removeFromCart(id);
-            }
-        });
+        if (!btn) return;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '&#10003; Added!';
+        btn.classList.add('swac-btn--added');
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.classList.remove('swac-btn--added');
+        }, 1400);
     }
 
     function bindLoopButtons() {
-        document.addEventListener('click', function (e) {
+        if (!safeDoc) return;
+        safeDoc.addEventListener('click', function (e) {
             const btn = e.target.closest('.swac-loop-add');
             if (!btn) return;
             e.preventDefault();
@@ -1743,7 +554,8 @@
     }
 
     function bindActionRowButtons() {
-        document.addEventListener('click', function (e) {
+        if (!safeDoc) return;
+        safeDoc.addEventListener('click', function (e) {
             // 1. Quantity Plus / Minus inside .swac-qty-selector
             const qtyBtn = e.target.closest('.swac-qty-selector .swac-qty-btn');
             if (qtyBtn) {
@@ -1753,131 +565,93 @@
                 if (!input) return;
 
                 let val = parseInt(input.value, 10) || 1;
+                const min = parseInt(input.min, 10) || 1;
+                const max = parseInt(input.max, 10) || CONFIG.maxQtyPerItem;
+
                 if (qtyBtn.classList.contains('swac-qty-plus')) {
-                    if (val >= CONFIG.maxQtyPerItem) {
-                        showToast(`Maximum ${CONFIG.maxQtyPerItem} units allowed per item.`);
-                        return;
-                    }
-                    val++;
+                    if (val < max) val++;
+                    else showToast(`Maximum ${max} units per item allowed.`);
                 } else if (qtyBtn.classList.contains('swac-qty-minus')) {
-                    if (val > 1) {
-                        val--;
-                    }
+                    if (val > min) val--;
                 }
                 input.value = val;
+                input.dispatchEvent(new Event('change', {bubbles: true}));
                 return;
             }
 
-            // 2. Add to Order Click on .swac-single-add-btn
-            const addBtn = e.target.closest('.swac-single-add-btn');
-            if (addBtn) {
+            // 2. Direct Add-to-Cart from Action Row Button (.swac-action-btn)
+            const actionBtn = e.target.closest('.swac-action-btn:not(.swac-loop-add)');
+            if (actionBtn) {
                 e.preventDefault();
-                const actionRow = addBtn.closest('.swac-action-row');
-                const qtyInput = actionRow ? actionRow.querySelector('.swac-qty-input') : null;
+                const row = actionBtn.closest('.swac-action-row');
+                const qtyInput = row ? row.querySelector('.swac-qty-input') : null;
                 let qty = qtyInput ? (parseInt(qtyInput.value, 10) || 1) : 1;
-                if (qty > CONFIG.maxQtyPerItem) {
-                    qty = CONFIG.maxQtyPerItem;
-                    if (qtyInput) qtyInput.value = qty;
-                    showToast(`Maximum ${CONFIG.maxQtyPerItem} units allowed per item.`);
+                if (qty < 1) qty = 1;
+                if (qty > CONFIG.maxQtyPerItem) qty = CONFIG.maxQtyPerItem;
+
+                const nameEl = safeDoc.querySelector('.product_title, h1.entry-title');
+                const priceEl = safeDoc.querySelector('.woocommerce-Price-amount, .price');
+                let priceFormatted = '';
+                let unitPrice = 0;
+                if (priceEl) {
+                    const insEl = priceEl.querySelector('ins .woocommerce-Price-amount') || priceEl;
+                    priceFormatted = insEl.textContent.trim();
+                    const num = parseFloat(priceFormatted.replace(/[^0-9.]/g, ''));
+                    if (!isNaN(num)) unitPrice = num;
                 }
 
-                const dataEl = document.getElementById('swac-product-data');
-                const titleEl = document.querySelector('.product_title, h1');
-                const defaultTitle = titleEl ? titleEl.textContent.trim() : 'Product';
+                const mrpRaw = row ? row.dataset.productMrp : null;
+                const salePriceRaw = row ? row.dataset.productSalePrice : null;
+                const cartonPackRaw = row ? row.dataset.cartonPack : null;
+                const schemeBadgeRaw = row ? row.dataset.schemeBadge : null;
+                const isRxRaw = row ? row.dataset.isRx : null;
 
                 const item = {
-                    id: addBtn.dataset.productId || dataEl?.dataset.productId || Date.now(),
-                    name: addBtn.dataset.productName || dataEl?.dataset.productName || defaultTitle,
-                    url: addBtn.dataset.productUrl || dataEl?.dataset.productUrl || window.location.href,
-                    price: addBtn.dataset.productPrice || dataEl?.dataset.productPrice || '',
-                    mrp: parseFloat(addBtn.dataset.productMrp) || parseFloat(dataEl?.dataset.productMrp) || 0,
-                    salePrice: parseFloat(addBtn.dataset.productSalePrice) || parseFloat(dataEl?.dataset.productSalePrice) || 0,
+                    id: (row ? row.dataset.productId : '') || window.location.pathname,
+                    name: nameEl ? nameEl.textContent.trim() : (row ? row.dataset.productName || 'Product' : 'Product'),
+                    url: window.location.href,
+                    price: priceFormatted,
+                    mrp: mrpRaw ? parseFloat(mrpRaw) : unitPrice,
+                    salePrice: salePriceRaw ? parseFloat(salePriceRaw) : unitPrice,
                     qty: qty,
-                    isRx: (addBtn.dataset.isRx === '1') || (dataEl?.dataset.isRx === '1'),
+                    cartonPack: cartonPackRaw ? parseInt(cartonPackRaw, 10) : 0,
+                    schemeBadge: schemeBadgeRaw || '',
+                    isRx: isRxRaw === '1',
                 };
 
-                addToCart(item, addBtn);
-            }
-        });
-
-        // 3. Clamp quantity inputs on manual typing
-        document.addEventListener('change', function (e) {
-            const input = e.target.closest('.swac-qty-selector .swac-qty-input');
-            if (input) {
-                let val = parseInt(input.value, 10);
-                if (isNaN(val) || val < 1) {
-                    val = 1;
-                } else if (val > CONFIG.maxQtyPerItem) {
-                    val = CONFIG.maxQtyPerItem;
-                    showToast(`Maximum ${CONFIG.maxQtyPerItem} units allowed per item.`);
-                }
-                input.value = val;
+                addToCart(item, actionBtn);
             }
         });
     }
 
-    // ── Catalog Ordering: Auto-Submit on Selection / Click ───────────────────
-    // Custom builders and stripped WooCommerce templates lack the auto-submit JS
-    // for .woocommerce-ordering. This ensures selecting an option reloads the page.
     function bindCatalogOrdering() {
-        document.addEventListener('change', function (e) {
-            const target = e.target;
-            if (target && (target.matches('.woocommerce-ordering select.orderby') || target.matches('form.woocommerce-ordering select') || target.matches('select[name="orderby"]') || target.classList.contains('orderby'))) {
-                const form = target.closest('form');
-                if (form) {
-                    form.submit();
-                }
+        if (!safeDoc) return;
+        safeDoc.addEventListener('change', function (e) {
+            const select = e.target.closest('select.orderby');
+            if (select) {
+                const form = select.closest('form');
+                if (form) form.submit();
             }
         });
 
-        document.addEventListener('click', function (e) {
-            const btn = e.target.closest('.woocommerce-ordering button, .woocommerce-ordering input[type="submit"]');
+        safeDoc.addEventListener('click', function (e) {
+            const btn = e.target.closest('.woocommerce-ordering button[type="submit"]');
             if (btn) {
                 const form = btn.closest('form');
-                if (form) {
-                    form.submit();
-                }
+                if (form) form.submit();
             }
         });
     }
 
-    // ── Delivery Cutoff Notice: Client-Side Hydration (Cache-Busting) ─────────
-    // Reconciles static HTML with active store timezone to prevent stale notices
-    // when pages are served from static full-page cache across cutoff boundaries.
+    // ── Delivery Cutoff Notice & Estimates (Delegated to delivery-engine.js) ──
     function getKolkataFormattedDate(baseIstDate, daysAhead) {
         const engine = getDeliveryEngine();
-        if (engine && typeof engine.getKolkataFormattedDate === 'function') {
-            return engine.getKolkataFormattedDate(baseIstDate, daysAhead);
-        }
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        const target = new Date(baseIstDate.getTime() + (daysAhead * 24 * 60 * 60 * 1000));
-        return `${target.getUTCDate()} ${months[target.getUTCMonth()]}`;
+        return engine ? engine.getKolkataFormattedDate(baseIstDate, daysAhead) : '';
     }
 
     function getKolkataDeliveryCutoffMessage(customNow) {
         const engine = getDeliveryEngine();
-        if (engine && typeof engine.getKolkataDeliveryCutoffMessage === 'function') {
-            return engine.getKolkataDeliveryCutoffMessage(customNow, CONFIG);
-        }
-        const now = (customNow instanceof Date) ? customNow : new Date();
-        const offsetHours = (typeof CONFIG.timezoneOffset === 'number') ? CONFIG.timezoneOffset : 0;
-        const istDate = new Date(now.getTime() + (offsetHours * 60 * 60 * 1000));
-        const day = istDate.getUTCDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
-        const hour = istDate.getUTCHours(); // 0 to 23
-
-        const msgs = CONFIG.cutoffMessages || {};
-        const msgMorning = msgs.morning || 'Order before 12 noon for same-day delivery';
-
-        // 1. Weekend Window: Saturday 12:00 PM to Sunday 11:59:59 PM
-        if (day === 0 || (day === 6 && hour >= 12)) {
-            return `Order now to get it by Monday (${getKolkataFormattedDate(istDate, day === 0 ? 1 : 2)})`;
-        }
-        // 2. Morning Cutoff Window: Monday through Saturday, 12:00 AM to 11:59:59 AM
-        if (hour < 12) {
-            return msgMorning;
-        }
-        // 3. Weekday Afternoon/Evening: Monday through Friday, 12:00 PM to 11:59:59 PM
-        return `Order now to receive it by tomorrow (${getKolkataFormattedDate(istDate, 1)})`;
+        return engine ? engine.getKolkataDeliveryCutoffMessage(customNow, CONFIG) : '';
     }
 
     function getDeliveryCutoffMessage(customNow) {
@@ -1886,30 +660,12 @@
 
     function getKolkataDeliveryEstimate(customNow) {
         const engine = getDeliveryEngine();
-        if (engine && typeof engine.getKolkataDeliveryEstimate === 'function') {
-            return engine.getKolkataDeliveryEstimate(customNow, CONFIG);
-        }
-        const now = (customNow instanceof Date) ? customNow : new Date();
-        const offsetHours = (typeof CONFIG.timezoneOffset === 'number') ? CONFIG.timezoneOffset : 0;
-        const istDate = new Date(now.getTime() + (offsetHours * 60 * 60 * 1000));
-        const day = istDate.getUTCDay();
-        const hour = istDate.getUTCHours();
-
-        if (day === 0 || (day === 6 && hour >= 12)) {
-            return `Monday (${getKolkataFormattedDate(istDate, day === 0 ? 1 : 2)})`;
-        }
-        if (hour < 12) {
-            return 'Today (Same-day)';
-        }
-        return `Tomorrow (${getKolkataFormattedDate(istDate, 1)})`;
+        return engine ? engine.getKolkataDeliveryEstimate(customNow, CONFIG) : '';
     }
 
     function getDeliveryEstimate(customNow) {
         return getKolkataDeliveryEstimate(customNow);
     }
-
-    // ── B2B Wholesale Retailer Gating & PIN Auth ─────────────────────────────
-    const RETAILER_STORAGE_KEY = 'swac_b2b_retailer';
 
     function getSavedRetailer() {
         try {
@@ -1921,33 +677,61 @@
     }
 
     function hydrateDeliveryNotice() {
+        if (!safeDoc) return;
         const message = getDeliveryCutoffMessage();
         if (!message) return;
 
         // 1. Single Product Page Notice
-        const productTextEl = document.querySelector('.swac-delivery-notice .swac-delivery-text');
+        const productTextEl = safeDoc.querySelector('.swac-delivery-notice .swac-delivery-text');
         if (productTextEl && productTextEl.textContent.trim() !== message) {
             productTextEl.textContent = message;
         }
 
         // 2. Slide-out Order Drawer Notice
-        const drawerTextEl = document.querySelector('.swac-drawer-cutoff-text');
+        const drawerTextEl = safeDoc.querySelector('.swac-drawer-cutoff-text');
         if (drawerTextEl && drawerTextEl.textContent.trim() !== message) {
             drawerTextEl.textContent = message;
         }
     }
 
+    // ── Global Cart API Bridge ────────────────────────────────────────────────
+    const cartApi = {
+        CONFIG,
+        fmtPrice,
+        fmtInr,
+        escHtml,
+        getCart,
+        saveCart,
+        addToCart,
+        removeFromCart,
+        clearCart,
+        getCustomerDetails,
+        saveCustomerDetails,
+        computeCartTotals,
+        evaluateDeliveryZone,
+        isAlwaysFreePincode,
+        refreshUI,
+        showToast,
+        openDrawer,
+        closeDrawer,
+        sendOrderToWhatsApp,
+        getDeliveryEstimate,
+        getDeliveryCutoffMessage,
+        getSavedRetailer,
+        hydrateDeliveryNotice,
+    };
+
+    safeWindow.swacCart = cartApi;
+    safeWindow.swacRefreshCartUI = refreshUI;
+    safeWindow.swacOpenCartDrawer = openDrawer;
+    safeWindow.swacCloseCartDrawer = closeDrawer;
+
     // ── Initialization (Browser only) ──────────────────────────────────────────
-    // NOTE: This script is enqueued in the footer (in_footer=true), so the DOM
-    // is already parsed when this IIFE runs. Do NOT wrap in DOMContentLoaded —
-    // it would never fire because the event has already dispatched.
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-        initAddressState();
         refreshUI();
         interceptAddToCart();
-        window.swacRefreshCartUI = refreshUI;
-        bindDrawerEvents();
         bindLoopButtons();
+        bindActionRowButtons();
         bindCatalogOrdering();
         hydrateDeliveryNotice();
     }
@@ -1976,9 +760,6 @@
                 if (engine && typeof engine.resetZoneSets === 'function') {
                     engine.resetZoneSets();
                 }
-                sameDaySet = null;
-                outskirtsSet = null;
-                alwaysFreeSet = null;
             }
         };
     }

@@ -33,7 +33,7 @@ add_action('wp_enqueue_scripts', function () {
         'in_footer' => true,
     ]);
 
-    // 4. WhatsApp Cart Engine & Submodules (delivery-engine.js, cart-math.js, order-serializer.js, wa_cart.js)
+    // 4. WhatsApp Cart Engine & Submodules (delivery-engine.js, cart-math.js, order-serializer.js, wa_cart.js, drawer-ui.js)
     if (!is_admin()) {
         wp_enqueue_script('swac-delivery-engine', SWAC_URL . 'assets/js/delivery-engine.js', [], SWAC_VERSION, [
             'strategy' => 'defer',
@@ -51,6 +51,12 @@ add_action('wp_enqueue_scripts', function () {
             'swac-delivery-engine',
             'swac-cart-math',
             'swac-order-serializer',
+        ], SWAC_VERSION, [
+            'strategy' => 'defer',
+            'in_footer' => true,
+        ]);
+        wp_enqueue_script('swac-drawer-ui', SWAC_URL . 'assets/js/drawer-ui.js', [
+            'swac-cart-script',
         ], SWAC_VERSION, [
             'strategy' => 'defer',
             'in_footer' => true,
