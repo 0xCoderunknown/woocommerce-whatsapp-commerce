@@ -6,6 +6,7 @@ describe('Wholesale Schemes & B2B Cart Calculations', () => {
     beforeEach(() => {
         waCart.setRuntimeConfig({
             name: 'Guwahati Wholesale Depot',
+            currencySymbol: '₹',
             freeShippingAt: 10000,
             shippingCharge: 0,
             alwaysFreeShippingCodes: [],
@@ -86,6 +87,6 @@ describe('Wholesale Schemes & B2B Cart Calculations', () => {
         // Verify scheme badge is formatted
         assert.match(msg, /Scheme: 12 \+ 1 FREE/);
         // Verify PTR calculation
-        assert.match(msg, /Price: ₹24\.50 × 144 = ₹3,528/);
+        assert.match(msg, /Price: ₹ 24\.5 × 144 = ₹ 3,528/);
     });
 });

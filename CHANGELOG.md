@@ -17,11 +17,10 @@
   - **WhatsApp Order Compilation**: Enhanced order payload to itemize cartons, loose units, active schemes, and retailer store identification for warehouse dispatch.
 
 ## [1.4.1] — 01-11-2026
-## [1.4.1] — 01-11-2026
+
 
 ### Fixed
 - **Action Row Button Binding**: Resolved critical issue where `[swac_action_row]` quantity controls (`.swac-qty-btn`) and Add to Order buttons (`.swac-single-add-btn`) were inert in `assets/js/wa_cart.js`. Added complete click listeners, data attribute extraction, and quantity clamping.
-## [1.4.1] — 01-11-2026
 - **Single Product Add-to-Cart Label Filter**: Added `woocommerce_product_single_add_to_cart_text` filter to ensure standard WooCommerce single product pages display "Add to Order", matching archive loop buttons.
 - **Page Builder Context Resolution in Pharmacy Tags**: Hardened `swac_composition_tag_shortcode` in `modules/pharmacy/product-meta.php` with queried object and `get_the_ID()` fallbacks when global `$post` is null.
 - **PHP CLI Test Runner Detection**: Enhanced `tests/php/runner.js` to auto-detect Windows XAMPP PHP installations (`K:\xampp\php\php.exe`) and run full `php -l` syntax checking across all PHP files.
@@ -40,8 +39,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 All release dates follow the Indian date standard format: **`DD-MM-YYYY`**.
 
 ---
-## [1.4.0] â€” 10-10-2026
-## [1.4.0] $([char]0x2014) 10-10-2026
+## [1.4.0] — 10-10-2026
+
 
 ### Added
 - **Multi-Tier Always-Free Postal Code Support** (`core/config.php`, `core/delivery-zones.php`, `frontend/enqueue.php`, `assets/js/wa_cart.js`, `assets/css/cart-drawer.css`):

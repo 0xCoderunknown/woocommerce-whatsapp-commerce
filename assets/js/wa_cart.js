@@ -44,18 +44,35 @@
     function getCustomerDetails() {
         try {
             const raw = safeStorage.getItem(CUSTOMER_STORAGE_KEY);
-            if (!raw) return null;
-            const data = JSON.parse(raw);
-            if (data && typeof data === 'object' && !Array.isArray(data)) {
-                return {
-                    name: (data.name || '').trim(),
-                    address: (data.address || '').trim(),
-                    landmark: (data.landmark || '').trim(),
-                    area: (data.area || '').trim(),
-                    pincode: (data.pincode || '').trim()
-                };
+            let details = null;
+            if (raw) {
+                const data = JSON.parse(raw);
+                if (data && typeof data === 'object' && !Array.isArray(data)) {
+                    details = {
+                        name: (data.name || '').trim(),
+                        address: (data.address || '').trim(),
+                        landmark: (data.landmark || '').trim(),
+                        area: (data.area || '').trim(),
+                        pincode: (data.pincode || '').trim()
+                    };
+                }
             }
-            return null;
+
+            // Fallback / enrich with authenticated B2B retailer identity
+            const retailer = typeof getSavedRetailer === 'function' ? getSavedRetailer() : null;
+            if (retailer && retailer.store_name) {
+                if (!details) {
+                    details = { name: '', address: '', landmark: '', area: '', pincode: '' };
+                }
+                if (!details.name) {
+                    details.name = retailer.store_name + (retailer.owner_name ? ' (' + retailer.owner_name + ')' : '');
+                }
+                if (!details.area && retailer.area) {
+                    details.area = retailer.area;
+                }
+            }
+
+            return details;
         } catch (e) {
             return null;
         }
@@ -1304,6 +1321,8 @@
 
     // ── Order Submission ─────────────────────────────────────────────────────
     function buildOrderMessage(cart, details) {
+        // Strip CR/LF from user/retailer fields to preserve WhatsApp formatting.
+        const safeStr = (val) => (val || '').replace(/[\r\n]+/g, ' ').trim();
         const loy = CONFIG.loyalty;
 
         const lines = cart.map((item, idx) => {
@@ -1372,9 +1391,6 @@
         }
 
         if (details) {
-            // Strip CR/LF from user-entered fields: a newline mid-field would break
-            // the WhatsApp message structure (each line is a labelled record).
-            const safeStr = (val) => (val || '').replace(/[\r\n]+/g, ' ').trim();
             msg += `\n\n*Delivery Details:*`
                 + `\nName: ${safeStr(details.name)}`
                 + `\nAddress: ${safeStr(details.address)}`;

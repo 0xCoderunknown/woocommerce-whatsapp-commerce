@@ -267,8 +267,15 @@
         // 5. Refresh Button
         document.getElementById('swac-rates-refresh')?.addEventListener('click', () => loadProducts());
 
-        // 6. CSV Import
+        // 6. CSV Import & Export
+        const importBtn = document.getElementById('swac-rates-import-btn');
         const importInput = document.getElementById('swac-rates-import-file');
+        const exportBtn = document.getElementById('swac-rates-export-btn');
+
+        if (importBtn && importInput) {
+            importBtn.addEventListener('click', () => importInput.click());
+        }
+
         if (importInput) {
             importInput.addEventListener('change', function () {
                 const file = this.files[0];
@@ -296,6 +303,37 @@
                 .catch(() => {
                     importInput.value = '';
                     showToast('Network error uploading CSV.');
+                });
+            });
+        }
+
+        if (exportBtn) {
+            exportBtn.addEventListener('click', function () {
+                showToast('Preparing wholesale rates CSV export...');
+                fetch(restUrl + 'swac/v1/desk/export-csv', {
+                    method: 'GET',
+                    headers: getHeaders(false)
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('Export error');
+                    return res.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = `wholesale-rates-${new Date().toISOString().slice(0, 10)}.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(() => {
+                        window.URL.revokeObjectURL(url);
+                        a.remove();
+                    }, 1000);
+                    showToast('✓ CSV Downloaded.');
+                })
+                .catch(() => {
+                    showToast('Failed to download CSV.');
                 });
             });
         }

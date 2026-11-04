@@ -224,6 +224,14 @@ function swac_render_retailers_admin_page()
             if (swac_delete_approved_retailer($phone)) {
                 $message = __('Retailer successfully removed from directory.', 'stateless-wa-commerce');
             }
+        } elseif ($action === 'update_master_pin') {
+            $master_pin = sanitize_text_field($_POST['master_pin'] ?? '');
+            if (strlen($master_pin) >= 4) {
+                update_option('swac_b2b_master_pin', $master_pin);
+                $message = __('Master Desk PIN updated successfully.', 'stateless-wa-commerce');
+            } else {
+                $error = __('Master PIN must be at least 4 digits.', 'stateless-wa-commerce');
+            }
         }
     }
 
@@ -342,6 +350,22 @@ function swac_render_retailers_admin_page()
                         <button type="submit" class="button button-primary" style="width:100%; height:36px;"><?php esc_html_e('Save & Approve Retailer', 'stateless-wa-commerce'); ?></button>
                     </p>
                 </form>
+
+                <!-- Master Desk PIN Card -->
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:6px; margin-top:20px;">
+                    <h4 style="margin:0 0 8px 0; font-size:13px;">🔐 <?php esc_html_e('Distributor Desk Master PIN', 'stateless-wa-commerce'); ?></h4>
+                    <p class="description" style="margin-bottom:12px; font-size:12px;">
+                        <?php esc_html_e('Used to unlock the frontend /distributor/ portal from mobile phones without WordPress login.', 'stateless-wa-commerce'); ?>
+                    </p>
+                    <form method="post">
+                        <?php wp_nonce_field('swac_retailer_admin_nonce'); ?>
+                        <input type="hidden" name="swac_retailer_action" value="update_master_pin">
+                        <p style="margin-bottom:10px;">
+                            <input type="text" name="master_pin" value="<?php echo esc_attr(get_option('swac_b2b_master_pin', '')); ?>" placeholder="e.g. 1234" class="regular-text" maxlength="8" style="font-size:15px; letter-spacing:2px; width:100%; text-align:center;">
+                        </p>
+                        <button type="submit" class="button" style="width:100%;"><?php esc_html_e('Update Master PIN', 'stateless-wa-commerce'); ?></button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
