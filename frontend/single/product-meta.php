@@ -120,39 +120,100 @@ if (!function_exists('swac_action_row_shortcode')) {
             );
         }
 
-        $price = $product->get_price() ? strip_tags((string)wc_price($product->get_price())) : '';
-        $mrp = (float)$product->get_regular_price();
-        $sale_price = (float)$product->get_sale_price();
-        if ($sale_price <= 0) {
-            $sale_price = (float)$product->get_price();
-        }
+                $b2b = function_exists('swac_b2b_get_product_data')
+            ? swac_b2b_get_product_data($product)
+            : ['is_b2b' => false, 'carton_pack' => 0, 'scheme_badge' => '', 'ptr' => 0, 'mrp' => 0];
+
+        $price = $product->get_price() ? strip_tags((string)wc_price($b2b['is_b2b'] ? $b2b['ptr'] : $product->get_price())) : '';
+        $mrp = (float)($b2b['is_b2b'] ? $b2b['mrp'] : $product->get_regular_price());
+        $sale_price = (float)($b2b['is_b2b'] ? $b2b['ptr'] : $product->get_price());
         $is_rx = (bool)apply_filters('swac_product_is_rx', false, $product);
         $icon = function_exists('swac_icon_svg') ? swac_icon_svg() : '';
+        $default_qty = (!empty($b2b['carton_pack']) && $b2b['carton_pack'] > 0) ? (int)$b2b['carton_pack'] : 1;
 
         ob_start();
         ?>
-        <div class="swac-action-row">
-            <div class="swac-qty-selector">
-                <button type="button" class="swac-qty-btn swac-qty-minus" aria-label="<?php esc_attr_e('Decrease quantity', 'stateless-wa-commerce'); ?>">−</button>
-                <input type="number" class="swac-qty-input" value="1" min="1" max="99" aria-label="<?php esc_attr_e('Product quantity', 'stateless-wa-commerce'); ?>">
-                <button type="button" class="swac-qty-btn swac-qty-plus" aria-label="<?php esc_attr_e('Increase quantity', 'stateless-wa-commerce'); ?>">+</button>
+        <?php if ($b2b['is_b2b']) : ?>
+            <div class="swac-b2b-loop-wrapper swac-b2b-single-wrapper">
+                <!-- Unauthenticated Locked Action -->
+                <div class="swac-b2b-locked-action">
+                    <button type="button" class="button swac-b2b-gate-trigger swac-b2b-locked-order-btn">
+                        <span class="swac-lock-icon" aria-hidden="true">🔒</span>
+                        <span><?php esc_html_e('Retailer Login to Order', 'stateless-wa-commerce'); ?></span>
+                    </button>
+                </div>
+
+                <!-- Authenticated Unlocked Action -->
+                <div class="swac-b2b-unlocked-action">
+                    <?php if (!empty($b2b['carton_pack']) && $b2b['carton_pack'] > 0) : ?>
+                        <div class="swac-b2b-carton-guide" style="margin-bottom:8px;" title="<?php esc_attr_e('Packing conversion reference', 'stateless-wa-commerce'); ?>">
+                            <span class="swac-b2b-carton-icon" aria-hidden="true">📦</span>
+                            <?php
+                            printf(
+                                /* translators: %d: pieces per carton */
+                                esc_html__('1 Carton = %d pcs', 'stateless-wa-commerce'),
+                                (int)$b2b['carton_pack']
+                            );
+                            ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="swac-action-row swac-b2b-loop-action">
+                        <div class="swac-qty-selector">
+                            <button type="button" class="swac-qty-btn swac-qty-minus" aria-label="<?php esc_attr_e('Decrease quantity', 'stateless-wa-commerce'); ?>">−</button>
+                            <input
+                                type="number"
+                                class="swac-qty-input"
+                                value="<?php echo esc_attr($default_qty); ?>"
+                                min="1"
+                                max="9999"
+                                data-carton-pack="<?php echo esc_attr($b2b['carton_pack']); ?>"
+                                aria-label="<?php esc_attr_e('Product quantity', 'stateless-wa-commerce'); ?>"
+                            >
+                            <button type="button" class="swac-qty-btn swac-qty-plus" aria-label="<?php esc_attr_e('Increase quantity', 'stateless-wa-commerce'); ?>">+</button>
+                        </div>
+                        <button
+                            type="button"
+                            class="button swac-single-add-btn swac-b2b-add-btn"
+                            data-product-id="<?php echo esc_attr($product->get_id()); ?>"
+                            data-product-name="<?php echo esc_attr($product->get_name()); ?>"
+                            data-product-url="<?php echo esc_url($product->get_permalink()); ?>"
+                            data-product-price="<?php echo esc_attr($price); ?>"
+                            data-product-mrp="<?php echo esc_attr($mrp); ?>"
+                            data-product-sale-price="<?php echo esc_attr($sale_price); ?>"
+                            data-carton-pack="<?php echo esc_attr($b2b['carton_pack']); ?>"
+                            data-scheme-badge="<?php echo esc_attr($b2b['scheme_badge']); ?>"
+                            data-is-rx="<?php echo $is_rx ? '1' : '0'; ?>"
+                        >
+                            <?php echo $icon; ?>
+                            <span><?php esc_html_e('Add to Order', 'stateless-wa-commerce'); ?></span>
+                        </button>
+                    </div>
+                </div>
             </div>
-            <button
-                type="button"
-                class="button swac-single-add-btn"
-                data-product-id="<?php echo esc_attr($product->get_id()); ?>"
-                data-product-name="<?php echo esc_attr($product->get_name()); ?>"
-                data-product-url="<?php echo esc_url($product->get_permalink()); ?>"
-                data-product-price="<?php echo esc_attr($price); ?>"
-                data-product-mrp="<?php echo esc_attr($mrp); ?>"
-                data-product-sale-price="<?php echo esc_attr($sale_price); ?>"
-                data-is-rx="<?php echo $is_rx ? '1' : '0'; ?>"
-            >
-                <?php echo $icon; ?>
-                <span><?php esc_html_e('Add to Order', 'stateless-wa-commerce'); ?></span>
-            </button>
-        </div>
-        <?php
+        <?php else : ?>
+            <div class="swac-action-row">
+                <div class="swac-qty-selector">
+                    <button type="button" class="swac-qty-btn swac-qty-minus" aria-label="<?php esc_attr_e('Decrease quantity', 'stateless-wa-commerce'); ?>">−</button>
+                    <input type="number" class="swac-qty-input" value="1" min="1" max="99" aria-label="<?php esc_attr_e('Product quantity', 'stateless-wa-commerce'); ?>">
+                    <button type="button" class="swac-qty-btn swac-qty-plus" aria-label="<?php esc_attr_e('Increase quantity', 'stateless-wa-commerce'); ?>">+</button>
+                </div>
+                <button
+                    type="button"
+                    class="button swac-single-add-btn"
+                    data-product-id="<?php echo esc_attr($product->get_id()); ?>"
+                    data-product-name="<?php echo esc_attr($product->get_name()); ?>"
+                    data-product-url="<?php echo esc_url($product->get_permalink()); ?>"
+                    data-product-price="<?php echo esc_attr($price); ?>"
+                    data-product-mrp="<?php echo esc_attr($mrp); ?>"
+                    data-product-sale-price="<?php echo esc_attr($sale_price); ?>"
+                    data-is-rx="<?php echo $is_rx ? '1' : '0'; ?>"
+                >
+                    <?php echo $icon; ?>
+                    <span><?php esc_html_e('Add to Order', 'stateless-wa-commerce'); ?></span>
+                </button>
+            </div>
+        <?php endif; ?>
         return (string)ob_get_clean();
     }
 }

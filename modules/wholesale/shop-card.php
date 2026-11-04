@@ -29,12 +29,85 @@ add_filter('swac_commerce_config', function (array $config): array {
 /**
  * 1. Replaces standard loop price with Wholesale Pricing Block (Gated).
  */
+if (!function_exists('swac_b2b_format_price_block_html')) {
+    /**
+     * Formats the dual-state Wholesale Pricing Block (Gated / Unlocked).
+     *
+     * @param array $b2b Wholesale product data array.
+     * @param bool $is_card Whether rendering in a loop card or single page.
+     * @return string
+     */
+    function swac_b2b_format_price_block_html(array $b2b, bool $is_card = false): string
+    {
+        $currency = function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol() : '₹';
+        $extra_class = $is_card ? ' swac-b2b-price-block--card' : ' swac-b2b-price-block--single';
+
+        ob_start();
+        ?>
+        <div class="swac-b2b-price-block<?php echo esc_attr($extra_class); ?>">
+            <!-- Unauthenticated Locked View -->
+            <div class="swac-b2b-locked-view">
+                <button type="button" class="swac-b2b-gate-trigger" aria-label="<?php esc_attr_e('Login to view wholesale rate', 'stateless-wa-commerce'); ?>">
+                    <span class="swac-lock-icon" aria-hidden="true">🔒</span>
+                    <span><?php esc_html_e('Retailer PIN to View Rate', 'stateless-wa-commerce'); ?></span>
+                </button>
+            </div>
+
+            <!-- Authenticated Unlocked View -->
+            <div class="swac-b2b-unlocked-view">
+                <div class="swac-b2b-rate-row">
+                    <span class="swac-b2b-ptr">
+                        <span class="swac-b2b-ptr-label"><?php esc_html_e('Rate:', 'stateless-wa-commerce'); ?></span>
+                        <span class="swac-b2b-ptr-val"><?php echo wc_price($b2b['ptr']); ?></span>
+                    </span>
+                    <?php if ($b2b['mrp'] > $b2b['ptr'] && $b2b['mrp'] > 0) : ?>
+                        <span class="swac-b2b-mrp">
+                            <?php esc_html_e('MRP:', 'stateless-wa-commerce'); ?>
+                            <s class="swac-b2b-mrp-strike"><?php echo wc_price($b2b['mrp']); ?></s>
+                        </span>
+                    <?php endif; ?>
+                </div>
+
+                <?php if ($b2b['margin_amount'] > 0) : ?>
+                    <div class="swac-b2b-margin-row">
+                        <span class="swac-b2b-margin-badge">
+                            <?php
+                            printf(
+                                /* translators: 1: currency symbol, 2: margin amount, 3: margin percent */
+                                esc_html__('Margin: %1$s%2$s (%3$s%%)', 'stateless-wa-commerce'),
+                                esc_html($currency),
+                                esc_html(number_format($b2b['margin_amount'], 2)),
+                                esc_html($b2b['margin_percent'])
+                            );
+                            ?>
+                        </span>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (!empty($b2b['scheme_badge'])) : ?>
+                    <div class="swac-b2b-scheme-row">
+                        <span class="swac-b2b-scheme-badge">
+                            <span class="swac-b2b-scheme-icon" aria-hidden="true">🎁</span>
+                            <?php echo esc_html($b2b['scheme_badge']); ?>
+                        </span>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php
+        return (string)ob_get_clean();
+    }
+}
+
+/**
+ * 1. Replaces standard loop price with Wholesale Pricing Block (Gated).
+ */
 add_filter('woocommerce_get_price_html', function ($price_html, $product) {
     if (!$product instanceof WC_Product) {
         return $price_html;
     }
 
-    if (!function_exists('swac_b2b_get_product_data')) {
+    if (!function_exists('swac_b2b_get_product_data') || !function_exists('swac_b2b_format_price_block_html')) {
         return $price_html;
     }
 
@@ -43,62 +116,7 @@ add_filter('woocommerce_get_price_html', function ($price_html, $product) {
         return $price_html;
     }
 
-    $currency = function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol() : '₹';
-
-    ob_start();
-    ?>
-    <div class="swac-b2b-price-block">
-        <!-- Unauthenticated Locked View -->
-        <div class="swac-b2b-locked-view">
-            <button type="button" class="swac-b2b-gate-trigger" aria-label="<?php esc_attr_e('Login to view wholesale rate', 'stateless-wa-commerce'); ?>">
-                <span class="swac-lock-icon" aria-hidden="true">🔒</span>
-                <span><?php esc_html_e('Retailer PIN to View Rate', 'stateless-wa-commerce'); ?></span>
-            </button>
-        </div>
-
-        <!-- Authenticated Unlocked View -->
-        <div class="swac-b2b-unlocked-view">
-            <div class="swac-b2b-rate-row">
-                <span class="swac-b2b-ptr">
-                    <span class="swac-b2b-ptr-label"><?php esc_html_e('Rate:', 'stateless-wa-commerce'); ?></span>
-                    <span class="swac-b2b-ptr-val"><?php echo wc_price($b2b['ptr']); ?></span>
-                </span>
-                <?php if ($b2b['mrp'] > $b2b['ptr'] && $b2b['mrp'] > 0) : ?>
-                    <span class="swac-b2b-mrp">
-                        <?php esc_html_e('MRP:', 'stateless-wa-commerce'); ?>
-                        <s class="swac-b2b-mrp-strike"><?php echo wc_price($b2b['mrp']); ?></s>
-                    </span>
-                <?php endif; ?>
-            </div>
-
-            <?php if ($b2b['margin_amount'] > 0) : ?>
-                <div class="swac-b2b-margin-row">
-                    <span class="swac-b2b-margin-badge">
-                        <?php
-                        printf(
-                            /* translators: 1: currency symbol, 2: margin amount, 3: margin percent */
-                            esc_html__('Margin: %1$s%2$s (%3$s%%)', 'stateless-wa-commerce'),
-                            esc_html($currency),
-                            esc_html(number_format($b2b['margin_amount'], 2)),
-                            esc_html($b2b['margin_percent'])
-                        );
-                        ?>
-                    </span>
-                </div>
-            <?php endif; ?>
-
-            <?php if (!empty($b2b['scheme_badge'])) : ?>
-                <div class="swac-b2b-scheme-row">
-                    <span class="swac-b2b-scheme-badge">
-                        <span class="swac-b2b-scheme-icon" aria-hidden="true">🎁</span>
-                        <?php echo esc_html($b2b['scheme_badge']); ?>
-                    </span>
-                </div>
-            <?php endif; ?>
-        </div>
-    </div>
-    <?php
-    return (string)ob_get_clean();
+    return swac_b2b_format_price_block_html($b2b, true);
 }, 25, 2);
 
 /**

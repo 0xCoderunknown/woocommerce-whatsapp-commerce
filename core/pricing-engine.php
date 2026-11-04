@@ -111,6 +111,12 @@ if (!function_exists('swac_format_price_block_html')) {
      */
     function swac_format_price_block_html(WC_Product $product, bool $is_card = false): string
     {
+        if (function_exists('swac_b2b_get_product_data') && function_exists('swac_b2b_format_price_block_html')) {
+            $b2b = swac_b2b_get_product_data($product);
+            if (!empty($b2b['is_b2b'])) {
+                return swac_b2b_format_price_block_html($b2b, $is_card);
+            }
+        }
         $data = swac_calculate_price_data($product);
         if ($data['price'] <= 0 && $data['regular_price'] <= 0) {
             return '';

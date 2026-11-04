@@ -266,6 +266,39 @@
 
         // 5. Refresh Button
         document.getElementById('swac-rates-refresh')?.addEventListener('click', () => loadProducts());
+
+        // 6. CSV Import
+        const importInput = document.getElementById('swac-rates-import-file');
+        if (importInput) {
+            importInput.addEventListener('change', function () {
+                const file = this.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append('file', file);
+
+                showToast('Syncing rates from CSV...');
+                fetch(restUrl + 'swac/v1/desk/import-csv', {
+                    method: 'POST',
+                    headers: getHeaders(false),
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    importInput.value = '';
+                    if (data && data.success) {
+                        showToast('✓ ' + data.message);
+                        loadProducts();
+                    } else {
+                        showToast('Failed to import CSV: ' + (data.message || ''));
+                    }
+                })
+                .catch(() => {
+                    importInput.value = '';
+                    showToast('Network error uploading CSV.');
+                });
+            });
+        }
     }
 
     function saveRowRate(productId) {

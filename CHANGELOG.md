@@ -5,15 +5,17 @@
 ### Added
 - **Wholesale & Schemes B2B Module** (modules/wholesale/):
   - **Wholesale PTR & Schemes Meta**: Added _swac_b2b_ptr, _swac_b2b_carton_pack, and flexible promotional scheme rules (free goods e.g. 12+1, volume tier slabs, cash discount %, custom text).
-  - **Dynamic Margin Calculation**: Automatically computes retailer margin amount and percentage relative to MRP on loop cards.
-  - **Carton Packing Guide**: Displays informative carton reference labels (1 Carton = X pcs) to streamline order sizing.
-  - **Direct Shop-Page Ordering**: Added inline quantity selector and bulk-order action button directly on catalog cards.
+  - **Dynamic Margin Calculation**: Automatically computes retailer margin amount and percentage relative to MRP on loop cards and single product pages.
+  - **Carton Packing Guide**: Displays informative carton reference labels (1 Carton = X pcs) to streamline bulk order sizing.
+  - **Direct Shop-Page & Single-Page Ordering**: Added inline quantity selector and bulk-order action button across both catalog cards and single product views.
   - **Zero-Cost Retailer Login Gate**: Implemented mobile + 4-digit PIN authentication (modules/wholesale/retailer-auth.php) with zero SMS gateway costs.
-  - **Client-Side Wholesale Price Masking**: Gated wholesale rates, schemes, and margins behind client-side verification, keeping the public storefront 100% full-page cacheable.
+  - **Client-Side Wholesale Price Masking**: Gated wholesale rates, schemes, and margins behind client-side verification, keeping the public storefront 100% full-page static cacheable.
   - **WhatsApp Retailer Registration Handshake**: Integrated 1-tap WhatsApp account application (modules/wholesale/login-modal.php) for unapproved retailers.
   - **Approved Retailers Admin Directory**: Added CRUD management screen in WordPress admin under Products to manage retailer PINs and accounts.
   - **Frontend Distributor Desk ([swac_distributor_portal] / [swac_frontend_admin])**: Mobile-first workspace with live-search rate tweaker, single-screen product entry with direct camera photo upload, and retailer PIN desk.
+  - **1-Click CSV Rate Sync**: Added one-click CSV export and upload to sync hundreds of product rates and stock states instantly.
   - **WhatsApp Order Compilation**: Enhanced order payload to itemize cartons, loose units, active schemes, and retailer store identification for warehouse dispatch.
+
 ## [1.4.1] — 01-11-2026
 ## [1.4.1] — 01-11-2026
 
