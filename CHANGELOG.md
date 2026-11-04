@@ -1,4 +1,4 @@
-﻿# Changelog
+# Changelog
 
 ## [1.5.0] — 03-11-2026
 
@@ -12,8 +12,9 @@
   - **Client-Side Wholesale Price Masking**: Gated wholesale rates, schemes, and margins behind client-side verification, keeping the public storefront 100% full-page cacheable.
   - **WhatsApp Retailer Registration Handshake**: Integrated 1-tap WhatsApp account application (modules/wholesale/login-modal.php) for unapproved retailers.
   - **Approved Retailers Admin Directory**: Added CRUD management screen in WordPress admin under Products to manage retailer PINs and accounts.
+  - **Frontend Distributor Desk ([swac_distributor_portal] / [swac_frontend_admin])**: Mobile-first workspace with live-search rate tweaker, single-screen product entry with direct camera photo upload, and retailer PIN desk.
   - **WhatsApp Order Compilation**: Enhanced order payload to itemize cartons, loose units, active schemes, and retailer store identification for warehouse dispatch.
-
+## [1.4.1] — 01-11-2026
 ## [1.4.1] — 01-11-2026
 
 ### Fixed
@@ -37,7 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 All release dates follow the Indian date standard format: **`DD-MM-YYYY`**.
 
 ---
-## [1.4.0] — 10-10-2026
+## [1.4.0] â€” 10-10-2026
 ## [1.4.0] $([char]0x2014) 10-10-2026
 
 ### Added
@@ -46,7 +47,7 @@ All release dates follow the Indian date standard format: **`DD-MM-YYYY`**.
   - Added helper function `swac_is_always_free_shipping_postal_code($code)` with `swac_always_free_shipping_postal_codes` filter.
   - Localized `always_free_shipping_codes` to both `window.swacZones` and `window.swacConfig` / `window.swacCommerce`.
   - Added client-side `isAlwaysFreePincode(pincode)` and made `computeCartTotals()` postal-code aware to automatically waive shipping (`shipping = 0`, `isAlwaysFree: true`).
-  - Made `renderLoyaltyUI()` display a distinct green `.swac-loyalty-card--free-zone` badge ("🎉 Free Delivery Unlocked!") while bypassing shipping gap nudges.
+  - Made `renderLoyaltyUI()` display a distinct green `.swac-loyalty-card--free-zone` badge ("ðŸŽ‰ Free Delivery Unlocked!") while bypassing shipping gap nudges.
   - Added real-time postal code `input` and `blur` event triggers to dynamically recalculate drawer totals and loyalty cards as the customer types.
 - **Background Cron Cleanup Guard** (`core/catalog-lockdown.php`):
   - Added a persistent one-time option guard (`swac_cron_cleaned`) on `init` that unschedules and clears unused WooCommerce background cron events (`woocommerce_cleanup_sessions`, `woocommerce_cleanup_personal_data`, `woocommerce_cancel_unpaid_orders`, `woocommerce_tracker_send_event`) to eliminate needless PHP wakeups.

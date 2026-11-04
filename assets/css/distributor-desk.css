@@ -1,0 +1,344 @@
+/**
+ * 🖥️ FRONTEND ASSET: DISTRIBUTOR DESK STYLESHEET
+ * Scope: Dedicated styles for [swac_distributor_portal] frontend admin workspace.
+ *
+ * @package StatelessWaCommerce
+ */
+
+.swac-desk-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 16px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    color: #1e293b;
+    box-sizing: border-box;
+}
+
+.swac-desk-container * {
+    box-sizing: border-box;
+}
+
+.swac-desk-hidden {
+    display: none !important;
+}
+
+/* Header */
+.swac-desk-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.swac-desk-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.swac-desk-brand-title {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.swac-desk-badge {
+    background: #ecfdf5;
+    color: #059669;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid #a7f3d0;
+}
+
+/* Tabs */
+.swac-desk-tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+}
+
+.swac-desk-tab-btn {
+    padding: 10px 18px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #64748b;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+}
+
+.swac-desk-tab-btn:hover {
+    color: #0f172a;
+}
+
+.swac-desk-tab-btn--active {
+    color: #128c7e;
+    border-bottom-color: #128c7e;
+}
+
+/* Tab Contents */
+.swac-desk-tab-content {
+    display: none;
+}
+
+.swac-desk-tab-content--active {
+    display: block;
+    animation: swacFadeIn 0.2s ease-in-out;
+}
+
+@keyframes swacFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Cards & Surfaces */
+.swac-desk-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Toolbar */
+.swac-desk-toolbar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+/* Inputs & Form Fields */
+.swac-desk-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.swac-desk-field label {
+    font-size: 0.82rem;
+    color: #334155;
+}
+
+.swac-desk-input {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.90rem;
+    color: #0f172a;
+    background: #ffffff;
+    transition: border-color 0.15s ease;
+}
+
+.swac-desk-input:focus {
+    outline: none;
+    border-color: #128c7e;
+    box-shadow: 0 0 0 3px rgba(18, 140, 126, 0.12);
+}
+
+.swac-desk-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.swac-desk-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+}
+
+/* Buttons */
+.swac-desk-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 40px;
+    padding: 0 16px;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.swac-desk-btn--primary {
+    background: #128c7e;
+    color: #ffffff;
+}
+
+.swac-desk-btn--primary:hover {
+    background: #075e54;
+    color: #ffffff;
+}
+
+.swac-desk-btn--secondary {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+}
+
+.swac-desk-btn--secondary:hover {
+    background: #e2e8f0;
+}
+
+.swac-desk-btn--outline {
+    background: transparent;
+    color: #128c7e;
+    border: 1px solid #128c7e;
+}
+
+.swac-desk-btn--outline:hover {
+    background: #ecfdf5;
+}
+
+/* Tables */
+.swac-desk-table-wrapper {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow-x: auto;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.swac-desk-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    text-align: left;
+}
+
+.swac-desk-table th {
+    background: #f8fafc;
+    padding: 12px 16px;
+    font-weight: 700;
+    color: #475569;
+    border-bottom: 1px solid #e2e8f0;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+}
+
+.swac-desk-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.swac-desk-table tr:hover td {
+    background: #f8fafc;
+}
+
+/* Table Item Cell */
+.swac-desk-item-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.swac-desk-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    object-fit: cover;
+    background: #f1f5f9;
+}
+
+/* Inline Table Inputs */
+.swac-table-input {
+    height: 34px;
+    padding: 0 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    width: 80px;
+    color: #0f172a;
+}
+
+.swac-table-input:focus {
+    outline: none;
+    border-color: #128c7e;
+    background: #ecfdf5;
+}
+
+/* Stock Toggle Button */
+.swac-stock-toggle-btn {
+    background: none;
+    border: 1px solid transparent;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.swac-stock-toggle-btn--in {
+    background: #ecfdf5;
+    color: #059669;
+    border-color: #a7f3d0;
+}
+
+.swac-stock-toggle-btn--out {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+/* Alert / Toast */
+.swac-desk-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #0f172a;
+    color: #ffffff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+    z-index: 999999;
+}
+
+.swac-desk-alert {
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+/* Mobile Breakpoints */
+@media (max-width: 640px) {
+    .swac-desk-grid-2,
+    .swac-desk-grid-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .swac-desk-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+}

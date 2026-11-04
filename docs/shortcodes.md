@@ -24,7 +24,8 @@ It serves as the definitive reference for page builders, theme templates, and de
 | `[swac_rx_badge]` | Prescription required regulatory badge | None |
 | `[swac_size_chart]` | Diaper & apparel size chart accordion | None |
 | `[swac_explore_salts]` | Alphabetical chemical composition directory grid | `columns`, `hide_empty`, `orderby`, `order` |
-| `[swac_missing_images_finder]` | Catalog audit table finding products missing images | `limit` (default: 200) |
+| [swac_missing_images_finder] | Catalog audit table finding products missing images | limit (default: 200) |
+| [swac_distributor_portal] | Frontend mobile-first distributor workspace (rates, product entry, PINs) | None |
 
 ---
 
@@ -200,4 +201,17 @@ It serves as the definitive reference for page builders, theme templates, and de
 - **Example**:
   ```text
   [swac_missing_images_finder limit="500"]
+  ```
+
+
+### `[swac_distributor_portal]`
+- **Aliases**: `[swac_frontend_admin]`
+- **Purpose**: Embeds a zero-admin, mobile-friendly Frontend Distributor Desk on any Breakdance or theme page (e.g. `/distributor/`). Enables wholesalers and dispatch clerks to:
+  1. Tweak daily wholesale rates (PTR), MRPs, carton conversions, active schemes, and stock status in an instant-search spreadsheet table.
+  2. Add new products via single-screen form with direct phone camera / gallery photo upload.
+  3. Manage and approve retailer accounts and assign 4-digit PINs.
+- **Access**: Authorized automatically for logged-in WordPress administrators, or secured via Master PIN prompt for phone access without WordPress login.
+- **Example**:
+  ```text
+  [swac_distributor_portal]
   ```

@@ -120,6 +120,7 @@ if (swac_is_module_active('wholesale') && is_dir(SWAC_PATH . 'modules/wholesale'
         'modules/wholesale/shop-card.php',
         'modules/wholesale/retailer-auth.php',
         'modules/wholesale/login-modal.php',
+        'modules/wholesale/frontend-desk.php',
     ];
     foreach ($wholesale_files as $file) {
         if (file_exists(SWAC_PATH . $file)) {

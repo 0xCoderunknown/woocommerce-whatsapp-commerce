@@ -232,7 +232,8 @@ Standard shortcodes use the unique `[swac_*]` prefix:
 | `[swac_stock_status]` | Single product out-of-stock safety net badge | `[swac_stock_status]` |
 | `[swac_explore_brands]` | A-Z brand directory with live search | `[swac_explore_brands hide_empty="true"]` |
 | `[swac_categories_grid]`| Grid of child categories under a parent slug | `[swac_categories_grid parent_slug="electronics"]`|
-| `[swac_missing_images_finder]` | Admin audit tool for products missing images | `[swac_missing_images_finder]` |
+| [swac_missing_images_finder] | Admin audit tool for products missing images | [swac_missing_images_finder] |
+| [swac_distributor_portal] | Frontend distributor desk (daily rate tweaks, product entry, retailer PINs) | [swac_distributor_portal] |
 
 > 📖 **Full Documentation**:
 > - [docs/shortcodes.md](docs/shortcodes.md) — Comprehensive shortcode dictionary (including pharmacy module shortcodes `[swac_generic_box]`, `[swac_size_chart]`, `[swac_explore_salts]`).
