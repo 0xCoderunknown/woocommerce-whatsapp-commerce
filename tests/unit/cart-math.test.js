@@ -1,4 +1,4 @@
-const { test, describe, beforeEach } = require('node:test');
+const {test, describe, beforeEach} = require('node:test');
 const assert = require('node:assert/strict');
 const waCart = require('../../assets/js/wa_cart.js');
 
@@ -25,7 +25,7 @@ describe('Cart Math & Reconciliation', () => {
 
     test('should calculate subtotal, total MRP, and savings for single item', () => {
         const cart = [
-            { id: 1, name: 'Product A', salePrice: 100, mrp: 150, qty: 1 }
+            {id: 1, name: 'Product A', salePrice: 100, mrp: 150, qty: 1}
         ];
         const totals = waCart.computeCartTotals(cart);
 
@@ -40,8 +40,8 @@ describe('Cart Math & Reconciliation', () => {
 
     test('should handle multi-item quantities and multiple products', () => {
         const cart = [
-            { id: 1, name: 'Product A', salePrice: 100, mrp: 120, qty: 2 }, // sale 200, mrp 240
-            { id: 2, name: 'Product B', salePrice: 200, mrp: 250, qty: 1 }  // sale 200, mrp 250
+            {id: 1, name: 'Product A', salePrice: 100, mrp: 120, qty: 2}, // sale 200, mrp 240
+            {id: 2, name: 'Product B', salePrice: 200, mrp: 250, qty: 1}  // sale 200, mrp 250
         ];
         const totals = waCart.computeCartTotals(cart);
 
@@ -55,8 +55,8 @@ describe('Cart Math & Reconciliation', () => {
 
     test('should clamp MRP when mrp <= 0 or mrp < salePrice', () => {
         const cart = [
-            { id: 1, name: 'Item 1', salePrice: 120, mrp: 0, qty: 1 },    // mrp falls back to 120
-            { id: 2, name: 'Item 2', salePrice: 200, mrp: 150, qty: 1 }   // mrp clamped up to 200
+            {id: 1, name: 'Item 1', salePrice: 120, mrp: 0, qty: 1},    // mrp falls back to 120
+            {id: 2, name: 'Item 2', salePrice: 200, mrp: 150, qty: 1}   // mrp clamped up to 200
         ];
         const totals = waCart.computeCartTotals(cart);
 
@@ -92,7 +92,7 @@ describe('Cart Math & Reconciliation', () => {
         });
 
         const cart = [
-            { id: 1, name: 'High Value Item', salePrice: 450, mrp: 500, qty: 1 }
+            {id: 1, name: 'High Value Item', salePrice: 450, mrp: 500, qty: 1}
         ];
 
         // Before accepting loyalty offer:

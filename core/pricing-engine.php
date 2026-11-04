@@ -49,7 +49,7 @@ if (!function_exists('swac_build_whatsapp_url')) {
      * Builds a canonical WhatsApp direct URL, ensuring query string delimiters ('?' vs '&')
      * are correctly resolved whether the base URL already contains query parameters or not.
      *
-     * @param string      $message  The unencoded message text to pre-fill.
+     * @param string $message The unencoded message text to pre-fill.
      * @param string|null $base_url Optional explicit base URL. Defaults to configured base_url.
      * @return string Fully assembled, URL-encoded WhatsApp link (or empty string if no base URL).
      */
@@ -93,9 +93,9 @@ if (!function_exists('swac_calculate_price_data')) {
         $discount_percent = $is_on_sale ? (int)round((($regular_price - $price) / $regular_price) * 100) : 0;
 
         return [
-            'price'            => $price,
-            'regular_price'    => $regular_price,
-            'is_on_sale'       => $is_on_sale,
+            'price' => $price,
+            'regular_price' => $regular_price,
+            'is_on_sale' => $is_on_sale,
             'discount_percent' => $discount_percent,
         ];
     }

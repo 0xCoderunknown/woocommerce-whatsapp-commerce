@@ -33,17 +33,17 @@ add_action('woocommerce_before_add_to_cart_button', function () {
     $is_rx = (bool)apply_filters('swac_product_is_rx', false, $product);
     ?>
     <span
-        id="swac-product-data"
-        class="swac-product-data"
-        data-product-id="<?php echo esc_attr($product->get_id()); ?>"
-        data-product-name="<?php echo esc_attr($product->get_name()); ?>"
-        data-product-url="<?php echo esc_url(get_permalink($product->get_id())); ?>"
-        data-product-price="<?php echo esc_attr($price_plain); ?>"
-        data-product-mrp="<?php echo esc_attr($mrp); ?>"
-        data-product-sale-price="<?php echo esc_attr($sale_price); ?>"
-        data-is-rx="<?php echo $is_rx ? '1' : '0'; ?>"
-        aria-hidden="true"
-        style="display:none;"
+            id="swac-product-data"
+            class="swac-product-data"
+            data-product-id="<?php echo esc_attr($product->get_id()); ?>"
+            data-product-name="<?php echo esc_attr($product->get_name()); ?>"
+            data-product-url="<?php echo esc_url(get_permalink($product->get_id())); ?>"
+            data-product-price="<?php echo esc_attr($price_plain); ?>"
+            data-product-mrp="<?php echo esc_attr($mrp); ?>"
+            data-product-sale-price="<?php echo esc_attr($sale_price); ?>"
+            data-is-rx="<?php echo $is_rx ? '1' : '0'; ?>"
+            aria-hidden="true"
+            style="display:none;"
     ></span>
     <?php
 });

@@ -34,7 +34,7 @@ add_action('wp_enqueue_scripts', function () {
         wp_enqueue_script('swac-desk-script', SWAC_URL . 'assets/js/distributor-desk.js', [], SWAC_VERSION, true);
         wp_localize_script('swac-desk-script', 'swacDeskConfig', [
             'rest_url' => esc_url_raw(rest_url()),
-            'nonce'    => wp_create_nonce('wp_rest'),
+            'nonce' => wp_create_nonce('wp_rest'),
             'is_admin' => current_user_can('manage_woocommerce'),
             'shop_url' => esc_url(wc_get_page_permalink('shop') ?: home_url('/')),
             'currency' => function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol() : '₹',

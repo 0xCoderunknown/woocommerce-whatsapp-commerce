@@ -71,32 +71,32 @@
 
                 fetch(restUrl + 'swac/v1/desk/auth', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pin })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({pin})
                 })
-                .then(res => res.json())
-                .then(data => {
-                    if (data && data.success && data.token) {
-                        masterToken = data.token;
-                        sessionStorage.setItem('swac_master_token', masterToken);
-                        document.getElementById('swac-desk-login-box').classList.add('swac-desk-hidden');
-                        document.getElementById('swac-desk-app').classList.remove('swac-desk-hidden');
-                        loadProducts();
-                        loadRetailers();
-                        showToast('Distributor Desk unlocked.');
-                    } else {
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.success && data.token) {
+                            masterToken = data.token;
+                            sessionStorage.setItem('swac_master_token', masterToken);
+                            document.getElementById('swac-desk-login-box').classList.add('swac-desk-hidden');
+                            document.getElementById('swac-desk-app').classList.remove('swac-desk-hidden');
+                            loadProducts();
+                            loadRetailers();
+                            showToast('Distributor Desk unlocked.');
+                        } else {
+                            if (errBox) {
+                                errBox.textContent = data.message || 'Incorrect PIN.';
+                                errBox.classList.remove('swac-desk-hidden');
+                            }
+                        }
+                    })
+                    .catch(() => {
                         if (errBox) {
-                            errBox.textContent = data.message || 'Incorrect PIN.';
+                            errBox.textContent = 'Server connection error.';
                             errBox.classList.remove('swac-desk-hidden');
                         }
-                    }
-                })
-                .catch(() => {
-                    if (errBox) {
-                        errBox.textContent = 'Server connection error.';
-                        errBox.classList.remove('swac-desk-hidden');
-                    }
-                });
+                    });
             });
         }
     }
@@ -135,19 +135,19 @@
             url += '?search=' + encodeURIComponent(search);
         }
 
-        fetch(url, { headers: getHeaders() })
-        .then(res => res.json())
-        .then(data => {
-            if (data && data.success && Array.isArray(data.products)) {
-                allProducts = data.products;
-                renderRateTable(allProducts);
-            } else {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#ef4444;">Failed to load catalog.</td></tr>';
-            }
-        })
-        .catch(() => {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#ef4444;">Network error loading catalog.</td></tr>';
-        });
+        fetch(url, {headers: getHeaders()})
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.success && Array.isArray(data.products)) {
+                    allProducts = data.products;
+                    renderRateTable(allProducts);
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#ef4444;">Failed to load catalog.</td></tr>';
+                }
+            })
+            .catch(() => {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#ef4444;">Network error loading catalog.</td></tr>';
+            });
     }
 
     function renderRateTable(products) {
@@ -210,18 +210,18 @@
                 fetch(restUrl + 'swac/v1/desk/quick-update', {
                     method: 'POST',
                     headers: getHeaders(),
-                    body: JSON.stringify({ id, in_stock: newStock })
+                    body: JSON.stringify({id, in_stock: newStock})
                 })
-                .then(res => res.json())
-                .then(data => {
-                    stockBtn.disabled = false;
-                    if (data && data.success) {
-                        stockBtn.dataset.stock = newStock ? '1' : '0';
-                        stockBtn.className = `swac-stock-toggle-btn ${newStock ? 'swac-stock-toggle-btn--in' : 'swac-stock-toggle-btn--out'}`;
-                        stockBtn.textContent = newStock ? '🟢 In Stock' : '🔴 Out of Stock';
-                        showToast('Stock status updated.');
-                    }
-                });
+                    .then(res => res.json())
+                    .then(data => {
+                        stockBtn.disabled = false;
+                        if (data && data.success) {
+                            stockBtn.dataset.stock = newStock ? '1' : '0';
+                            stockBtn.className = `swac-stock-toggle-btn ${newStock ? 'swac-stock-toggle-btn--in' : 'swac-stock-toggle-btn--out'}`;
+                            stockBtn.textContent = newStock ? '🟢 In Stock' : '🔴 Out of Stock';
+                            showToast('Stock status updated.');
+                        }
+                    });
                 return;
             }
 
@@ -290,20 +290,20 @@
                     headers: getHeaders(false),
                     body: formData
                 })
-                .then(res => res.json())
-                .then(data => {
-                    importInput.value = '';
-                    if (data && data.success) {
-                        showToast('✓ ' + data.message);
-                        loadProducts();
-                    } else {
-                        showToast('Failed to import CSV: ' + (data.message || ''));
-                    }
-                })
-                .catch(() => {
-                    importInput.value = '';
-                    showToast('Network error uploading CSV.');
-                });
+                    .then(res => res.json())
+                    .then(data => {
+                        importInput.value = '';
+                        if (data && data.success) {
+                            showToast('✓ ' + data.message);
+                            loadProducts();
+                        } else {
+                            showToast('Failed to import CSV: ' + (data.message || ''));
+                        }
+                    })
+                    .catch(() => {
+                        importInput.value = '';
+                        showToast('Network error uploading CSV.');
+                    });
             });
         }
 
@@ -314,27 +314,27 @@
                     method: 'GET',
                     headers: getHeaders(false)
                 })
-                .then(res => {
-                    if (!res.ok) throw new Error('Export error');
-                    return res.blob();
-                })
-                .then(blob => {
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.style.display = 'none';
-                    a.href = url;
-                    a.download = `wholesale-rates-${new Date().toISOString().slice(0, 10)}.csv`;
-                    document.body.appendChild(a);
-                    a.click();
-                    setTimeout(() => {
-                        window.URL.revokeObjectURL(url);
-                        a.remove();
-                    }, 1000);
-                    showToast('✓ CSV Downloaded.');
-                })
-                .catch(() => {
-                    showToast('Failed to download CSV.');
-                });
+                    .then(res => {
+                        if (!res.ok) throw new Error('Export error');
+                        return res.blob();
+                    })
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = url;
+                        a.download = `wholesale-rates-${new Date().toISOString().slice(0, 10)}.csv`;
+                        document.body.appendChild(a);
+                        a.click();
+                        setTimeout(() => {
+                            window.URL.revokeObjectURL(url);
+                            a.remove();
+                        }, 1000);
+                        showToast('✓ CSV Downloaded.');
+                    })
+                    .catch(() => {
+                        showToast('Failed to download CSV.');
+                    });
             });
         }
     }
@@ -365,25 +365,25 @@
             headers: getHeaders(),
             body: JSON.stringify(payload)
         })
-        .then(res => res.json())
-        .then(data => {
-            if (saveBtn) {
-                saveBtn.disabled = false;
-                saveBtn.textContent = 'Save';
-            }
-            if (data && data.success) {
-                showToast('✓ Saved: Rate updated');
-            } else {
-                showToast('Failed to save rate: ' + (data.message || ''));
-            }
-        })
-        .catch(() => {
-            if (saveBtn) {
-                saveBtn.disabled = false;
-                saveBtn.textContent = 'Save';
-            }
-            showToast('Network error saving rate.');
-        });
+            .then(res => res.json())
+            .then(data => {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Save';
+                }
+                if (data && data.success) {
+                    showToast('✓ Saved: Rate updated');
+                } else {
+                    showToast('Failed to save rate: ' + (data.message || ''));
+                }
+            })
+            .catch(() => {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Save';
+                }
+                showToast('Network error saving rate.');
+            });
     }
 
     // ── 4. Tab 2: Fast Product Creation Form ──────────────────────────────────
@@ -441,29 +441,29 @@
                 headers: getHeaders(false), // multipart
                 body: formData
             })
-            .then(res => res.json())
-            .then(data => {
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = '➕ Save & Publish to Wholesale Catalog';
-                }
-                if (data && data.success) {
-                    form.reset();
-                    if (previewBox) previewBox.innerHTML = '';
-                    subfieldsBox?.classList.add('swac-desk-hidden');
-                    showToast('🎉 ' + data.message);
-                    loadProducts(); // refresh catalog
-                } else {
-                    showToast('Failed to add product: ' + (data.message || ''));
-                }
-            })
-            .catch(() => {
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = '➕ Save & Publish to Wholesale Catalog';
-                }
-                showToast('Network error creating product.');
-            });
+                .then(res => res.json())
+                .then(data => {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = '➕ Save & Publish to Wholesale Catalog';
+                    }
+                    if (data && data.success) {
+                        form.reset();
+                        if (previewBox) previewBox.innerHTML = '';
+                        subfieldsBox?.classList.add('swac-desk-hidden');
+                        showToast('🎉 ' + data.message);
+                        loadProducts(); // refresh catalog
+                    } else {
+                        showToast('Failed to add product: ' + (data.message || ''));
+                    }
+                })
+                .catch(() => {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = '➕ Save & Publish to Wholesale Catalog';
+                    }
+                    showToast('Network error creating product.');
+                });
         });
     }
 
@@ -472,13 +472,13 @@
         const tbody = document.getElementById('swac-retailers-tbody');
         if (!tbody) return;
 
-        fetch(restUrl + 'swac/v1/desk/retailers', { headers: getHeaders() })
-        .then(res => res.json())
-        .then(data => {
-            if (data && data.success && Array.isArray(data.retailers)) {
-                renderRetailersTable(data.retailers);
-            }
-        });
+        fetch(restUrl + 'swac/v1/desk/retailers', {headers: getHeaders()})
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.success && Array.isArray(data.retailers)) {
+                    renderRetailersTable(data.retailers);
+                }
+            });
     }
 
     function renderRetailersTable(retailers) {
@@ -515,15 +515,15 @@
                         fetch(restUrl + 'swac/v1/desk/delete-retailer', {
                             method: 'POST',
                             headers: getHeaders(),
-                            body: JSON.stringify({ phone })
+                            body: JSON.stringify({phone})
                         })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data && data.success) {
-                                showToast('Retailer removed.');
-                                loadRetailers();
-                            }
-                        });
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data && data.success) {
+                                    showToast('Retailer removed.');
+                                    loadRetailers();
+                                }
+                            });
                     }
                 }
             });
@@ -541,16 +541,16 @@
                     headers: getHeaders(),
                     body: JSON.stringify(payload)
                 })
-                .then(res => res.json())
-                .then(data => {
-                    if (data && data.success) {
-                        addForm.reset();
-                        showToast('✓ Retailer approved & PIN activated!');
-                        loadRetailers();
-                    } else {
-                        showToast('Error: ' + (data.message || ''));
-                    }
-                });
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.success) {
+                            addForm.reset();
+                            showToast('✓ Retailer approved & PIN activated!');
+                            loadRetailers();
+                        } else {
+                            showToast('Error: ' + (data.message || ''));
+                        }
+                    });
             });
         }
 

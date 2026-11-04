@@ -60,9 +60,9 @@ if (!function_exists('swac_get_delivery_cutoff_message')) {
          * Filter the delivery cutoff message.
          *
          * @param string $message Evaluated message.
-         * @param int    $day     Day of week (1-7).
-         * @param int    $hour    Hour of day (0-23).
-         * @param int    $timestamp Current timestamp.
+         * @param int $day Day of week (1-7).
+         * @param int $hour Hour of day (0-23).
+         * @param int $timestamp Current timestamp.
          */
         return (string)apply_filters('swac_delivery_cutoff_message', $default_message, $day, $hour, $timestamp);
     }

@@ -18,16 +18,17 @@ if (!function_exists('swac_is_module_active') || !swac_is_module_active('explore
 }
 
 // ─── 1. SHORTCODE: CATEGORIES GRID ───────────────────────────────────────────
-function swac_categories_grid_shortcode($atts) {
+function swac_categories_grid_shortcode($atts)
+{
     wp_enqueue_style('swac-explore-style');
     wp_enqueue_script('swac-frontend-script');
 
     $atts = shortcode_atts([
         'parent_slug' => '',
-        'hide_empty'  => false,
-        'orderby'     => 'name',
-        'order'       => 'ASC',
-        'image_size'  => 'medium',
+        'hide_empty' => false,
+        'orderby' => 'name',
+        'order' => 'ASC',
+        'image_size' => 'medium',
     ], $atts, 'swac_categories_grid');
 
     if (empty($atts['parent_slug'])) {
@@ -45,11 +46,11 @@ function swac_categories_grid_shortcode($atts) {
 
     if (false === $terms) {
         $terms = get_terms([
-            'taxonomy'   => 'product_cat',
-            'child_of'   => $parent_term->term_id,
+            'taxonomy' => 'product_cat',
+            'child_of' => $parent_term->term_id,
             'hide_empty' => filter_var($atts['hide_empty'], FILTER_VALIDATE_BOOLEAN),
-            'orderby'    => $atts['orderby'],
-            'order'      => $atts['order'],
+            'orderby' => $atts['orderby'],
+            'order' => $atts['order'],
         ]);
 
         if (!is_wp_error($terms)) {
@@ -92,7 +93,8 @@ function swac_categories_grid_shortcode($atts) {
                 $image_url = $image_id ? wp_get_attachment_image_url($image_id, $atts['image_size']) : false;
                 $first_letter = function_exists('swac_get_term_initial') ? swac_get_term_initial((string)($term->name ?? '')) : '#';
                 ?>
-                <div class="swac-brand-card swac-search-item" data-title="<?php echo esc_attr(strtolower($term->name)); ?>">
+                <div class="swac-brand-card swac-search-item"
+                     data-title="<?php echo esc_attr(strtolower($term->name)); ?>">
                     <a href="<?php echo esc_url($link); ?>" class="swac-brand-link">
                         <div class="swac-brand-image-wrap">
                             <?php if ($image_url) : ?>
@@ -112,7 +114,7 @@ function swac_categories_grid_shortcode($atts) {
                                 <span class="swac-brand-count">
                                     <?php
                                     echo sprintf(
-                                        /* translators: %d: count */
+                                    /* translators: %d: count */
                                         esc_html(_n('%d product', '%d products', $term->count, 'stateless-wa-commerce')),
                                         $term->count
                                     );
@@ -128,10 +130,12 @@ function swac_categories_grid_shortcode($atts) {
     <?php
     return (string)ob_get_clean();
 }
+
 add_shortcode('swac_categories_grid', 'swac_categories_grid_shortcode');
 
 // ─── 2. SHORTCODE: DIRECTORY SEARCH ──────────────────────────────────────────
-function swac_directory_search_shortcode($atts) {
+function swac_directory_search_shortcode($atts)
+{
     wp_enqueue_script('swac-frontend-script');
 
     $atts = shortcode_atts([
@@ -160,4 +164,5 @@ function swac_directory_search_shortcode($atts) {
     <?php
     return (string)ob_get_clean();
 }
+
 add_shortcode('swac_directory_search', 'swac_directory_search_shortcode');

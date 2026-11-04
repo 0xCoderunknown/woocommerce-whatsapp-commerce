@@ -48,19 +48,19 @@ if (!function_exists('swac_seo_output_homepage_schema')) {
         $postcode = function_exists('WC') && WC()->countries ? WC()->countries->get_base_postcode() : '';
 
         $schema = [
-            '@context'  => 'https://schema.org/',
-            '@type'     => 'LocalBusiness',
-            'name'      => $store_name,
-            'url'       => $site_url,
-            'logo'      => $site_icon,
-            'image'     => $site_icon,
+            '@context' => 'https://schema.org/',
+            '@type' => 'LocalBusiness',
+            'name' => $store_name,
+            'url' => $site_url,
+            'logo' => $site_icon,
+            'image' => $site_icon,
             'telephone' => $phone,
-            'address'   => [
-                '@type'           => 'PostalAddress',
-                'streetAddress'   => $address,
+            'address' => [
+                '@type' => 'PostalAddress',
+                'streetAddress' => $address,
                 'addressLocality' => $city,
-                'postalCode'      => $postcode,
-                'addressCountry'  => $country,
+                'postalCode' => $postcode,
+                'addressCountry' => $country,
             ],
         ];
 

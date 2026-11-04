@@ -6,13 +6,13 @@
 
 const fs = require('fs');
 const path = require('path');
-const { spawnSync } = require('child_process');
+const {spawnSync} = require('child_process');
 
 const ROOT_DIR = path.resolve(__dirname, '../..');
 const TEXT_DOMAIN = 'stateless-wa-commerce';
 
 function getAllPhpFiles(dir, fileList = []) {
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    const entries = fs.readdirSync(dir, {withFileTypes: true});
     for (const entry of entries) {
         if (entry.name.startsWith('.') || entry.name === 'node_modules') {
             continue;
@@ -159,11 +159,11 @@ function runPhpVerification() {
         phpBin = process.env.PHP_BINARY;
     }
 
-    const hasPhpCli = spawnSync(phpBin, ['-v'], { encoding: 'utf8' }).status === 0;
+    const hasPhpCli = spawnSync(phpBin, ['-v'], {encoding: 'utf8'}).status === 0;
     if (hasPhpCli) {
         console.log(`PHP CLI detected (${phpBin}). Running syntax lint (php -l)...\n`);
         for (const filePath of phpFiles) {
-            const res = spawnSync(phpBin, ['-l', filePath], { encoding: 'utf8' });
+            const res = spawnSync(phpBin, ['-l', filePath], {encoding: 'utf8'});
             if (res.status !== 0) {
                 errors.push(`PHP Syntax Error in ${path.relative(ROOT_DIR, filePath)}: ${res.stderr || res.stdout}`);
             }

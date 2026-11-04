@@ -26,28 +26,28 @@ if (!function_exists('swac_render_size_chart')) {
 
         $default_charts = [
             'adult-diaper' => [
-                'slugs'  => ['adult-diaper-bed-pan', 'adult-diapers-underpads'],
-                'title'  => __('📏 Adult Diaper Size Chart', 'stateless-wa-commerce'),
+                'slugs' => ['adult-diaper-bed-pan', 'adult-diapers-underpads'],
+                'title' => __('📏 Adult Diaper Size Chart', 'stateless-wa-commerce'),
                 'header' => [__('Size', 'stateless-wa-commerce'), __('Waist Range', 'stateless-wa-commerce')],
-                'rows'   => [
+                'rows' => [
                     ['<strong>M</strong> (Medium)', '28 – 44 inches'],
                     ['<strong>L</strong> (Large)', '38 – 54 inches'],
                     ['<strong>XL</strong> (Extra Large)', '48 – 68 inches'],
                 ],
-                'note'   => __('*Sizes are approximate. Measure waist for the best fit.', 'stateless-wa-commerce'),
+                'note' => __('*Sizes are approximate. Measure waist for the best fit.', 'stateless-wa-commerce'),
             ],
             'baby-diaper' => [
-                'slugs'  => ['baby-diaper', 'diapers-pants'],
-                'title'  => __('👶 Baby Diaper Size Chart', 'stateless-wa-commerce'),
+                'slugs' => ['baby-diaper', 'diapers-pants'],
+                'title' => __('👶 Baby Diaper Size Chart', 'stateless-wa-commerce'),
                 'header' => [__('Size', 'stateless-wa-commerce'), __('Weight Range', 'stateless-wa-commerce')],
-                'rows'   => [
+                'rows' => [
                     ['New Born (NB)', 'Up to 5 kg'],
                     ['Small (S)', '4 – 8 kg'],
                     ['Medium (M)', '7 – 12 kg'],
                     ['Large (L)', '9 – 14 kg'],
                     ['Extra Large (XL)', '12 – 17 kg'],
                 ],
-                'note'   => __('*Weight ranges may vary slightly by brand fit.', 'stateless-wa-commerce'),
+                'note' => __('*Weight ranges may vary slightly by brand fit.', 'stateless-wa-commerce'),
             ],
         ];
 
@@ -84,19 +84,19 @@ if (!function_exists('swac_render_size_chart')) {
             <div class="swac-size-chart-content">
                 <table class="swac-size-table">
                     <thead>
-                        <tr>
-                            <?php foreach ($active_config['header'] as $th) : ?>
-                                <th><?php echo esc_html($th); ?></th>
-                            <?php endforeach; ?>
-                        </tr>
+                    <tr>
+                        <?php foreach ($active_config['header'] as $th) : ?>
+                            <th><?php echo esc_html($th); ?></th>
+                        <?php endforeach; ?>
+                    </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($active_config['rows'] as $row) : ?>
-                            <tr>
-                                <td><?php echo wp_kses_post($row[0]); ?></td>
-                                <td><?php echo wp_kses_post($row[1]); ?></td>
-                            </tr>
-                        <?php endforeach; ?>
+                    <?php foreach ($active_config['rows'] as $row) : ?>
+                        <tr>
+                            <td><?php echo wp_kses_post($row[0]); ?></td>
+                            <td><?php echo wp_kses_post($row[1]); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
                     </tbody>
                 </table>
                 <?php if (!empty($active_config['note'])) : ?>

@@ -112,7 +112,6 @@ define('SWAC_MAX_QTY_PER_ITEM', 10);
 define('SWAC_ORDER_DISCLAIMER', '⚡ Final bill & product availability will be confirmed on WhatsApp.');
 
 
-
 // ─────────────────────────────────────────────────────────────────────────────
 // LOYALTY REWARD  (optional cart incentive)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -158,7 +157,7 @@ if (!defined('SWAC_URL')) {
     define('SWAC_URL', plugin_dir_url(dirname(__FILE__)));
 }
 if (!defined('SWAC_VERSION')) {
-    define('SWAC_VERSION', '1.5.1');
+    define('SWAC_VERSION', '1.6.0');
 }
 
 if (!function_exists('swac_get_config')) {
@@ -185,27 +184,27 @@ if (!function_exists('swac_get_config')) {
         $store_name = SWAC_STORE_NAME !== '' ? SWAC_STORE_NAME : (get_bloginfo('name') ?: 'Store');
 
         $defaults = [
-            'phone_number'                      => SWAC_PHONE,
-            'store_name'                        => $store_name,
-            'base_url'                          => '',
-            'free_shipping_at'                  => (float) SWAC_FREE_SHIPPING_AT,
-            'shipping_charge'                   => (float) SWAC_SHIPPING_CHARGE,
-            'always_free_shipping_postal_codes' => (array) (defined('SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES') ? SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES : []),
-            'currency_symbol'                   => $currency_symbol,
-            'city_name'                         => SWAC_CITY_NAME,
-            'max_cart_items'                    => (int) SWAC_MAX_CART_ITEMS,
-            'max_qty_per_item'                  => (int) SWAC_MAX_QTY_PER_ITEM,
-            'order_disclaimer'                  => SWAC_ORDER_DISCLAIMER,
+            'phone_number' => SWAC_PHONE,
+            'store_name' => $store_name,
+            'base_url' => '',
+            'free_shipping_at' => (float)SWAC_FREE_SHIPPING_AT,
+            'shipping_charge' => (float)SWAC_SHIPPING_CHARGE,
+            'always_free_shipping_postal_codes' => (array)(defined('SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES') ? SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES : []),
+            'currency_symbol' => $currency_symbol,
+            'city_name' => SWAC_CITY_NAME,
+            'max_cart_items' => (int)SWAC_MAX_CART_ITEMS,
+            'max_qty_per_item' => (int)SWAC_MAX_QTY_PER_ITEM,
+            'order_disclaimer' => SWAC_ORDER_DISCLAIMER,
             // Prescription note: pharmacy module concern — set via swac_commerce_config filter when pharmacy module is active.
-            'prescription_note_enabled'         => false,
-            'prescription_note'                 => '',
-            'loyalty'                           => [
-                'enabled'    => (bool) SWAC_LOYALTY_ENABLED,
-                'threshold'  => (int)  SWAC_LOYALTY_THRESHOLD,
+            'prescription_note_enabled' => false,
+            'prescription_note' => '',
+            'loyalty' => [
+                'enabled' => (bool)SWAC_LOYALTY_ENABLED,
+                'threshold' => (int)SWAC_LOYALTY_THRESHOLD,
                 'item_label' => SWAC_LOYALTY_ITEM_LABEL,
-                'item_worth' => (int)  SWAC_LOYALTY_ITEM_WORTH,
-                'item_price' => (int)  SWAC_LOYALTY_ITEM_PRICE,
-                'flag'       => SWAC_LOYALTY_FLAG,
+                'item_worth' => (int)SWAC_LOYALTY_ITEM_WORTH,
+                'item_price' => (int)SWAC_LOYALTY_ITEM_PRICE,
+                'flag' => SWAC_LOYALTY_FLAG,
             ],
             'modules' => [], // Controlled exclusively by features.php — do not set here.
         ];
@@ -215,7 +214,7 @@ if (!function_exists('swac_get_config')) {
 
         if (empty($config['base_url']) && !empty($config['phone_number'])) {
             $config['base_url'] = 'https://api.whatsapp.com/send?phone='
-                . preg_replace('/[^0-9]/', '', (string) $config['phone_number']);
+                . preg_replace('/[^0-9]/', '', (string)$config['phone_number']);
         }
 
         $resolved_config = $config;
@@ -234,6 +233,6 @@ if (!function_exists('swac_is_module_active')) {
     {
         $config = swac_get_config();
         $active_modules = apply_filters('swac_active_modules', $config['modules'] ?? []);
-        return in_array($module, (array) $active_modules, true);
+        return in_array($module, (array)$active_modules, true);
     }
 }

@@ -32,24 +32,24 @@ if (!defined('SWAC_TAX_GENERIC')) {
 add_action('init', function () {
     $taxonomies = [
         SWAC_TAX_SALT => [
-            'singular'     => __('Composition', 'stateless-wa-commerce'),
-            'plural'       => __('Compositions', 'stateless-wa-commerce'),
-            'slug'         => 'composition',
-            'public'       => true,
+            'singular' => __('Composition', 'stateless-wa-commerce'),
+            'plural' => __('Compositions', 'stateless-wa-commerce'),
+            'slug' => 'composition',
+            'public' => true,
             'hierarchical' => false,
         ],
         SWAC_TAX_PACK_SIZE => [
-            'singular'     => __('Pack Size', 'stateless-wa-commerce'),
-            'plural'       => __('Pack Sizes', 'stateless-wa-commerce'),
-            'slug'         => 'pack-size',
-            'public'       => true,
+            'singular' => __('Pack Size', 'stateless-wa-commerce'),
+            'plural' => __('Pack Sizes', 'stateless-wa-commerce'),
+            'slug' => 'pack-size',
+            'public' => true,
             'hierarchical' => false,
         ],
         SWAC_TAX_GENERIC => [
-            'singular'     => __('Generic Flag', 'stateless-wa-commerce'),
-            'plural'       => __('Generic Flags', 'stateless-wa-commerce'),
-            'slug'         => 'generic',
-            'public'       => true,
+            'singular' => __('Generic Flag', 'stateless-wa-commerce'),
+            'plural' => __('Generic Flags', 'stateless-wa-commerce'),
+            'slug' => 'generic',
+            'public' => true,
             'hierarchical' => true,
         ],
     ];
@@ -63,25 +63,25 @@ add_action('init', function () {
 
     foreach ($taxonomies as $key => $config) {
         $labels = [
-            'name'          => $config['plural'],
+            'name' => $config['plural'],
             'singular_name' => $config['singular'],
-            'search_items'  => sprintf(__('Search %s', 'stateless-wa-commerce'), $config['plural']),
-            'all_items'     => sprintf(__('All %s', 'stateless-wa-commerce'), $config['plural']),
-            'edit_item'     => sprintf(__('Edit %s', 'stateless-wa-commerce'), $config['singular']),
-            'update_item'   => sprintf(__('Update %s', 'stateless-wa-commerce'), $config['singular']),
-            'add_new_item'  => sprintf(__('Add New %s', 'stateless-wa-commerce'), $config['singular']),
+            'search_items' => sprintf(__('Search %s', 'stateless-wa-commerce'), $config['plural']),
+            'all_items' => sprintf(__('All %s', 'stateless-wa-commerce'), $config['plural']),
+            'edit_item' => sprintf(__('Edit %s', 'stateless-wa-commerce'), $config['singular']),
+            'update_item' => sprintf(__('Update %s', 'stateless-wa-commerce'), $config['singular']),
+            'add_new_item' => sprintf(__('Add New %s', 'stateless-wa-commerce'), $config['singular']),
             'new_item_name' => sprintf(__('New %s Name', 'stateless-wa-commerce'), $config['singular']),
-            'menu_name'     => $config['plural'],
+            'menu_name' => $config['plural'],
         ];
 
         register_taxonomy($key, 'product', [
-            'hierarchical'      => $config['hierarchical'],
-            'labels'            => $labels,
-            'show_ui'           => true,
+            'hierarchical' => $config['hierarchical'],
+            'labels' => $labels,
+            'show_ui' => true,
             'show_admin_column' => true,
-            'query_var'         => true,
-            'show_in_rest'      => true,
-            'rewrite'           => ['slug' => $config['slug']],
+            'query_var' => true,
+            'show_in_rest' => true,
+            'rewrite' => ['slug' => $config['slug']],
         ]);
     }
 });

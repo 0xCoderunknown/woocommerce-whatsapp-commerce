@@ -44,7 +44,7 @@ if (!function_exists('swac_render_taxonomy_dropdown')) {
      * Render the Select2 dropdown box for a given taxonomy.
      *
      * @param WP_Post $post Post object.
-     * @param array   $box  Meta box arguments.
+     * @param array $box Meta box arguments.
      * @return void
      */
     function swac_render_taxonomy_dropdown($post, array $box): void
@@ -64,11 +64,11 @@ if (!function_exists('swac_render_taxonomy_dropdown')) {
         ?>
         <div class="swac-taxonomy-select2-wrapper wa-taxonomy-select2-wrapper" style="margin-top: 5px;">
             <select
-                name="swac_tax_select2[<?php echo esc_attr($taxonomy); ?>]"
-                class="swac-taxonomy-select2 wa-taxonomy-select2"
-                data-taxonomy="<?php echo esc_attr($taxonomy); ?>"
-                data-placeholder="<?php echo esc_attr(sprintf(__('Select %s...', 'stateless-wa-commerce'), $tax_name)); ?>"
-                style="width: 100%;"
+                    name="swac_tax_select2[<?php echo esc_attr($taxonomy); ?>]"
+                    class="swac-taxonomy-select2 wa-taxonomy-select2"
+                    data-taxonomy="<?php echo esc_attr($taxonomy); ?>"
+                    data-placeholder="<?php echo esc_attr(sprintf(__('Select %s...', 'stateless-wa-commerce'), $tax_name)); ?>"
+                    style="width: 100%;"
             >
                 <option value=""><?php echo esc_html(sprintf(__('— No %s —', 'stateless-wa-commerce'), $tax_name)); ?></option>
                 <?php if ($selected_term) : ?>
@@ -112,7 +112,7 @@ add_action('save_post_product', function ($post_id) {
             continue;
         }
 
-        $term_id = (int) $raw_input[$taxonomy];
+        $term_id = (int)$raw_input[$taxonomy];
         if ($term_id > 0) {
             wp_set_object_terms($post_id, [$term_id], $taxonomy, false);
         } else {
@@ -148,17 +148,17 @@ $swac_search_terms_handler = function () {
     }
 
     $terms = get_terms([
-        'taxonomy'   => $taxonomy,
+        'taxonomy' => $taxonomy,
         'hide_empty' => false,
-        'search'     => $search,
-        'number'     => 20,
+        'search' => $search,
+        'number' => 20,
     ]);
 
     $results = [];
     if (!empty($terms) && !is_wp_error($terms)) {
         foreach ($terms as $term) {
             $results[] = [
-                'id'   => (int)$term->term_id,
+                'id' => (int)$term->term_id,
                 'text' => html_entity_decode($term->name, ENT_QUOTES, 'UTF-8'),
             ];
         }
@@ -193,7 +193,7 @@ add_action('admin_enqueue_scripts', function ($hook) {
 
     $localize_payload = [
         'ajax_url' => admin_url('admin-ajax.php'),
-        'nonce'    => wp_create_nonce('swac_admin_tax_nonce'),
+        'nonce' => wp_create_nonce('swac_admin_tax_nonce'),
     ];
 
     wp_localize_script('swac-admin-taxonomy', 'swacAdminTax', $localize_payload);

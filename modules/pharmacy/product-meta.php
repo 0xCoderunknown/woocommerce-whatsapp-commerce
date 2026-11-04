@@ -18,7 +18,8 @@ if (!function_exists('swac_is_module_active') || !swac_is_module_active('pharmac
 /**
  * Composition Link Tag Shortcode: [swac_composition_tag]
  */
-function swac_composition_tag_shortcode() {
+function swac_composition_tag_shortcode()
+{
     if (!function_exists('is_product') || !is_product()) {
         return '';
     }
@@ -54,13 +55,15 @@ function swac_composition_tag_shortcode() {
 
     return $output;
 }
+
 add_shortcode('swac_composition_tag', 'swac_composition_tag_shortcode');
 add_shortcode('g1_composition_tag', 'swac_composition_tag_shortcode');
 
 /**
  * Regulatory Rx Badge Shortcode: [swac_rx_badge]
  */
-function swac_rx_badge_shortcode() {
+function swac_rx_badge_shortcode()
+{
     if (!function_exists('is_product') || !is_product()) {
         return '';
     }
@@ -78,4 +81,5 @@ function swac_rx_badge_shortcode() {
 
     return '<span class="swac-otc-badge wa-otc-badge pd-otc-badge">' . esc_html__('OTC', 'stateless-wa-commerce') . '</span>';
 }
+
 add_shortcode('swac_rx_badge', 'swac_rx_badge_shortcode');

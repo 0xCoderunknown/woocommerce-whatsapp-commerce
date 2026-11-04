@@ -230,6 +230,69 @@ define('SWAC_MODULE_SEO', false);
  */
 define('SWAC_MODULE_WHOLESALE', true);
 
+/**
+ * Catalog Operating Mode.
+ *
+ * Defines the storefront persona:
+ *
+ *   - 'walled_garden' : (Wholesalers / Distributors — Shikhar style)
+ *                       100% private B2B portal. The entire catalog, products, and prices
+ *                       are walled behind Phone + 4-digit PIN. Unauthenticated visitors cannot
+ *                       view products or prices. Automatically shields the site from search
+ *                       engines (noindex, nofollow, robots.txt disallow). Enables 1-tap
+ *                       route-based WhatsApp ordering for retailers.
+ *
+ *   - 'hybrid'        : (B2B + B2C Catalog)
+ *                       Public catalog browsing for guests; rates and bulk ordering
+ *                       locked behind 4-digit PIN for approved retailers.
+ *
+ *   - 'retail'        : (Standard B2C Store like GuwahatiOne)
+ *                       Public retail consumer storefront. Standard pricing, MRP strike-throughs,
+ *                       residential delivery address, and same-day cutoff timers.
+ */
+define('SWAC_CATALOG_MODE', 'walled_garden');
+
+/**
+ * Private Catalog / Stealth Mode (Search Engine Invisibility).
+ *
+ * When TRUE (or automatically when SWAC_CATALOG_MODE is 'walled_garden'):
+ *   - Search engines (Google, Bing) are blocked via X-Robots-Tag: noindex, nofollow
+ *   - Meta robots tag noindex is printed in <head>
+ *   - Disallow: / is added to robots.txt
+ *   - XML Sitemap (/sitemap.xml) is disabled
+ */
+define('SWAC_PRIVATE_CATALOG', true);
+
+if (!function_exists('swac_get_catalog_mode')) {
+    /**
+     * Retrieves the resolved catalog operating mode.
+     *
+     * @return string 'walled_garden'|'hybrid'|'retail'
+     */
+    function swac_get_catalog_mode(): string
+    {
+        if (defined('SWAC_CATALOG_MODE')) {
+            return (string)SWAC_CATALOG_MODE;
+        }
+        return swac_is_module_active('wholesale') ? 'walled_garden' : 'retail';
+    }
+}
+
+if (!function_exists('swac_is_private_catalog')) {
+    /**
+     * Checks if search engine indexing is disallowed for this catalog.
+     *
+     * @return bool
+     */
+    function swac_is_private_catalog(): bool
+    {
+        if (defined('SWAC_PRIVATE_CATALOG') && SWAC_PRIVATE_CATALOG) {
+            return true;
+        }
+        return swac_get_catalog_mode() === 'walled_garden';
+    }
+}
+
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // WIRING — translates constants → filters (do not edit below this line)
@@ -241,12 +304,12 @@ define('SWAC_MODULE_WHOLESALE', true);
  * swac_is_lockdown_enabled() seals the feature map on first call.
  */
 add_filter('swac_lockdown_features', function (array $features): array {
-    $features['head_bloat']            = SWAC_LOCKDOWN_HEAD_BLOAT;
-    $features['security_hardening']    = SWAC_LOCKDOWN_SECURITY;
-    $features['heartbeat_comments']    = SWAC_LOCKDOWN_HEARTBEAT_COMMENTS;
-    $features['admin_cleanup']         = SWAC_LOCKDOWN_ADMIN_CLEANUP;
+    $features['head_bloat'] = SWAC_LOCKDOWN_HEAD_BLOAT;
+    $features['security_hardening'] = SWAC_LOCKDOWN_SECURITY;
+    $features['heartbeat_comments'] = SWAC_LOCKDOWN_HEARTBEAT_COMMENTS;
+    $features['admin_cleanup'] = SWAC_LOCKDOWN_ADMIN_CLEANUP;
     $features['registration_suppress'] = SWAC_LOCKDOWN_REGISTRATION;
-    $features['script_dequeue']        = SWAC_LOCKDOWN_SCRIPT_DEQUEUE;
+    $features['script_dequeue'] = SWAC_LOCKDOWN_SCRIPT_DEQUEUE;
     return $features;
 }, 5);
 

@@ -35,10 +35,10 @@ if (!function_exists('swac_flush_explore_transients')) {
             $all_purge_urls = array_unique(array_filter(array_merge($default_urls, $purge_urls)));
 
             /**
-              * Filter URLs to purge in LiteSpeed Cache.
-              *
-              * @param string[] $all_purge_urls Array of URLs to purge.
-              */
+             * Filter URLs to purge in LiteSpeed Cache.
+             *
+             * @param string[] $all_purge_urls Array of URLs to purge.
+             */
             $filtered_urls = (array)apply_filters('swac_cache_purge_urls', $all_purge_urls);
 
             foreach ($filtered_urls as $url) {
@@ -54,8 +54,8 @@ if (!function_exists('swac_on_taxonomy_change')) {
     /**
      * Handler for taxonomy term creation, modification, or deletion.
      *
-     * @param int    $term_id
-     * @param int    $tt_id
+     * @param int $term_id
+     * @param int $tt_id
      * @param string $taxonomy
      * @return void
      */

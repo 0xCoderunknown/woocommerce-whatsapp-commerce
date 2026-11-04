@@ -21,7 +21,7 @@ if (!function_exists('swac_button_shortcode')) {
      * Render the WhatsApp action button.
      *
      * @param array|string $atts Shortcode attributes.
-     * @param string|null  $content Enclosed button content.
+     * @param string|null $content Enclosed button content.
      * @return string
      */
     function swac_button_shortcode($atts = [], ?string $content = null): string
@@ -42,10 +42,10 @@ if (!function_exists('swac_button_shortcode')) {
         $default_msg = sprintf(__('Hello %s.', 'stateless-wa-commerce'), get_bloginfo('name') ?: 'Store');
 
         $parsed_atts = shortcode_atts([
-            'text'      => __('Order on WhatsApp', 'stateless-wa-commerce'),
-            'message'   => $default_msg,
+            'text' => __('Order on WhatsApp', 'stateless-wa-commerce'),
+            'message' => $default_msg,
             'fullwidth' => 'no',
-            'icon'      => 'yes',
+            'icon' => 'yes',
         ], is_array($atts) ? $atts : [], 'swac_button');
 
         $text = !empty($parsed_atts['text']) ? esc_html($parsed_atts['text']) : __('Contact Us', 'stateless-wa-commerce');
@@ -90,7 +90,7 @@ if (!function_exists('cdr_whatsapp_button_shortcode')) {
      * Backward-compatibility alias for WhatsApp button shortcode handler.
      *
      * @param array|string $atts
-     * @param string|null  $content
+     * @param string|null $content
      * @return string
      */
     function cdr_whatsapp_button_shortcode($atts = [], ?string $content = null): string

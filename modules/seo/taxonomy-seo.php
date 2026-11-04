@@ -82,7 +82,7 @@ if (!function_exists('swac_seo_get_taxonomy_description')) {
 
             if (!empty($loc_suffix)) {
                 return sprintf(
-                    /* translators: 1: term name, 2: location suffix, 3: store name */
+                /* translators: 1: term name, 2: location suffix, 3: store name */
                     __('Browse %1$s online in %2$s with direct WhatsApp ordering at %3$s.', 'stateless-wa-commerce'),
                     $term_name,
                     $loc_suffix,
@@ -91,7 +91,7 @@ if (!function_exists('swac_seo_get_taxonomy_description')) {
             }
 
             return sprintf(
-                /* translators: 1: term name, 2: store name */
+            /* translators: 1: term name, 2: store name */
                 __('Browse %1$s online with direct WhatsApp ordering at %2$s.', 'stateless-wa-commerce'),
                 $term_name,
                 $store_name

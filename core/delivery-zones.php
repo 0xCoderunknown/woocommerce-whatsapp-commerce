@@ -29,20 +29,20 @@ if (!function_exists('swac_get_delivery_zones')) {
     function swac_get_delivery_zones(): array
     {
         $defaults = [
-            'gated'    => false, // Default: Open Mode. Set true to enforce registered postal codes.
-            'zones'    => [
+            'gated' => false, // Default: Open Mode. Set true to enforce registered postal codes.
+            'zones' => [
                 'standard' => [
-                    'label'        => __('Standard Delivery', 'stateless-wa-commerce'),
-                    'badge_text'   => __('✓ Delivery Available', 'stateless-wa-commerce'),
+                    'label' => __('Standard Delivery', 'stateless-wa-commerce'),
+                    'badge_text' => __('✓ Delivery Available', 'stateless-wa-commerce'),
                     'status_class' => 'swac-pin-success',
-                    'allow_order'  => true,
-                    'pincodes'     => [], // Associative array of ['postal_code' => 'Area Name']
+                    'allow_order' => true,
+                    'pincodes' => [], // Associative array of ['postal_code' => 'Area Name']
                 ],
             ],
             'messages' => [
-                'available'   => __('✓ Delivery is available to your location', 'stateless-wa-commerce'),
+                'available' => __('✓ Delivery is available to your location', 'stateless-wa-commerce'),
                 'unsupported' => __('⚠️ We do not deliver to this location yet.', 'stateless-wa-commerce'),
-                'invalid'     => __('Please enter a valid postal code.', 'stateless-wa-commerce'),
+                'invalid' => __('Please enter a valid postal code.', 'stateless-wa-commerce'),
             ],
         ];
 

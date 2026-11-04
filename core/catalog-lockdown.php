@@ -31,15 +31,15 @@ function swac_is_lockdown_enabled(string $feature): bool
     static $features = null;
     if ($features === null) {
         $defaults = [
-            'head_bloat'             => true,
-            'security_hardening'     => true,
-            'heartbeat_comments'     => true,
+            'head_bloat' => true,
+            'security_hardening' => true,
+            'heartbeat_comments' => true,
             'cart_checkout_redirect' => true,
-            'wc_ajax_intercept'      => true,
-            'admin_cleanup'          => true,
-            'registration_suppress'  => true,
-            'script_dequeue'         => true,
-            'session_tuning'         => true,
+            'wc_ajax_intercept' => true,
+            'admin_cleanup' => true,
+            'registration_suppress' => true,
+            'script_dequeue' => true,
+            'session_tuning' => true,
         ];
         $features = (array)apply_filters('swac_lockdown_features', $defaults);
     }
@@ -107,6 +107,28 @@ if (swac_is_lockdown_enabled('security_hardening')) {
 
         return $result;
     }, 10, 3);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SECTION 2B: PRIVATE STEALTH CATALOG & SEARCH ENGINE SHIELD
+// ─────────────────────────────────────────────────────────────────────────────
+
+if (function_exists('swac_is_private_catalog') && swac_is_private_catalog()) {
+    add_action('send_headers', function () {
+        if (!headers_sent()) {
+            header('X-Robots-Tag: noindex, nofollow, noarchive');
+        }
+    });
+
+    add_action('wp_head', function () {
+        echo '<meta name="robots" content="noindex, nofollow, noarchive">' . "\n";
+    }, 1);
+
+    add_filter('robots_txt', function ($output) {
+        return "User-agent: *\nDisallow: /\n";
+    }, 99);
+
+    add_filter('wp_sitemaps_enabled', '__return_false');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

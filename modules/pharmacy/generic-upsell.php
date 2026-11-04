@@ -22,7 +22,7 @@ if (!function_exists('swac_generic_box_html')) {
      * Generates HTML markup for the spotlight alternate box.
      *
      * @param WC_Product $main_product
-     * @param WP_Post    $generic_post
+     * @param WP_Post $generic_post
      * @return string
      */
     function swac_generic_box_html(WC_Product $main_product, $generic_post): string
@@ -83,7 +83,7 @@ if (!function_exists('swac_generic_box_html')) {
                 <h3>
                     <?php
                     echo sprintf(
-                        /* translators: %s: formatted savings amount */
+                    /* translators: %s: formatted savings amount */
                         esc_html__('Save %s with a Verified Alternate', 'stateless-wa-commerce'),
                         '<span class="swac-savings-amount">' . esc_html($savings_formatted) . '</span>'
                     );
@@ -125,7 +125,8 @@ if (!function_exists('swac_generic_box_html')) {
     }
 }
 
-function swac_generic_box_shortcode() {
+function swac_generic_box_shortcode()
+{
     if (!function_exists('is_product') || !is_product()) {
         return '';
     }
@@ -155,7 +156,7 @@ if (!function_exists('cdr_generic_box_html')) {
      * Backward-compatibility alias for generic alternate box HTML generator.
      *
      * @param WC_Product $main_product
-     * @param WP_Post    $generic_post
+     * @param WP_Post $generic_post
      * @return string
      */
     function cdr_generic_box_html(WC_Product $main_product, $generic_post): string

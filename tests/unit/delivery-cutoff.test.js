@@ -1,4 +1,4 @@
-const { test, describe, beforeEach } = require('node:test');
+const {test, describe, beforeEach} = require('node:test');
 const assert = require('node:assert/strict');
 const waCart = require('../../assets/js/wa_cart.js');
 

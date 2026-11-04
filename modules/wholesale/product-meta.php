@@ -30,15 +30,15 @@ function swac_b2b_get_product_data($product): array
 
     if (!$product instanceof WC_Product) {
         return [
-            'is_b2b'         => false,
-            'ptr'            => 0.0,
-            'mrp'            => 0.0,
-            'margin_amount'  => 0.0,
+            'is_b2b' => false,
+            'ptr' => 0.0,
+            'mrp' => 0.0,
+            'margin_amount' => 0.0,
             'margin_percent' => 0.0,
-            'carton_pack'    => 0,
-            'scheme_type'    => 'none',
-            'scheme_text'    => '',
-            'scheme_badge'   => '',
+            'carton_pack' => 0,
+            'scheme_type' => 'none',
+            'scheme_text' => '',
+            'scheme_badge' => '',
         ];
     }
 
@@ -73,7 +73,7 @@ function swac_b2b_get_product_data($product): array
         if ($buy_qty > 0 && $free_qty > 0) {
             $scheme_badge = sprintf('%d + %d FREE', $buy_qty, $free_qty);
             $scheme_text = sprintf(
-                /* translators: 1: buy quantity, 2: free quantity */
+            /* translators: 1: buy quantity, 2: free quantity */
                 __('Buy %1$d pcs, get %2$d pc FREE', 'stateless-wa-commerce'),
                 $buy_qty,
                 $free_qty
@@ -90,7 +90,7 @@ function swac_b2b_get_product_data($product): array
         if ($cd_percent > 0) {
             $scheme_badge = sprintf('%s%% Cash Discount', rtrim(rtrim((string)$cd_percent, '0'), '.'));
             $scheme_text = sprintf(
-                /* translators: %s: discount percentage */
+            /* translators: %s: discount percentage */
                 __('%s%% Cash Discount on prompt settlement', 'stateless-wa-commerce'),
                 rtrim(rtrim((string)$cd_percent, '0'), '.')
             );
@@ -106,15 +106,15 @@ function swac_b2b_get_product_data($product): array
     $is_b2b = ($has_explicit_ptr || $carton_pack > 0 || $scheme_type !== 'none');
 
     return [
-        'is_b2b'         => $is_b2b,
-        'ptr'            => $ptr,
-        'mrp'            => $mrp,
-        'margin_amount'  => $margin_amount,
+        'is_b2b' => $is_b2b,
+        'ptr' => $ptr,
+        'mrp' => $mrp,
+        'margin_amount' => $margin_amount,
         'margin_percent' => $margin_percent,
-        'carton_pack'    => $carton_pack,
-        'scheme_type'    => $scheme_type,
-        'scheme_text'    => $scheme_text,
-        'scheme_badge'   => $scheme_badge,
+        'carton_pack' => $carton_pack,
+        'scheme_type' => $scheme_type,
+        'scheme_text' => $scheme_text,
+        'scheme_badge' => $scheme_badge,
     ];
 }
 
@@ -123,9 +123,9 @@ function swac_b2b_get_product_data($product): array
  */
 add_filter('woocommerce_product_data_tabs', function (array $tabs): array {
     $tabs['swac_wholesale'] = [
-        'label'    => __('Wholesale & Scheme', 'stateless-wa-commerce'),
-        'target'   => 'swac_wholesale_product_data',
-        'class'    => ['show_if_simple', 'show_if_variable'],
+        'label' => __('Wholesale & Scheme', 'stateless-wa-commerce'),
+        'target' => 'swac_wholesale_product_data',
+        'class' => ['show_if_simple', 'show_if_variable'],
         'priority' => 21,
     ];
     return $tabs;
@@ -159,38 +159,38 @@ add_action('woocommerce_product_data_panels', function () {
 
             <?php
             woocommerce_wp_text_input([
-                'id'          => '_swac_b2b_ptr',
-                'label'       => __('Wholesale Rate / PTR (₹)', 'stateless-wa-commerce'),
+                'id' => '_swac_b2b_ptr',
+                'label' => __('Wholesale Rate / PTR (₹)', 'stateless-wa-commerce'),
                 'description' => __('Price To Retailer (PTR). If left empty, regular price is used.', 'stateless-wa-commerce'),
-                'desc_tip'    => true,
-                'type'        => 'text',
-                'value'       => $ptr,
+                'desc_tip' => true,
+                'type' => 'text',
+                'value' => $ptr,
                 'placeholder' => __('e.g. 24.50', 'stateless-wa-commerce'),
             ]);
 
             woocommerce_wp_text_input([
-                'id'          => '_swac_b2b_carton_pack',
-                'label'       => __('Carton Packing Guide', 'stateless-wa-commerce'),
+                'id' => '_swac_b2b_carton_pack',
+                'label' => __('Carton Packing Guide', 'stateless-wa-commerce'),
                 'description' => __('Number of pieces per carton / case (e.g. 144). Shown as reference guide for retailers.', 'stateless-wa-commerce'),
-                'desc_tip'    => true,
-                'type'        => 'number',
-                'value'       => $carton_pack,
+                'desc_tip' => true,
+                'type' => 'number',
+                'value' => $carton_pack,
                 'placeholder' => __('e.g. 144', 'stateless-wa-commerce'),
                 'custom_attributes' => ['min' => '0', 'step' => '1'],
             ]);
 
             woocommerce_wp_select([
-                'id'          => '_swac_b2b_scheme_type',
-                'label'       => __('Active Scheme Type', 'stateless-wa-commerce'),
+                'id' => '_swac_b2b_scheme_type',
+                'label' => __('Active Scheme Type', 'stateless-wa-commerce'),
                 'description' => __('Select promotional scheme applied on this item.', 'stateless-wa-commerce'),
-                'desc_tip'    => true,
-                'value'       => $scheme_type,
-                'options'     => [
-                    'none'          => __('No Scheme', 'stateless-wa-commerce'),
-                    'free_goods'    => __('Buy X Get Y Free (e.g. 12+1)', 'stateless-wa-commerce'),
+                'desc_tip' => true,
+                'value' => $scheme_type,
+                'options' => [
+                    'none' => __('No Scheme', 'stateless-wa-commerce'),
+                    'free_goods' => __('Buy X Get Y Free (e.g. 12+1)', 'stateless-wa-commerce'),
                     'tier_discount' => __('Volume Tier Slabs (e.g. 10=2%, 25=5%)', 'stateless-wa-commerce'),
                     'cash_discount' => __('Cash Discount (CD %)', 'stateless-wa-commerce'),
-                    'custom'        => __('Custom Scheme Text', 'stateless-wa-commerce'),
+                    'custom' => __('Custom Scheme Text', 'stateless-wa-commerce'),
                 ],
             ]);
             ?>
@@ -199,44 +199,44 @@ add_action('woocommerce_product_data_panels', function () {
         <div class="options_group swac-scheme-fields">
             <?php
             woocommerce_wp_text_input([
-                'id'          => '_swac_b2b_scheme_buy',
-                'label'       => __('Buy Quantity (X)', 'stateless-wa-commerce'),
-                'type'        => 'number',
-                'value'       => $scheme_buy,
+                'id' => '_swac_b2b_scheme_buy',
+                'label' => __('Buy Quantity (X)', 'stateless-wa-commerce'),
+                'type' => 'number',
+                'value' => $scheme_buy,
                 'placeholder' => '12',
                 'custom_attributes' => ['min' => '1', 'step' => '1'],
             ]);
 
             woocommerce_wp_text_input([
-                'id'          => '_swac_b2b_scheme_free',
-                'label'       => __('Free Quantity (Y)', 'stateless-wa-commerce'),
-                'type'        => 'number',
-                'value'       => $scheme_free,
+                'id' => '_swac_b2b_scheme_free',
+                'label' => __('Free Quantity (Y)', 'stateless-wa-commerce'),
+                'type' => 'number',
+                'value' => $scheme_free,
                 'placeholder' => '1',
                 'custom_attributes' => ['min' => '1', 'step' => '1'],
             ]);
 
             woocommerce_wp_text_input([
-                'id'          => '_swac_b2b_scheme_tiers',
-                'label'       => __('Volume Tier Slabs', 'stateless-wa-commerce'),
+                'id' => '_swac_b2b_scheme_tiers',
+                'label' => __('Volume Tier Slabs', 'stateless-wa-commerce'),
                 'description' => __('Format: Qty:Discount (e.g. 10:2%, 25:5%)', 'stateless-wa-commerce'),
-                'desc_tip'    => true,
-                'value'       => $scheme_tiers,
+                'desc_tip' => true,
+                'value' => $scheme_tiers,
                 'placeholder' => '10:2%, 25:5%',
             ]);
 
             woocommerce_wp_text_input([
-                'id'          => '_swac_b2b_scheme_cd',
-                'label'       => __('Cash Discount %', 'stateless-wa-commerce'),
-                'type'        => 'text',
-                'value'       => $scheme_cd,
+                'id' => '_swac_b2b_scheme_cd',
+                'label' => __('Cash Discount %', 'stateless-wa-commerce'),
+                'type' => 'text',
+                'value' => $scheme_cd,
                 'placeholder' => '2',
             ]);
 
             woocommerce_wp_text_input([
-                'id'          => '_swac_b2b_scheme_custom',
-                'label'       => __('Custom Scheme Text', 'stateless-wa-commerce'),
-                'value'       => $scheme_custom,
+                'id' => '_swac_b2b_scheme_custom',
+                'label' => __('Custom Scheme Text', 'stateless-wa-commerce'),
+                'value' => $scheme_custom,
                 'placeholder' => __('e.g. Extra ₹20 off per box', 'stateless-wa-commerce'),
             ]);
             ?>

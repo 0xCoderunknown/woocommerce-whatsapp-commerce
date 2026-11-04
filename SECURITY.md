@@ -3,7 +3,7 @@
 ## Supported Versions
 
 | Version | Supported |
-| :------ | :-------- |
+|:--------|:----------|
 | 1.5.x   | ✅ Yes     |
 | 1.4.x   | ✅ Yes     |
 | 1.3.x   | ✅ Yes     |
@@ -15,10 +15,13 @@
 
 If you believe you have found a security vulnerability in Stateless WhatsApp Commerce, please report it privately:
 
-1. **GitHub Private Vulnerability Reporting**: Use the [Security Advisories](../../security/advisories/new) feature on this repository to submit a report confidentially.
-2. **Email**: If you are unable to use GitHub's private reporting, you may open a GitHub issue with only a brief description (no details) and request private contact.
+1. **GitHub Private Vulnerability Reporting**: Use the [Security Advisories](../../security/advisories/new) feature on
+   this repository to submit a report confidentially.
+2. **Email**: If you are unable to use GitHub's private reporting, you may open a GitHub issue with only a brief
+   description (no details) and request private contact.
 
 Please include:
+
 - A description of the vulnerability and its potential impact.
 - The affected version(s).
 - Steps to reproduce the issue.
@@ -28,7 +31,8 @@ Please include:
 
 - **Acknowledgement**: We aim to acknowledge reports within **72 hours**.
 - **Assessment**: We will assess severity and confirm or dispute the report within **7 days**.
-- **Fix**: Critical and high-severity issues will be patched as quickly as possible. We will coordinate disclosure timing with the reporter.
+- **Fix**: Critical and high-severity issues will be patched as quickly as possible. We will coordinate disclosure
+  timing with the reporter.
 
 ## Scope
 

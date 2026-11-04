@@ -1,19 +1,19 @@
 {
-    "name":  "woocommerce-whatsapp-commerce",
-    "version": "1.5.1",
-    "description":  "Zero-session catalog lockdown and client-side WhatsApp commerce engine for WooCommerce",
-    "main":  "assets/js/wa_cart.js",
-    "scripts":  {
-                    "test":  "node --test tests/unit/*.test.js \u0026\u0026 node tests/php/runner.js"
-                },
-    "keywords":  [
-                     "woocommerce",
-                     "whatsapp",
-                     "commerce",
-                     "stateless",
-                     "litespeed",
-                     "zero-session"
-                 ],
-    "author":  "0xCoderunknown",
-    "license":  "GPL-2.0-or-later"
+  "name": "woocommerce-whatsapp-commerce",
+  "version": "1.6.0",
+  "description": "Zero-session catalog lockdown and client-side WhatsApp commerce engine for WooCommerce",
+  "main": "assets/js/wa_cart.js",
+  "scripts": {
+    "test": "node --test tests/unit/*.test.js \u0026\u0026 node tests/php/runner.js"
+  },
+  "keywords": [
+    "woocommerce",
+    "whatsapp",
+    "commerce",
+    "stateless",
+    "litespeed",
+    "zero-session"
+  ],
+  "author": "0xCoderunknown",
+  "license": "GPL-2.0-or-later"
 }

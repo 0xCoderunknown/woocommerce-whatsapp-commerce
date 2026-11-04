@@ -110,9 +110,9 @@ if (!function_exists('swac_get_product_pack_metrics')) {
         $wc_product = ($product instanceof WC_Product) ? $product : ($product_id ? wc_get_product($product_id) : null);
 
         $default = [
-            'qty'        => 1.0,
-            'unit_type'  => 'unit',
-            'unit_name'  => 'unit',
+            'qty' => 1.0,
+            'unit_type' => 'unit',
+            'unit_name' => 'unit',
             'unit_price' => $wc_product ? (float)$wc_product->get_price() : 0.0,
         ];
 
@@ -126,9 +126,9 @@ if (!function_exists('swac_get_product_pack_metrics')) {
         $meta_qty = (float)$wc_product->get_meta('_swac_pack_qty');
         if ($meta_qty > 0) {
             return [
-                'qty'        => $meta_qty,
-                'unit_type'  => 'unit',
-                'unit_name'  => 'unit',
+                'qty' => $meta_qty,
+                'unit_type' => 'unit',
+                'unit_name' => 'unit',
                 'unit_price' => $price / $meta_qty,
             ];
         }
@@ -178,9 +178,9 @@ if (!function_exists('swac_get_product_pack_metrics')) {
         }
 
         return [
-            'qty'        => $qty,
-            'unit_type'  => $unit_type,
-            'unit_name'  => $unit_name,
+            'qty' => $qty,
+            'unit_type' => $unit_type,
+            'unit_name' => $unit_name,
             'unit_price' => $price / max(1.0, $qty),
         ];
     }
@@ -244,7 +244,7 @@ if (!function_exists('swac_is_prescription_product')) {
             ? swac_get_product_terms_memoized($product_id, 'product_tag')
             : get_the_terms($product_id, 'product_tag');
 
-        $has_rx_tag  = false;
+        $has_rx_tag = false;
         $has_otc_tag = false;
 
         if (!empty($tags) && !is_wp_error($tags)) {
@@ -332,7 +332,7 @@ if (!function_exists('swac_render_generic_badge')) {
      * Renders the generic badge HTML.
      *
      * @param int|WC_Product|null $product
-     * @param string              $extra_class
+     * @param string $extra_class
      * @return string
      */
     function swac_render_generic_badge($product = null, string $extra_class = ''): string
@@ -419,18 +419,18 @@ if (!function_exists('swac_find_generic_alternate')) {
         }
 
         $query = new WP_Query([
-            'post_type'      => 'product',
+            'post_type' => 'product',
             'posts_per_page' => 5,
-            'post__not_in'   => [$product_id],
-            'tax_query'      => $tax_query,
-            'meta_query'     => [
+            'post__not_in' => [$product_id],
+            'tax_query' => $tax_query,
+            'meta_query' => [
                 ['key' => '_stock_status', 'value' => 'instock', 'compare' => '='],
             ],
-            'orderby'        => 'meta_value_num',
-            'meta_key'       => '_price',
-            'order'          => 'ASC',
-            'fields'         => 'ids',
-            'no_found_rows'  => true,
+            'orderby' => 'meta_value_num',
+            'meta_key' => '_price',
+            'order' => 'ASC',
+            'fields' => 'ids',
+            'no_found_rows' => true,
         ]);
 
         if (empty($query->posts)) {

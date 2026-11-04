@@ -20,16 +20,17 @@ if (!function_exists('swac_is_module_active') || !swac_is_module_active('pharmac
     return;
 }
 
-function swac_explore_salts_shortcode($atts) {
+function swac_explore_salts_shortcode($atts)
+{
     wp_enqueue_style('swac-pharmacy-style');
     wp_enqueue_style('swac-explore-style');
     wp_enqueue_script('swac-frontend-script');
 
     $atts = shortcode_atts([
-        'columns'    => 4,
+        'columns' => 4,
         'hide_empty' => false,
-        'orderby'    => 'name',
-        'order'      => 'ASC',
+        'orderby' => 'name',
+        'order' => 'ASC',
     ], $atts, 'swac_explore_salts');
 
     $salt_tax = defined('SWAC_TAX_SALT') ? SWAC_TAX_SALT : 'composition';
@@ -43,10 +44,10 @@ function swac_explore_salts_shortcode($atts) {
 
     if (false === $terms) {
         $terms = get_terms([
-            'taxonomy'   => $salt_tax,
+            'taxonomy' => $salt_tax,
             'hide_empty' => filter_var($atts['hide_empty'], FILTER_VALIDATE_BOOLEAN),
-            'orderby'    => $atts['orderby'],
-            'order'      => $atts['order'],
+            'orderby' => $atts['orderby'],
+            'order' => $atts['order'],
         ]);
 
         if (!is_wp_error($terms)) {
@@ -115,4 +116,5 @@ function swac_explore_salts_shortcode($atts) {
     <?php
     return (string)ob_get_clean();
 }
+
 add_shortcode('swac_explore_salts', 'swac_explore_salts_shortcode');

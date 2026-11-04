@@ -22,7 +22,7 @@ if (!function_exists('swac_is_module_active') || !swac_is_module_active('wholesa
  */
 add_filter('swac_commerce_config', function (array $config): array {
     $config['max_qty_per_item'] = 9999;
-    $config['max_cart_items']   = 150;
+    $config['max_cart_items'] = 150;
     return $config;
 }, 20);
 
@@ -47,7 +47,8 @@ if (!function_exists('swac_b2b_format_price_block_html')) {
         <div class="swac-b2b-price-block<?php echo esc_attr($extra_class); ?>">
             <!-- Unauthenticated Locked View -->
             <div class="swac-b2b-locked-view">
-                <button type="button" class="swac-b2b-gate-trigger" aria-label="<?php esc_attr_e('Login to view wholesale rate', 'stateless-wa-commerce'); ?>">
+                <button type="button" class="swac-b2b-gate-trigger"
+                        aria-label="<?php esc_attr_e('Login to view wholesale rate', 'stateless-wa-commerce'); ?>">
                     <span class="swac-lock-icon" aria-hidden="true">🔒</span>
                     <span><?php esc_html_e('Retailer PIN to View Rate', 'stateless-wa-commerce'); ?></span>
                 </button>
@@ -73,7 +74,7 @@ if (!function_exists('swac_b2b_format_price_block_html')) {
                         <span class="swac-b2b-margin-badge">
                             <?php
                             printf(
-                                /* translators: 1: currency symbol, 2: margin amount, 3: margin percent */
+                            /* translators: 1: currency symbol, 2: margin amount, 3: margin percent */
                                 esc_html__('Margin: %1$s%2$s (%3$s%%)', 'stateless-wa-commerce'),
                                 esc_html($currency),
                                 esc_html(number_format($b2b['margin_amount'], 2)),
@@ -163,11 +164,12 @@ add_filter('woocommerce_loop_add_to_cart_link', function ($button_html, $product
         <!-- Authenticated Unlocked Action -->
         <div class="swac-b2b-unlocked-action">
             <?php if (!empty($b2b['carton_pack']) && $b2b['carton_pack'] > 0) : ?>
-                <div class="swac-b2b-carton-guide" title="<?php esc_attr_e('Packing conversion reference', 'stateless-wa-commerce'); ?>">
+                <div class="swac-b2b-carton-guide"
+                     title="<?php esc_attr_e('Packing conversion reference', 'stateless-wa-commerce'); ?>">
                     <span class="swac-b2b-carton-icon" aria-hidden="true">📦</span>
                     <?php
                     printf(
-                        /* translators: %d: pieces per carton */
+                    /* translators: %d: pieces per carton */
                         esc_html__('1 Carton = %d pcs', 'stateless-wa-commerce'),
                         (int)$b2b['carton_pack']
                     );
@@ -177,31 +179,35 @@ add_filter('woocommerce_loop_add_to_cart_link', function ($button_html, $product
 
             <div class="swac-b2b-loop-action">
                 <div class="swac-qty-selector">
-                    <button type="button" class="swac-qty-btn swac-qty-minus" aria-label="<?php esc_attr_e('Decrease quantity', 'stateless-wa-commerce'); ?>">−</button>
+                    <button type="button" class="swac-qty-btn swac-qty-minus"
+                            aria-label="<?php esc_attr_e('Decrease quantity', 'stateless-wa-commerce'); ?>">−
+                    </button>
                     <input
-                        type="number"
-                        class="swac-qty-input"
-                        value="<?php echo (!empty($b2b['carton_pack']) && $b2b['carton_pack'] > 0) ? esc_attr($b2b['carton_pack']) : '1'; ?>"
-                        min="1"
-                        max="9999"
-                        data-carton-pack="<?php echo esc_attr($b2b['carton_pack']); ?>"
-                        aria-label="<?php esc_attr_e('Order quantity', 'stateless-wa-commerce'); ?>"
+                            type="number"
+                            class="swac-qty-input"
+                            value="<?php echo (!empty($b2b['carton_pack']) && $b2b['carton_pack'] > 0) ? esc_attr($b2b['carton_pack']) : '1'; ?>"
+                            min="1"
+                            max="9999"
+                            data-carton-pack="<?php echo esc_attr($b2b['carton_pack']); ?>"
+                            aria-label="<?php esc_attr_e('Order quantity', 'stateless-wa-commerce'); ?>"
                     >
-                    <button type="button" class="swac-qty-btn swac-qty-plus" aria-label="<?php esc_attr_e('Increase quantity', 'stateless-wa-commerce'); ?>">+</button>
+                    <button type="button" class="swac-qty-btn swac-qty-plus"
+                            aria-label="<?php esc_attr_e('Increase quantity', 'stateless-wa-commerce'); ?>">+
+                    </button>
                 </div>
 
                 <a href="<?php echo esc_url($url); ?>"
-                    class="button swac-loop-add swac-b2b-add-btn"
-                    data-product-id="<?php echo esc_attr($product_id); ?>"
-                    data-product-name="<?php echo esc_attr($name); ?>"
-                    data-product-url="<?php echo esc_url($url); ?>"
-                    data-product-price="<?php echo esc_attr($price); ?>"
-                    data-product-mrp="<?php echo esc_attr($mrp); ?>"
-                    data-product-sale-price="<?php echo esc_attr($sale_price); ?>"
-                    data-carton-pack="<?php echo esc_attr($b2b['carton_pack']); ?>"
-                    data-scheme-badge="<?php echo esc_attr($b2b['scheme_badge']); ?>"
-                    data-is-rx="<?php echo $is_rx ? '1' : '0'; ?>"
-                    aria-label="<?php echo esc_attr(sprintf(__('Add %s to wholesale order', 'stateless-wa-commerce'), $name)); ?>"
+                   class="button swac-loop-add swac-b2b-add-btn"
+                   data-product-id="<?php echo esc_attr($product_id); ?>"
+                   data-product-name="<?php echo esc_attr($name); ?>"
+                   data-product-url="<?php echo esc_url($url); ?>"
+                   data-product-price="<?php echo esc_attr($price); ?>"
+                   data-product-mrp="<?php echo esc_attr($mrp); ?>"
+                   data-product-sale-price="<?php echo esc_attr($sale_price); ?>"
+                   data-carton-pack="<?php echo esc_attr($b2b['carton_pack']); ?>"
+                   data-scheme-badge="<?php echo esc_attr($b2b['scheme_badge']); ?>"
+                   data-is-rx="<?php echo $is_rx ? '1' : '0'; ?>"
+                   aria-label="<?php echo esc_attr(sprintf(__('Add %s to wholesale order', 'stateless-wa-commerce'), $name)); ?>"
                 >
                     <?php echo $icon; ?>
                     <span><?php echo esc_html($button_label); ?></span>

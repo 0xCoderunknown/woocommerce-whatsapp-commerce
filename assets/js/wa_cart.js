@@ -27,13 +27,24 @@
             if (typeof localStorage !== 'undefined') {
                 return localStorage;
             }
-        } catch (e) {}
+        } catch (e) {
+        }
         const memoryStore = {};
         return {
-            getItem: function (k) { return Object.prototype.hasOwnProperty.call(memoryStore, k) ? memoryStore[k] : null; },
-            setItem: function (k, v) { memoryStore[k] = String(v); },
-            removeItem: function (k) { delete memoryStore[k]; },
-            clear: function () { Object.keys(memoryStore).forEach(function (k) { delete memoryStore[k]; }); }
+            getItem: function (k) {
+                return Object.prototype.hasOwnProperty.call(memoryStore, k) ? memoryStore[k] : null;
+            },
+            setItem: function (k, v) {
+                memoryStore[k] = String(v);
+            },
+            removeItem: function (k) {
+                delete memoryStore[k];
+            },
+            clear: function () {
+                Object.keys(memoryStore).forEach(function (k) {
+                    delete memoryStore[k];
+                });
+            }
         };
     })();
 
@@ -62,7 +73,7 @@
             const retailer = typeof getSavedRetailer === 'function' ? getSavedRetailer() : null;
             if (retailer && retailer.store_name) {
                 if (!details) {
-                    details = { name: '', address: '', landmark: '', area: '', pincode: '' };
+                    details = {name: '', address: '', landmark: '', area: '', pincode: ''};
                 }
                 if (!details.name) {
                     details.name = retailer.store_name + (retailer.owner_name ? ' (' + retailer.owner_name + ')' : '');
@@ -111,14 +122,14 @@
             outskirtsSet = new Set(rawOutskirts.map(String));
             alwaysFreeSet = new Set((Array.isArray(rawAlwaysFree) ? rawAlwaysFree : []).map(String).map(s => s.replace(/\D/g, '')).filter(Boolean));
         }
-        return { sameDaySet, outskirtsSet, alwaysFreeSet };
+        return {sameDaySet, outskirtsSet, alwaysFreeSet};
     }
 
     function isAlwaysFreePincode(pincode) {
         if (!pincode) return false;
         const clean = String(pincode).replace(/\D/g, '');
         if (!clean) return false;
-        const { alwaysFreeSet: freeSet } = getZoneSets();
+        const {alwaysFreeSet: freeSet} = getZoneSets();
         return Boolean(freeSet && freeSet.has(clean));
     }
 
@@ -149,7 +160,7 @@
             };
         }
 
-        const { sameDaySet: sDays, outskirtsSet: oSkirts } = getZoneSets();
+        const {sameDaySet: sDays, outskirtsSet: oSkirts} = getZoneSets();
         const msgs = zonesData.messages || {};
 
         if (sDays.has(clean)) {
@@ -269,7 +280,10 @@
         };
     })();
 
-    const fmtPrice = n => (CONFIG.currencySymbol ? CONFIG.currencySymbol + ' ' : '') + n.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    const fmtPrice = n => (CONFIG.currencySymbol ? CONFIG.currencySymbol + ' ' : '') + n.toLocaleString(undefined, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    });
     const fmtInr = fmtPrice;
 
     function isLoyaltyActive(saleTotal) {
@@ -280,6 +294,7 @@
 
     let _toastTimer = null;
     safeWindow.swacShowToast = showToast;
+
     function showToast(msg) {
         let toast = document.getElementById('swac-toast');
         if (!toast) {
@@ -526,6 +541,29 @@
     function renderAddressSection(force, justSaved) {
         const container = document.getElementById('swac-address-section');
         if (!container) return;
+
+        const retailer = typeof getSavedRetailer === 'function' ? getSavedRetailer() : null;
+        if (retailer && retailer.store_name) {
+            container.innerHTML = `
+                <div class="swac-address-card swac-b2b-route-card" id="swac-address-card">
+                    <div class="swac-address-card-header">
+                        <span class="swac-address-card-badge">
+                            🚚 Wholesale Route Dispatch
+                        </span>
+                        <span style="font-size:11px; font-weight:700; color:#15803d;">✓ Route Verified</span>
+                    </div>
+                    <div class="swac-address-card-body" style="padding:10px 12px; font-size:12px; line-height:1.5;">
+                        <div style="font-weight:700; color:#0f172a; font-size:13px;">🏪 ${escHtml(retailer.store_name)}</div>
+                        <div style="color:#475569;">📍 Route / Area: <strong>${escHtml(retailer.area || 'Wholesale Delivery Route')}</strong></div>
+                        <div style="color:#475569;">📞 Mobile: <code>${escHtml(retailer.phone)}</code></div>
+                        <div style="margin-top:8px;">
+                            <input type="text" id="swac-b2b-remarks" class="swac-addr-input" style="font-size:12px; height:34px; width:100%; box-sizing:border-box;" placeholder="Optional dispatch note (e.g. transport builty, carton mark)...">
+                        </div>
+                    </div>
+                </div>
+            `;
+            return;
+        }
 
         const saved = getCustomerDetails();
 
@@ -848,7 +886,7 @@
                     }
                 }
 
-                const { isValid: pinIsValid, cleanPin } = runPincodeValidation(pincodeInput);
+                const {isValid: pinIsValid, cleanPin} = runPincodeValidation(pincodeInput);
                 if (!pinIsValid) {
                     isValid = false;
                     if (!firstInvalid) firstInvalid = pincodeInput;
@@ -856,7 +894,7 @@
 
                 if (!isValid) {
                     if (firstInvalid) {
-                        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstInvalid.scrollIntoView({behavior: 'smooth', block: 'center'});
                         setTimeout(() => firstInvalid.focus(), 150);
                     }
                     return;
@@ -871,7 +909,7 @@
                 };
 
                 saveCustomerDetails(details);
-                addressDraft = { ...details, saveDefault: shouldSave };
+                addressDraft = {...details, saveDefault: shouldSave};
                 addressMode = 'preview';
                 renderAddressSection(true, true);
             });
@@ -932,7 +970,7 @@
             amountPayable += CONFIG.loyalty.itemPrice;
         }
 
-        return { totalMrp, saleTotal, youSave, savePct, shipping, amountPayable, isAlwaysFree };
+        return {totalMrp, saleTotal, youSave, savePct, shipping, amountPayable, isAlwaysFree};
     }
 
     // ── Loyalty & Delivery Offer State Machine ──────────────────────────────
@@ -1064,7 +1102,7 @@
 
     function renderTotals(container, cart, totals) {
         const loy = CONFIG.loyalty;
-        const { totalMrp, saleTotal, youSave, savePct, shipping, amountPayable } = totals;
+        const {totalMrp, saleTotal, youSave, savePct, shipping, amountPayable} = totals;
         const loyaltyActive = isLoyaltyActive(saleTotal);
 
         const shipLabel = shipping === 0 ? '<span class="swac-totals-free">FREE</span>' : fmtInr(shipping);
@@ -1076,8 +1114,8 @@
             <div class="swac-totals-row swac-totals-save"><span>Discount</span><span>${fmtInr(youSave)} (${savePct}% off)</span></div>
             <div class="swac-totals-row"><span>Shipping</span><span>${shipLabel}</span></div>
             ${loyaltyChoice === 'yes' && loyaltyActive
-                ? `<div class="swac-totals-row swac-totals-loyalty cdr-totals-loyalty"><span><span class="cdr-loyalty-gift-icon" aria-hidden="true">&#127873;</span>${escHtml(loy.itemLabel)} (worth ${fmtInr(loy.itemWorth)})</span><span>+${fmtInr(loy.itemPrice)}</span></div>`
-                : ''}
+            ? `<div class="swac-totals-row swac-totals-loyalty cdr-totals-loyalty"><span><span class="cdr-loyalty-gift-icon" aria-hidden="true">&#127873;</span>${escHtml(loy.itemLabel)} (worth ${fmtInr(loy.itemWorth)})</span><span>+${fmtInr(loy.itemPrice)}</span></div>`
+            : ''}
             <div class="swac-totals-row swac-totals-payable"><span>To Pay</span><span>${fmtInr(amountPayable)}</span></div>
             <div class="swac-drawer-delivery-info">
                 ${CONFIG.cityName ? `<span class="swac-drawer-area-badge">&#128205; Delivering in ${escHtml(CONFIG.cityName)}</span>` : ''}
@@ -1222,11 +1260,26 @@
             }
         }
 
-        return { isValid, cleanPin, zoneRes };
+        return {isValid, cleanPin, zoneRes};
     }
 
     // ── Form Validation ──────────────────────────────────────────────────────
     function validateAddress() {
+        const retailer = typeof getSavedRetailer === 'function' ? getSavedRetailer() : null;
+        if (retailer && retailer.store_name) {
+            const remarksInput = document.getElementById('swac-b2b-remarks');
+            const remarks = remarksInput ? remarksInput.value.trim() : '';
+            return {
+                name: retailer.store_name + (retailer.owner_name ? ' (' + retailer.owner_name + ')' : ''),
+                phone: retailer.phone,
+                area: retailer.area || 'Wholesale Delivery Route',
+                address: 'Wholesale Route Dispatch',
+                pincode: '000000',
+                remarks: remarks,
+                isB2B: true
+            };
+        }
+
         if (addressMode === 'preview') {
             const saved = getCustomerDetails();
             if (saved && saved.name && saved.address && saved.pincode) {
@@ -1286,7 +1339,7 @@
             }
         }
 
-        const { isValid: pinIsValid, cleanPin } = runPincodeValidation(pincodeInput);
+        const {isValid: pinIsValid, cleanPin} = runPincodeValidation(pincodeInput);
         if (!pinIsValid) {
             isValid = false;
             if (!firstInvalid) firstInvalid = pincodeInput;
@@ -1294,7 +1347,7 @@
 
         if (!isValid) {
             if (firstInvalid) {
-                firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstInvalid.scrollIntoView({behavior: 'smooth', block: 'center'});
                 setTimeout(() => firstInvalid.focus(), 150);
             }
             return null;
@@ -1310,11 +1363,11 @@
 
         if (shouldSave) {
             saveCustomerDetails(details);
-            addressDraft = { ...details, saveDefault: true };
+            addressDraft = {...details, saveDefault: true};
             addressMode = 'preview';
             renderAddressSection(true);
         } else {
-            addressDraft = { ...details, saveDefault: false };
+            addressDraft = {...details, saveDefault: false};
         }
 
         return details;
@@ -1357,7 +1410,14 @@
             return line;
         });
 
-        const { totalMrp, saleTotal, youSave, savePct, shipping, amountPayable } = computeCartTotals(cart, details ? details.pincode : undefined);
+        const {
+            totalMrp,
+            saleTotal,
+            youSave,
+            savePct,
+            shipping,
+            amountPayable
+        } = computeCartTotals(cart, details ? details.pincode : undefined);
         const shipLabel = shipping === 0 ? 'FREE' : fmtInr(shipping);
         const loyaltyActive = isLoyaltyActive(saleTotal);
 
@@ -1391,7 +1451,13 @@
             }
         }
 
-        if (details) {
+        if (details && details.isB2B) {
+            msg += `\n\n🚚 *Dispatch Route:* ${safeStr(details.area || 'Wholesale Delivery Route')}`;
+            if (details.remarks) {
+                msg += `\n📝 *Dispatch Note:* ${safeStr(details.remarks)}`;
+            }
+            msg += `\n${sep}`;
+        } else if (details) {
             msg += `\n\n*Delivery Details:*`
                 + `\nName: ${safeStr(details.name)}`
                 + `\nAddress: ${safeStr(details.address)}`;
@@ -1864,6 +1930,7 @@
         initAddressState();
         refreshUI();
         interceptAddToCart();
+        window.swacRefreshCartUI = refreshUI;
         bindDrawerEvents();
         bindLoopButtons();
         bindCatalogOrdering();

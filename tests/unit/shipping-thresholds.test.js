@@ -1,4 +1,4 @@
-const { test, describe, beforeEach } = require('node:test');
+const {test, describe, beforeEach} = require('node:test');
 const assert = require('node:assert/strict');
 const waCart = require('../../assets/js/wa_cart.js');
 
@@ -16,7 +16,7 @@ describe('Shipping Thresholds & Always-Free Postal Codes', () => {
     });
 
     test('should apply flat shipping fee when cart is below threshold', () => {
-        const cart = [{ id: 1, name: 'Item', salePrice: 350, mrp: 400, qty: 1 }];
+        const cart = [{id: 1, name: 'Item', salePrice: 350, mrp: 400, qty: 1}];
         const totals = waCart.computeCartTotals(cart, '781020');
 
         assert.equal(totals.saleTotal, 350);
@@ -26,7 +26,7 @@ describe('Shipping Thresholds & Always-Free Postal Codes', () => {
     });
 
     test('should waive shipping fee when cart is at or above threshold', () => {
-        const cart = [{ id: 1, name: 'Item', salePrice: 500, mrp: 600, qty: 1 }];
+        const cart = [{id: 1, name: 'Item', salePrice: 500, mrp: 600, qty: 1}];
         const totals = waCart.computeCartTotals(cart, '781020');
 
         assert.equal(totals.saleTotal, 500);
@@ -36,7 +36,7 @@ describe('Shipping Thresholds & Always-Free Postal Codes', () => {
     });
 
     test('should waive shipping fee for always-free postal code even below threshold', () => {
-        const cart = [{ id: 1, name: 'Item', salePrice: 150, mrp: 200, qty: 1 }];
+        const cart = [{id: 1, name: 'Item', salePrice: 150, mrp: 200, qty: 1}];
         const totals = waCart.computeCartTotals(cart, '781001');
 
         assert.equal(totals.saleTotal, 150);

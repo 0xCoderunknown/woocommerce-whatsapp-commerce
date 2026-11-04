@@ -53,61 +53,61 @@ function swac_desk_is_authorized(?WP_REST_Request $request = null): bool
 add_action('rest_api_init', function () {
     // 1. Master PIN Verification
     register_rest_route('swac/v1', '/desk/auth', [
-        'methods'             => 'POST',
-        'callback'            => 'swac_rest_desk_auth',
+        'methods' => 'POST',
+        'callback' => 'swac_rest_desk_auth',
         'permission_callback' => '__return_true',
     ]);
 
     // 2. Fetch Catalog Items for Quick Rate Sheet
     register_rest_route('swac/v1', '/desk/products', [
-        'methods'             => 'GET',
-        'callback'            => 'swac_rest_desk_get_products',
+        'methods' => 'GET',
+        'callback' => 'swac_rest_desk_get_products',
         'permission_callback' => 'swac_desk_is_authorized',
     ]);
 
     // 3. Quick Update Rate & Scheme
     register_rest_route('swac/v1', '/desk/quick-update', [
-        'methods'             => 'POST',
-        'callback'            => 'swac_rest_desk_quick_update',
+        'methods' => 'POST',
+        'callback' => 'swac_rest_desk_quick_update',
         'permission_callback' => 'swac_desk_is_authorized',
     ]);
 
     // 4. Create New Product
     register_rest_route('swac/v1', '/desk/create-product', [
-        'methods'             => 'POST',
-        'callback'            => 'swac_rest_desk_create_product',
+        'methods' => 'POST',
+        'callback' => 'swac_rest_desk_create_product',
         'permission_callback' => 'swac_desk_is_authorized',
     ]);
 
     // 5. Retailer Management Endpoints
     register_rest_route('swac/v1', '/desk/retailers', [
-        'methods'             => 'GET',
-        'callback'            => 'swac_rest_desk_get_retailers',
+        'methods' => 'GET',
+        'callback' => 'swac_rest_desk_get_retailers',
         'permission_callback' => 'swac_desk_is_authorized',
     ]);
 
     register_rest_route('swac/v1', '/desk/save-retailer', [
-        'methods'             => 'POST',
-        'callback'            => 'swac_rest_desk_save_retailer',
+        'methods' => 'POST',
+        'callback' => 'swac_rest_desk_save_retailer',
         'permission_callback' => 'swac_desk_is_authorized',
     ]);
 
     register_rest_route('swac/v1', '/desk/delete-retailer', [
-        'methods'             => 'POST',
-        'callback'            => 'swac_rest_desk_delete_retailer',
+        'methods' => 'POST',
+        'callback' => 'swac_rest_desk_delete_retailer',
         'permission_callback' => 'swac_desk_is_authorized',
     ]);
 
     // 6. CSV Export & Import Endpoints
     register_rest_route('swac/v1', '/desk/export-csv', [
-        'methods'             => 'GET',
-        'callback'            => 'swac_rest_desk_export_csv',
+        'methods' => 'GET',
+        'callback' => 'swac_rest_desk_export_csv',
         'permission_callback' => 'swac_desk_is_authorized',
     ]);
 
     register_rest_route('swac/v1', '/desk/import-csv', [
-        'methods'             => 'POST',
-        'callback'            => 'swac_rest_desk_import_csv',
+        'methods' => 'POST',
+        'callback' => 'swac_rest_desk_import_csv',
         'permission_callback' => 'swac_desk_is_authorized',
     ]);
 });
@@ -143,7 +143,7 @@ function swac_rest_desk_auth(WP_REST_Request $request): WP_REST_Response
 
     return new WP_REST_Response([
         'success' => true,
-        'token'   => $token,
+        'token' => $token,
         'message' => __('Access Granted.', 'stateless-wa-commerce'),
     ], 200);
 }
@@ -155,11 +155,11 @@ function swac_rest_desk_get_products(WP_REST_Request $request): WP_REST_Response
 {
     $search = sanitize_text_field((string)$request->get_param('search'));
     $args = [
-        'post_type'      => 'product',
-        'post_status'    => 'publish',
+        'post_type' => 'product',
+        'post_status' => 'publish',
         'posts_per_page' => 150,
-        'orderby'        => 'title',
-        'order'          => 'ASC',
+        'orderby' => 'title',
+        'order' => 'ASC',
     ];
 
     if (!empty($search)) {
@@ -187,17 +187,17 @@ function swac_rest_desk_get_products(WP_REST_Request $request): WP_REST_Response
         $brand = (!empty($brand_terms) && !is_wp_error($brand_terms)) ? current($brand_terms)->name : '';
 
         $items[] = [
-            'id'           => $product->get_id(),
-            'name'         => $product->get_name(),
-            'brand'        => $brand,
-            'thumb'        => $thumb,
-            'in_stock'     => $product->is_in_stock(),
-            'mrp'          => $b2b['mrp'],
-            'ptr'          => $b2b['ptr'],
-            'carton_pack'  => $b2b['carton_pack'],
-            'scheme_type'  => $b2b['scheme_type'],
+            'id' => $product->get_id(),
+            'name' => $product->get_name(),
+            'brand' => $brand,
+            'thumb' => $thumb,
+            'in_stock' => $product->is_in_stock(),
+            'mrp' => $b2b['mrp'],
+            'ptr' => $b2b['ptr'],
+            'carton_pack' => $b2b['carton_pack'],
+            'scheme_type' => $b2b['scheme_type'],
             'scheme_badge' => $b2b['scheme_badge'],
-            'permalink'    => $product->get_permalink(),
+            'permalink' => $product->get_permalink(),
         ];
     }
 
@@ -352,12 +352,12 @@ function swac_rest_desk_create_product(WP_REST_Request $request): WP_REST_Respon
     }
 
     return new WP_REST_Response([
-        'success'    => true,
+        'success' => true,
         'product_id' => $product_id,
-        'name'       => $name,
-        'permalink'  => $product->get_permalink(),
-        'message'    => sprintf(
-            /* translators: %s: product title */
+        'name' => $name,
+        'permalink' => $product->get_permalink(),
+        'message' => sprintf(
+        /* translators: %s: product title */
             __('%s successfully added to wholesale catalog!', 'stateless-wa-commerce'),
             $name
         ),
@@ -410,11 +410,11 @@ function swac_rest_desk_delete_retailer(WP_REST_Request $request): WP_REST_Respo
 function swac_rest_desk_export_csv(WP_REST_Request $request)
 {
     $args = [
-        'post_type'      => 'product',
-        'post_status'    => 'publish',
+        'post_type' => 'product',
+        'post_status' => 'publish',
         'posts_per_page' => -1,
-        'orderby'        => 'title',
-        'order'          => 'ASC',
+        'orderby' => 'title',
+        'order' => 'ASC',
     ];
     $query = new WP_Query($args);
 
@@ -592,9 +592,9 @@ function swac_rest_desk_import_csv(WP_REST_Request $request): WP_REST_Response
 
     return new WP_REST_Response([
         'success' => true,
-        'count'   => $updated_count,
+        'count' => $updated_count,
         'message' => sprintf(
-            /* translators: %d: number of updated products */
+        /* translators: %d: number of updated products */
             __('Successfully updated %d products from CSV.', 'stateless-wa-commerce'),
             $updated_count
         ),

@@ -8,13 +8,18 @@
 > [!WARNING]
 > **Important: Store Behavior Notice Upon Activation**
 >
-> Activating Stateless WhatsApp Commerce transforms your WooCommerce store from a traditional payment gateway store into a **direct WhatsApp order-intent catalog**:
-> - **Page Redirections**: Cart, Checkout, and My Account pages are intercepted and redirected (default: redirects to homepage).
-> - **Sessions & Fragments Suppressed**: Native WooCommerce frontend session creation (`wp_woocommerce_sessions`) and render-blocking cart fragments AJAX (`wc-ajax=get_refreshed_fragments`) are disabled site-wide for all visitors.
-> - **Native Emails & Gateways Bypassed**: Standard WooCommerce customer transaction emails and gateway checkouts are not triggered because orders are initiated directly via customer WhatsApp messages.
+> Activating Stateless WhatsApp Commerce transforms your WooCommerce store from a traditional payment gateway store into
+> a **direct WhatsApp order-intent catalog**:
+> - **Page Redirections**: Cart, Checkout, and My Account pages are intercepted and redirected (default: redirects to
+    homepage).
+> - **Sessions & Fragments Suppressed**: Native WooCommerce frontend session creation (`wp_woocommerce_sessions`) and
+    render-blocking cart fragments AJAX (`wc-ajax=get_refreshed_fragments`) are disabled site-wide for all visitors.
+> - **Native Emails & Gateways Bypassed**: Standard WooCommerce customer transaction emails and gateway checkouts are
+    not triggered because orders are initiated directly via customer WhatsApp messages.
 >
 > **Need to adjust or disable these behaviours?**
-> Open `features.php` (in the plugin root) — every lockdown feature group has its own on/off toggle with a full explanation. For a complete lockdown disable, set `swac_enable_catalog_lockdown` to false via filter:
+> Open `features.php` (in the plugin root) — every lockdown feature group has its own on/off toggle with a full
+> explanation. For a complete lockdown disable, set `swac_enable_catalog_lockdown` to false via filter:
 > ```php
 > add_filter('swac_enable_catalog_lockdown', '__return_false');
 > ```
@@ -23,24 +28,29 @@
 
 ## ⚡ Overview
 
-**Stateless WhatsApp Commerce** enables WooCommerce stores to run as **session-free public catalogs** that can be served directly from full-page static cache (e.g. LiteSpeed Cache, Nginx fastcgi_cache, or Edge CDNs) without PHP or database execution overhead on cache hits.
+**Stateless WhatsApp Commerce** enables WooCommerce stores to run as **session-free public catalogs** that can be served
+directly from full-page static cache (e.g. LiteSpeed Cache, Nginx fastcgi_cache, or Edge CDNs) without PHP or database
+execution overhead on cache hits.
 
-Customer cart items, address details, and delivery zone serviceability run in the browser using vanilla JavaScript and `localStorage`. When the user is ready, the cart compiles into an itemized, structured **WhatsApp message link** (`wa.me`) where the customer reviews and transmits the order directly to your dispatch team.
+Customer cart items, address details, and delivery zone serviceability run in the browser using vanilla JavaScript
+and `localStorage`. When the user is ready, the cart compiles into an itemized, structured **WhatsApp message link
+** (`wa.me`) where the customer reviews and transmits the order directly to your dispatch team.
 
 ---
 
 ## 📊 Operational Comparison
 
-| Metric / Behavior | Standard WooCommerce | Stateless WhatsApp Commerce |
-| :--- | :--- | :--- |
-| **Full-Page Cache Hits** | Frequently bypassed by session cookies & cart fragments | **Served from full-page cache without PHP or database overhead** |
-| **Database Session Writes** | 1 write per browsing session (`wp_woocommerce_sessions`) | **0 Database Writes** (handled entirely client-side) |
-| **Frontend Cookies** | Plugin sets `wp_woocommerce_session_*`, `woocommerce_items_in_cart` | **Plugin sets zero frontend commerce cookies** (static cache friendly) |
-| **Cart Fragments AJAX** | Dispatches `get_refreshed_fragments` on page loads | **Completely disabled** (no background server requests) |
-| **Checkout Workflow** | Multi-step form with cart abandonment | **Direct WhatsApp Order** with itemized pricing & address |
-| **Edge Cacheability (Cloudflare / CDN)** | Requires complex cookie-bypass exclusion rules | **Edge-cache friendly** (depends on your edge cache rules) |
+| Metric / Behavior                        | Standard WooCommerce                                                | Stateless WhatsApp Commerce                                            |
+|:-----------------------------------------|:--------------------------------------------------------------------|:-----------------------------------------------------------------------|
+| **Full-Page Cache Hits**                 | Frequently bypassed by session cookies & cart fragments             | **Served from full-page cache without PHP or database overhead**       |
+| **Database Session Writes**              | 1 write per browsing session (`wp_woocommerce_sessions`)            | **0 Database Writes** (handled entirely client-side)                   |
+| **Frontend Cookies**                     | Plugin sets `wp_woocommerce_session_*`, `woocommerce_items_in_cart` | **Plugin sets zero frontend commerce cookies** (static cache friendly) |
+| **Cart Fragments AJAX**                  | Dispatches `get_refreshed_fragments` on page loads                  | **Completely disabled** (no background server requests)                |
+| **Checkout Workflow**                    | Multi-step form with cart abandonment                               | **Direct WhatsApp Order** with itemized pricing & address              |
+| **Edge Cacheability (Cloudflare / CDN)** | Requires complex cookie-bypass exclusion rules                      | **Edge-cache friendly** (depends on your edge cache rules)             |
 
-> *Note on cookies & cache: The plugin itself sets zero frontend commerce cookies. Overall site cookie behavior and Cloudflare edge caching also depend on your active theme, third-party plugins, and CDN page rule configurations.*
+> *Note on cookies & cache: The plugin itself sets zero frontend commerce cookies. Overall site cookie behavior and
+Cloudflare edge caching also depend on your active theme, third-party plugins, and CDN page rule configurations.*
 
 ---
 
@@ -84,39 +94,60 @@ Customer cart items, address details, and delivery zone serviceability run in th
 ## 🚀 Key Features
 
 - **Zero-Session Lockdown**:
-  Stubs the WooCommerce session engine with `SWAC_Null_Session_Handler`. Eliminates session cookies, database writes, and cart fragment overhead. Fully toggleable via `swac_enable_catalog_lockdown`.
+  Stubs the WooCommerce session engine with `SWAC_Null_Session_Handler`. Eliminates session cookies, database writes,
+  and cart fragment overhead. Fully toggleable via `swac_enable_catalog_lockdown`.
 - **Client-Side Cart & Slide-Out Drawer**:
-  Lightweight, zero-dependency slide-out order drawer with real-time totals, dynamic shipping threshold alerts, and postal zone gating.
+  Lightweight, zero-dependency slide-out order drawer with real-time totals, dynamic shipping threshold alerts, and
+  postal zone gating.
 - **Dynamic Price Reconciliation**:
-  Reconciles `localStorage` cart item prices against fresh DOM attributes on cached pages, preventing stale cache checkouts.
+  Reconciles `localStorage` cart item prices against fresh DOM attributes on cached pages, preventing stale cache
+  checkouts.
 - **Filterable Zone Registry**:
   Supports open checkout or gated delivery zones via `apply_filters('swac_delivery_zones', ...)`.
 - **Timezone-Aware Delivery Cutoffs**:
-  Calculates local order cutoffs using WordPress core `wp_timezone()`, complete with dynamic calendar date stamping `(j M)` for weekend and weekday afternoon windows.
+  Calculates local order cutoffs using WordPress core `wp_timezone()`, complete with dynamic calendar date
+  stamping `(j M)` for weekend and weekday afternoon windows.
 - **High-Performance Submodules**:
-  - `modules/pharmacy/`: Chemical compositions (`composition`), pack sizes (`pack_size`), and generic alternate price comparisons.
-  - `modules/explore/`: High-speed directory exploration for brands and categories with instant live client search.
-  - `modules/seo/`: Dynamic OpenGraph headers, taxonomy titles, and Schema.org JSON-LD metadata without external SEO plugins.
-  - `modules/wholesale/`: B2B Wholesale & schemes engine with PTR pricing, dynamic retailer margin badges (₹ & %), active promotional schemes (12+1 free goods, volume slab tiers, CD %), carton packing guides, direct shop-page bulk ordering, zero-cost phone + 4-digit PIN rate gating, and mobile frontend distributor desk with 1-click CSV synchronization.
-  - `integrations/`: Streaming low-memory XML sitemap generator (`/sitemap.xml`) and reverse-proxy SSL enforcer.
+    - `modules/pharmacy/`: Chemical compositions (`composition`), pack sizes (`pack_size`), and generic alternate price
+      comparisons.
+    - `modules/explore/`: High-speed directory exploration for brands and categories with instant live client search.
+    - `modules/seo/`: Dynamic OpenGraph headers, taxonomy titles, and Schema.org JSON-LD metadata without external SEO
+      plugins.
+    - `modules/wholesale/`: B2B Wholesale & schemes engine with PTR pricing, dynamic retailer margin badges (₹ & %),
+      active promotional schemes (12+1 free goods, volume slab tiers, CD %), carton packing guides, direct shop-page
+      bulk ordering, zero-cost phone + 4-digit PIN rate gating, and mobile frontend distributor desk with 1-click CSV
+      synchronization.
+    - `integrations/`: Streaming low-memory XML sitemap generator (`/sitemap.xml`) and reverse-proxy SSL enforcer.
 - **HPOS & Modern Block Ready**:
-  Compatibility for High-Performance Order Storage (`custom_order_tables`) and Cart/Checkout Blocks declared via `FeaturesUtil::declare_compatibility()` on `before_woocommerce_init`.
+  Compatibility for High-Performance Order Storage (`custom_order_tables`) and Cart/Checkout Blocks declared
+  via `FeaturesUtil::declare_compatibility()` on `before_woocommerce_init`.
 
 ---
 
 ## 🎨 Theme & Builder Compatibility
 
-Stateless WhatsApp Commerce is built as a **true drop-in solution** designed to work out of the box with almost any WordPress theme or visual page builder:
+Stateless WhatsApp Commerce is built as a **true drop-in solution** designed to work out of the box with almost any
+WordPress theme or visual page builder:
 
-- **100% Theme Agnostic**: Leaves all site layout, typography, branding, headers, footers, and product grid designs completely untouched. The plugin does not override your theme's archive or single-product templates.
-- **Tested with Visual Page Builders**: Works seamlessly with **Breakdance Builder**, **Elementor**, **Bricks**, **Divi**, and modern **WordPress Block Themes** (Full Site Editing).
+- **100% Theme Agnostic**: Leaves all site layout, typography, branding, headers, footers, and product grid designs
+  completely untouched. The plugin does not override your theme's archive or single-product templates.
+- **Tested with Visual Page Builders**: Works seamlessly with **Breakdance Builder**, **Elementor**, **Bricks**, **Divi
+  **, and modern **WordPress Block Themes** (Full Site Editing).
 - **Automatic "Add to Cart" Transformation**:
-  - **Catalog & Archive Loops**: Automatically hooks into `woocommerce_loop_add_to_cart_link` to transform standard server-side buttons into client-side WhatsApp order actions.
-  - **Single Product Pages**: Automatically intercepts the native WooCommerce `form.cart` submission (`.single_add_to_cart_button`) directly in the browser via JavaScript (`preventDefault`). Clicking "Add to Cart" immediately adds the product to `localStorage` without triggering page reloads, AJAX delays, or session cookies.
-  - **Custom Builder Templates**: When designing custom single-product layouts in Breakdance or Elementor, you can either keep the builder's standard Add to Cart widget (which is automatically intercepted) or drop in the dedicated `[swac_action_row]` shortcode for integrated quantity steppers and WhatsApp ordering.
+    - **Catalog & Archive Loops**: Automatically hooks into `woocommerce_loop_add_to_cart_link` to transform standard
+      server-side buttons into client-side WhatsApp order actions.
+    - **Single Product Pages**: Automatically intercepts the native WooCommerce `form.cart`
+      submission (`.single_add_to_cart_button`) directly in the browser via JavaScript (`preventDefault`). Clicking "Add
+      to Cart" immediately adds the product to `localStorage` without triggering page reloads, AJAX delays, or session
+      cookies.
+    - **Custom Builder Templates**: When designing custom single-product layouts in Breakdance or Elementor, you can
+      either keep the builder's standard Add to Cart widget (which is automatically intercepted) or drop in the
+      dedicated `[swac_action_row]` shortcode for integrated quantity steppers and WhatsApp ordering.
 - **Zero-Dependency Slide-Out Drawer**:
-  - Replaces traditional multi-step `/cart/` and `/checkout/` redirection loops with a modern, lightweight, client-side slide-out cart drawer.
-  - Features real-time totals, dynamic shipping threshold progress, item quantity selectors, and postal zone serviceability checks, compiling everything directly into the final `wa.me` order link.
+    - Replaces traditional multi-step `/cart/` and `/checkout/` redirection loops with a modern, lightweight,
+      client-side slide-out cart drawer.
+    - Features real-time totals, dynamic shipping threshold progress, item quantity selectors, and postal zone
+      serviceability checks, compiling everything directly into the final `wa.me` order link.
 
 ---
 
@@ -177,13 +208,15 @@ define('SWAC_MODULE_WHOLESALE', true);  // B2B wholesale pricing, schemes & PIN 
 ```
 
 > [!NOTE]
-> Cart & checkout redirect, WC AJAX intercept, and the zero-session engine are **not** listed in `features.php` — they are architectural non-negotiables. Disabling them would break the WhatsApp checkout model entirely.
+> Cart & checkout redirect, WC AJAX intercept, and the zero-session engine are **not** listed in `features.php` — they
+> are architectural non-negotiables. Disabling them would break the WhatsApp checkout model entirely.
 
 ---
 
 ### 3. Delivery Zones (`swac_delivery_zones`)
 
-Delivery zone serviceability cannot be defined via constants (it's runtime, potentially database-driven). Configure via filter:
+Delivery zone serviceability cannot be defined via constants (it's runtime, potentially database-driven). Configure via
+filter:
 
 ```php
 add_filter('swac_delivery_zones', function ($config) {
@@ -204,7 +237,8 @@ add_filter('swac_delivery_zones', function ($config) {
 
 ### 4. Advanced: Programmatic Config Overrides
 
-For dynamic config (multi-site, environment-specific, or database-driven values), the `swac_commerce_config` filter overrides any constant:
+For dynamic config (multi-site, environment-specific, or database-driven values), the `swac_commerce_config` filter
+overrides any constant:
 
 ```php
 add_filter('swac_commerce_config', function ($config) {
@@ -220,23 +254,25 @@ add_filter('swac_commerce_config', function ($config) {
 
 Standard shortcodes use the unique `[swac_*]` prefix:
 
-| Shortcode | Purpose | Example |
-| :--- | :--- | :--- |
-| `[swac_button]` | Standalone WhatsApp order/contact button (supports `icon="yes\|no"`) | `[swac_button text="Order Now" icon="yes"]` |
-| `[swac_price_block]` | Hero price block with regular price & discount % | `[swac_price_block context="single"]` |
-| `[swac_pack_size]` | Product pack size badge | `[swac_pack_size]` |
-| `[swac_price_pack_hierarchy]` | Unified price and pack size container | `[swac_price_pack_hierarchy context="single"]` |
-| `[swac_action_row]` | Add to Order button with quantity controls | `[swac_action_row]` |
-| `[swac_delivery_notice]` | Dynamic dispatch cutoff notice with date stamping | `[swac_delivery_notice]` |
-| `[swac_stock_status]` | Single product out-of-stock safety net badge | `[swac_stock_status]` |
-| `[swac_explore_brands]` | A-Z brand directory with live search | `[swac_explore_brands hide_empty="true"]` |
-| `[swac_categories_grid]`| Grid of child categories under a parent slug | `[swac_categories_grid parent_slug="electronics"]`|
-| `[swac_missing_images_finder]` | Admin audit tool for products missing images | `[swac_missing_images_finder]` |
-| `[swac_distributor_portal]` | Frontend distributor desk (daily rate tweaks, product entry, retailer PINs, CSV sync) | `[swac_distributor_portal]` |
+| Shortcode                      | Purpose                                                                               | Example                                            |
+|:-------------------------------|:--------------------------------------------------------------------------------------|:---------------------------------------------------|
+| `[swac_button]`                | Standalone WhatsApp order/contact button (supports `icon="yes\|no"`)                  | `[swac_button text="Order Now" icon="yes"]`        |
+| `[swac_price_block]`           | Hero price block with regular price & discount %                                      | `[swac_price_block context="single"]`              |
+| `[swac_pack_size]`             | Product pack size badge                                                               | `[swac_pack_size]`                                 |
+| `[swac_price_pack_hierarchy]`  | Unified price and pack size container                                                 | `[swac_price_pack_hierarchy context="single"]`     |
+| `[swac_action_row]`            | Add to Order button with quantity controls                                            | `[swac_action_row]`                                |
+| `[swac_delivery_notice]`       | Dynamic dispatch cutoff notice with date stamping                                     | `[swac_delivery_notice]`                           |
+| `[swac_stock_status]`          | Single product out-of-stock safety net badge                                          | `[swac_stock_status]`                              |
+| `[swac_explore_brands]`        | A-Z brand directory with live search                                                  | `[swac_explore_brands hide_empty="true"]`          |
+| `[swac_categories_grid]`       | Grid of child categories under a parent slug                                          | `[swac_categories_grid parent_slug="electronics"]` |
+| `[swac_missing_images_finder]` | Admin audit tool for products missing images                                          | `[swac_missing_images_finder]`                     |
+| `[swac_distributor_portal]`    | Frontend distributor desk (daily rate tweaks, product entry, retailer PINs, CSV sync) | `[swac_distributor_portal]`                        |
 
 > 📖 **Full Documentation**:
-> - [docs/shortcodes.md](docs/shortcodes.md) — Comprehensive shortcode dictionary (including pharmacy module shortcodes `[swac_generic_box]`, `[swac_size_chart]`, `[swac_explore_salts]`).
-> - [docs/architecture.md](docs/architecture.md) — Architectural deep-dive on zero-session caching and client-side reconciliation.
+> - [docs/shortcodes.md](docs/shortcodes.md) — Comprehensive shortcode dictionary (including pharmacy module
+    shortcodes `[swac_generic_box]`, `[swac_size_chart]`, `[swac_explore_salts]`).
+> - [docs/architecture.md](docs/architecture.md) — Architectural deep-dive on zero-session caching and client-side
+    reconciliation.
 
 ---
 
@@ -247,14 +283,16 @@ Standard shortcodes use the unique `[swac_*]` prefix:
 - **WooCommerce**: 8.0 through 11.1 (Tested up to 11.1)
 - **HPOS**: Fully compatible (Custom Order Tables declared)
 - **Cart/Checkout Blocks**: Declared compatible
-- **Themes & Page Builders**: 100% theme-agnostic; tested with Breakdance Builder, Elementor, Bricks, and classic/block themes
+- **Themes & Page Builders**: 100% theme-agnostic; tested with Breakdance Builder, Elementor, Bricks, and classic/block
+  themes
 - **Web Server / Cache**: LiteSpeed Web Server, Nginx, or any reverse-proxy / full-page caching layer
 
 ---
 
 ## 🧪 Testing & Verification
 
-The repository includes a 0-dependency automated testing suite powered by Node.js native test runner and static PHP verification:
+The repository includes a 0-dependency automated testing suite powered by Node.js native test runner and static PHP
+verification:
 
 ```bash
 # Run unit tests and PHP invariant/domain verification
@@ -268,7 +306,9 @@ run-tests.cmd
 
 ## ⚖️ Disclaimer
 
-This plugin is an independent open-source project and is not affiliated with, endorsed by, or sponsored by WhatsApp, Meta, or WooCommerce. WhatsApp is a registered trademark of Meta Platforms, Inc. WooCommerce is a registered trademark of Automattic Inc.
+This plugin is an independent open-source project and is not affiliated with, endorsed by, or sponsored by WhatsApp,
+Meta, or WooCommerce. WhatsApp is a registered trademark of Meta Platforms, Inc. WooCommerce is a registered trademark
+of Automattic Inc.
 
 ---
 

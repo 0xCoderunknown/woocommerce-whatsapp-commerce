@@ -21,16 +21,17 @@ if (!function_exists('swac_is_module_active') || !swac_is_module_active('explore
     return;
 }
 
-function swac_explore_brands_shortcode($atts) {
+function swac_explore_brands_shortcode($atts)
+{
     wp_enqueue_style('swac-explore-style');
     wp_enqueue_script('swac-frontend-script');
 
     $atts = shortcode_atts([
-        'columns'    => 4,
+        'columns' => 4,
         'hide_empty' => true,
         'image_size' => 'medium',
-        'orderby'    => 'name',
-        'order'      => 'ASC',
+        'orderby' => 'name',
+        'order' => 'ASC',
     ], $atts, 'swac_explore_brands');
 
     $brand_tax = defined('SWAC_TAX_BRAND') ? SWAC_TAX_BRAND : 'product_brand';
@@ -44,10 +45,10 @@ function swac_explore_brands_shortcode($atts) {
 
     if (false === $terms) {
         $terms = get_terms([
-            'taxonomy'   => $brand_tax,
+            'taxonomy' => $brand_tax,
             'hide_empty' => filter_var($atts['hide_empty'], FILTER_VALIDATE_BOOLEAN),
-            'orderby'    => $atts['orderby'],
-            'order'      => $atts['order'],
+            'orderby' => $atts['orderby'],
+            'order' => $atts['order'],
         ]);
 
         if (!is_wp_error($terms)) {
@@ -94,7 +95,8 @@ function swac_explore_brands_shortcode($atts) {
                 $image_url = $image_id ? wp_get_attachment_image_url($image_id, $atts['image_size']) : false;
                 $first_letter = function_exists('swac_get_term_initial') ? swac_get_term_initial((string)($term->name ?? '')) : '#';
                 ?>
-                <div class="swac-brand-card swac-search-item" data-title="<?php echo esc_attr(strtolower($term->name)); ?>">
+                <div class="swac-brand-card swac-search-item"
+                     data-title="<?php echo esc_attr(strtolower($term->name)); ?>">
                     <a href="<?php echo esc_url($link); ?>" class="swac-brand-link">
                         <div class="swac-brand-image-wrap">
                             <?php if ($image_url) : ?>
@@ -114,7 +116,7 @@ function swac_explore_brands_shortcode($atts) {
                                 <span class="swac-brand-count">
                                     <?php
                                     echo sprintf(
-                                        /* translators: %d: product count */
+                                    /* translators: %d: product count */
                                         esc_html(_n('%d product', '%d products', $term->count, 'stateless-wa-commerce')),
                                         $term->count
                                     );
@@ -130,4 +132,5 @@ function swac_explore_brands_shortcode($atts) {
     <?php
     return (string)ob_get_clean();
 }
+
 add_shortcode('swac_explore_brands', 'swac_explore_brands_shortcode');

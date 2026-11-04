@@ -171,18 +171,18 @@ add_action('wp_head', function () {
     $currency = function_exists('get_woocommerce_currency') ? get_woocommerce_currency() : 'USD';
 
     $schema = [
-        '@context'    => 'https://schema.org/',
-        '@type'       => 'Product',
-        'name'        => $product->get_name(),
-        'image'       => $img_url ? [$img_url] : [],
+        '@context' => 'https://schema.org/',
+        '@type' => 'Product',
+        'name' => $product->get_name(),
+        'image' => $img_url ? [$img_url] : [],
         'description' => swac_seo_build_description($product_id),
-        'sku'         => $sku,
-        'offers'      => [
-            '@type'         => 'Offer',
-            'url'           => $permalink,
+        'sku' => $sku,
+        'offers' => [
+            '@type' => 'Offer',
+            'url' => $permalink,
             'priceCurrency' => $currency,
-            'price'         => number_format($price, 2, '.', ''),
-            'availability'  => $product->is_in_stock() ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            'price' => number_format($price, 2, '.', ''),
+            'availability' => $product->is_in_stock() ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
         ],
     ];
 

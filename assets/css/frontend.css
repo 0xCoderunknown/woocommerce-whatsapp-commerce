@@ -535,7 +535,6 @@ div.stock.out-of-stock {
 }
 
 
-
 /* =========================================
    8. WHOLESALE & B2B SCHEME STYLES
    ========================================= */
@@ -1041,4 +1040,138 @@ div.stock.out-of-stock {
 .swac-pill-logout-btn:hover {
     background: #ef4444;
     color: #ffffff;
+}
+/* =========================================
+   10. SHIKHAR-STYLE WALLED GARDEN GATE
+   ========================================= */
+
+/* When Walled Garden Mode is active and retailer is NOT authenticated: hide catalog, products, cart bubble */
+.swac-walled-garden-mode:not(.swac-retailer-auth) .woocommerce-products-header,
+.swac-walled-garden-mode:not(.swac-retailer-auth) ul.products,
+.swac-walled-garden-mode:not(.swac-retailer-auth) .products,
+.swac-walled-garden-mode:not(.swac-retailer-auth) .woocommerce-result-count,
+.swac-walled-garden-mode:not(.swac-retailer-auth) .woocommerce-ordering,
+.swac-walled-garden-mode:not(.swac-retailer-auth) .woocommerce-pagination,
+.swac-walled-garden-mode:not(.swac-retailer-auth) div.product,
+.swac-walled-garden-mode:not(.swac-retailer-auth) .swac-cart-bubble,
+.swac-walled-garden-mode:not(.swac-retailer-auth) .swac-price-pack-wrap,
+.swac-walled-garden-mode:not(.swac-retailer-auth) .swac-delivery-notice,
+.swac-walled-garden-mode:not(.swac-retailer-auth) #main > *:not(.swac-walled-gate-screen):not(header):not(nav) {
+    display: none !important;
+}
+
+/* When authenticated: hide the walled garden gate screen completely */
+.swac-retailer-auth .swac-walled-gate-screen,
+html.swac-retailer-auth .swac-walled-gate-screen {
+    display: none !important;
+}
+
+/* Walled Garden Gate Screen & Card Container */
+.swac-walled-gate-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 65vh;
+    padding: 32px 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.swac-walled-gate-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+    max-width: 440px;
+    width: 100%;
+    padding: 32px 24px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.swac-walled-gate-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    margin-bottom: 14px;
+}
+
+.swac-walled-gate-title {
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 10px 0;
+    line-height: 1.25;
+}
+
+.swac-walled-gate-desc {
+    font-size: 0.88rem;
+    color: #64748b;
+    line-height: 1.5;
+    margin: 0 0 24px 0;
+}
+
+.swac-walled-gate-form {
+    text-align: left;
+}
+
+.swac-walled-gate-form .swac-form-row {
+    margin-bottom: 16px;
+}
+
+.swac-walled-gate-form .swac-form-row label {
+    display: block;
+    font-size: 0.82rem;
+    color: #334155;
+    margin-bottom: 6px;
+}
+
+.swac-walled-gate-btn {
+    width: 100%;
+    height: 46px;
+    font-size: 0.95rem;
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.swac-walled-gate-footer {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
+}
+
+/* B2B Route Card in Cart Drawer */
+.swac-b2b-route-card {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.swac-b2b-route-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.swac-b2b-route-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: #0f766e;
+    background: #ccfbf1;
+    padding: 2px 8px;
+    border-radius: 4px;
 }

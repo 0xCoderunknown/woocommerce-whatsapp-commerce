@@ -33,6 +33,16 @@ if (!function_exists('swac_render_sitemap')) {
             return;
         }
 
+        if (function_exists('swac_is_private_catalog') && swac_is_private_catalog()) {
+            global $wp_query;
+            if (isset($wp_query) && is_object($wp_query)) {
+                $wp_query->set_404();
+            }
+            status_header(404);
+            nocache_headers();
+            return;
+        }
+
         global $wpdb;
 
         if (ob_get_length()) {

@@ -29,14 +29,14 @@ add_action('wp_enqueue_scripts', function () {
 
     // 3. Explore Search JS (registered for on-demand enqueue by shortcodes)
     wp_register_script('swac-frontend-script', SWAC_URL . 'assets/js/frontend.js', [], SWAC_VERSION, [
-        'strategy'  => 'defer',
+        'strategy' => 'defer',
         'in_footer' => true,
     ]);
 
     // 4. WhatsApp Cart Engine (wa_cart.js)
     if (!is_admin()) {
         wp_enqueue_script('swac-cart-script', SWAC_URL . 'assets/js/wa_cart.js', [], SWAC_VERSION, [
-            'strategy'  => 'defer',
+            'strategy' => 'defer',
             'in_footer' => true,
         ]);
 
@@ -59,39 +59,39 @@ add_action('wp_enqueue_scripts', function () {
 
         $always_free_pins = $cfg['always_free_shipping_postal_codes']
             ?? (defined('SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES') ? SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES : []);
-        $always_free_pins = (array) apply_filters('swac_always_free_shipping_postal_codes', $always_free_pins, null);
+        $always_free_pins = (array)apply_filters('swac_always_free_shipping_postal_codes', $always_free_pins, null);
         $always_free_codes = array_values(array_unique(array_filter(array_map(function ($c) {
-            return preg_replace('/\D/', '', (string) $c);
+            return preg_replace('/\D/', '', (string)$c);
         }, $always_free_pins))));
 
         $localized_zones = [
-            'gated'                      => !empty($zones['gated']),
-            'same_day_pins'              => array_values(array_unique($same_day_pins)),
-            'outskirts_pins'             => array_values(array_unique($outskirts_pins)),
+            'gated' => !empty($zones['gated']),
+            'same_day_pins' => array_values(array_unique($same_day_pins)),
+            'outskirts_pins' => array_values(array_unique($outskirts_pins)),
             'always_free_shipping_codes' => $always_free_codes,
-            'messages'                   => $zones['messages'] ?? [],
+            'messages' => $zones['messages'] ?? [],
         ];
 
         $localized_config = [
-            'number'                     => $cfg['phone_number'],
-            'name'                       => $cfg['store_name'],
-            'baseUrl'                    => $cfg['base_url'],
-            'cityName'                   => $cfg['city_name'],
-            'currencySymbol'             => $cfg['currency_symbol'],
-            'free_shipping_at'           => $cfg['free_shipping_at'],
-            'shipping_charge'            => $cfg['shipping_charge'],
+            'number' => $cfg['phone_number'],
+            'name' => $cfg['store_name'],
+            'baseUrl' => $cfg['base_url'],
+            'cityName' => $cfg['city_name'],
+            'currencySymbol' => $cfg['currency_symbol'],
+            'free_shipping_at' => $cfg['free_shipping_at'],
+            'shipping_charge' => $cfg['shipping_charge'],
             'always_free_shipping_codes' => $always_free_codes,
-            'rest_url'                   => esc_url_raw(rest_url()),
-            'is_admin'                   => current_user_can('manage_woocommerce'),
-            'prescription_note_enabled'  => (bool)$cfg['prescription_note_enabled'],
-            'prescription_note'          => $cfg['prescription_note'],
-            'max_cart_items'             => (int)($cfg['max_cart_items'] ?? 10),
-            'max_qty_per_item'           => (int)($cfg['max_qty_per_item'] ?? 10),
-            'loyalty'                    => $cfg['loyalty'],
-            'timezone_offset'            => function_exists('wp_timezone') ? (float)((wp_timezone()->getOffset(new DateTime('now', new DateTimeZone('UTC')))) / 3600) : 0.0,
-            'cutoff_messages'            => [
-                'weekend'   => __('Order now to get it by Monday', 'stateless-wa-commerce'),
-                'morning'   => __('Order before 12 noon for same-day delivery', 'stateless-wa-commerce'),
+            'rest_url' => esc_url_raw(rest_url()),
+            'is_admin' => current_user_can('manage_woocommerce'),
+            'prescription_note_enabled' => (bool)$cfg['prescription_note_enabled'],
+            'prescription_note' => $cfg['prescription_note'],
+            'max_cart_items' => (int)($cfg['max_cart_items'] ?? 10),
+            'max_qty_per_item' => (int)($cfg['max_qty_per_item'] ?? 10),
+            'loyalty' => $cfg['loyalty'],
+            'timezone_offset' => function_exists('wp_timezone') ? (float)((wp_timezone()->getOffset(new DateTime('now', new DateTimeZone('UTC')))) / 3600) : 0.0,
+            'cutoff_messages' => [
+                'weekend' => __('Order now to get it by Monday', 'stateless-wa-commerce'),
+                'morning' => __('Order before 12 noon for same-day delivery', 'stateless-wa-commerce'),
                 'afternoon' => __('Order now to receive it by tomorrow', 'stateless-wa-commerce'),
             ],
         ];

@@ -1,4 +1,4 @@
-const { test, describe, beforeEach } = require('node:test');
+const {test, describe, beforeEach} = require('node:test');
 const assert = require('node:assert/strict');
 const waCart = require('../../assets/js/wa_cart.js');
 
@@ -10,7 +10,7 @@ describe('Wholesale Schemes & B2B Cart Calculations', () => {
             freeShippingAt: 10000,
             shippingCharge: 0,
             alwaysFreeShippingCodes: [],
-            loyalty: { enabled: false }
+            loyalty: {enabled: false}
         });
     });
 
@@ -88,5 +88,33 @@ describe('Wholesale Schemes & B2B Cart Calculations', () => {
         assert.match(msg, /Scheme: 12 \+ 1 FREE/);
         // Verify PTR calculation
         assert.match(msg, /Price: ₹ 24\.5 × 144 = ₹ 3,528/);
+    });
+
+    test('should format B2B dispatch route and remarks for authenticated retailers', () => {
+        const cart = [
+            {
+                id: 102,
+                name: 'Surf Excel 1kg',
+                price: '₹120',
+                mrp: 140,
+                salePrice: 120,
+                qty: 24,
+                cartonPack: 12,
+                schemeBadge: '2% Cash Discount'
+            }
+        ];
+
+        const b2bDetails = {
+            name: 'Maa Tara Stores (Ramesh Sharma)',
+            area: 'Fancy Bazar Route #3',
+            remarks: 'Ship via Assam Bengal Transport',
+            isB2B: true
+        };
+
+        const msg = waCart.buildOrderMessage(cart, b2bDetails);
+
+        assert.match(msg, /Dispatch Route:\* Fancy Bazar Route #3/);
+        assert.match(msg, /Dispatch Note:\* Ship via Assam Bengal Transport/);
+        assert.doesNotMatch(msg, /Postal Code:/);
     });
 });

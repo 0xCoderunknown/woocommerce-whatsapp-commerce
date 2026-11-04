@@ -1,4 +1,4 @@
-const { test, describe, beforeEach } = require('node:test');
+const {test, describe, beforeEach} = require('node:test');
 const assert = require('node:assert/strict');
 const waCart = require('../../assets/js/wa_cart.js');
 
@@ -15,7 +15,7 @@ describe('Delimiter Safety & WhatsApp Message Serialization', () => {
     });
 
     test('should sanitize carriage returns and newlines in customer address fields', () => {
-        const cart = [{ id: 1, name: 'Item Alpha', salePrice: 200, mrp: 250, qty: 1 }];
+        const cart = [{id: 1, name: 'Item Alpha', salePrice: 200, mrp: 250, qty: 1}];
         const dirtyDetails = {
             name: 'John\nDoe',
             address: 'Line 1\r\nLine 2\nApartment 4B',
@@ -35,7 +35,7 @@ describe('Delimiter Safety & WhatsApp Message Serialization', () => {
     });
 
     test('should serialize zero-shipping for always-free postal code in order message', () => {
-        const cart = [{ id: 1, name: 'Item Alpha', salePrice: 200, mrp: 250, qty: 1 }];
+        const cart = [{id: 1, name: 'Item Alpha', salePrice: 200, mrp: 250, qty: 1}];
         const details = {
             name: 'Alice Smith',
             address: '123 River Road',
