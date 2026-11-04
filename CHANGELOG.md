@@ -25,6 +25,12 @@ All release dates strictly follow the Indian standard date format: **`DD-MM-YYYY
   - Replaces residential address, apartment number, and postal code requirements with verified store name, mobile number, and delivery route / area (e.g. Central Wholesale Route, Transport Bilty).
   - Added optional B2B dispatch note/remarks field in cart drawer.
 
+### Refactored
+- **Architectural Lockdown Decomposition**: Split `core/catalog-lockdown.php` into `core/session-engine.php` (inviolable zero-session invariants) and `core/system-cleanup.php` (tunable bloat cleanups).
+- **Core Helpers & Pricing SRP**: Extracted shared utilities (`swac_get_currency_symbol`, `swac_clean_pincode`, WhatsApp URL builder) into `core/helpers.php`, streamlining `core/pricing-engine.php` into pure pricing computation.
+- **Explore Directory Deduplication**: Created `modules/explore/card-template.php`, eliminating duplicate HTML card loops across brand and category directories.
+- **Retailer Auth Deduplication**: Unified modal and walled garden PIN login submission handlers in `assets/js/retailer-auth.js` via `bindLoginForm`.
+
 ---
 ## [1.5.1] — 04-11-2026
 

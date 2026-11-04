@@ -17,6 +17,8 @@ if (!function_exists('swac_is_module_active') || !swac_is_module_active('explore
     return;
 }
 
+require_once __DIR__ . '/card-template.php';
+
 // ─── 1. SHORTCODE: CATEGORIES GRID ───────────────────────────────────────────
 function swac_categories_grid_shortcode($atts)
 {
@@ -59,10 +61,9 @@ function swac_categories_grid_shortcode($atts)
     }
 
     if (empty($terms) || is_wp_error($terms)) {
-        return '<p class="swac-no-results">' . esc_html__('No subcategories found. Please check if categories have associated products, or set hide_empty="false".', 'stateless-wa-commerce') . '</p>';
+        return '<p class="swac-no-results">' . esc_html__('No categories found. Please check if categories have associated products, or set hide_empty="false".', 'stateless-wa-commerce') . '</p>';
     }
 
-    // Keep leaf terms
     $parent_ids = wp_list_pluck($terms, 'parent');
     $leaf_terms = [];
     foreach ($terms as $term) {
@@ -84,47 +85,8 @@ function swac_categories_grid_shortcode($atts)
 
         <div class="swac-brand-grid">
             <?php foreach ($terms as $term) :
-                $link = get_term_link($term);
-                if (is_wp_error($link)) {
-                    continue;
-                }
-
-                $image_id = get_term_meta($term->term_id, 'thumbnail_id', true);
-                $image_url = $image_id ? wp_get_attachment_image_url($image_id, $atts['image_size']) : false;
-                $first_letter = function_exists('swac_get_term_initial') ? swac_get_term_initial((string)($term->name ?? '')) : '#';
-                ?>
-                <div class="swac-brand-card swac-search-item"
-                     data-title="<?php echo esc_attr(strtolower($term->name)); ?>">
-                    <a href="<?php echo esc_url($link); ?>" class="swac-brand-link">
-                        <div class="swac-brand-image-wrap">
-                            <?php if ($image_url) : ?>
-                                <img src="<?php echo esc_url($image_url); ?>"
-                                     alt="<?php echo esc_attr($term->name); ?>"
-                                     class="swac-brand-img"
-                                     loading="lazy">
-                            <?php else : ?>
-                                <div class="swac-brand-placeholder">
-                                    <span><?php echo esc_html($first_letter); ?></span>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                        <div class="swac-brand-meta">
-                            <span class="swac-brand-title"><?php echo esc_html($term->name); ?></span>
-                            <?php if ($term->count > 0) : ?>
-                                <span class="swac-brand-count">
-                                    <?php
-                                    echo sprintf(
-                                    /* translators: %d: count */
-                                        esc_html(_n('%d product', '%d products', $term->count, 'stateless-wa-commerce')),
-                                        $term->count
-                                    );
-                                    ?>
-                                </span>
-                            <?php endif; ?>
-                        </div>
-                    </a>
-                </div>
-            <?php endforeach; ?>
+                echo swac_render_explore_card($term, (string)$atts['image_size']);
+            endforeach; ?>
         </div>
     </div>
     <?php
@@ -158,7 +120,7 @@ function swac_directory_search_shortcode($atts)
             </div>
         </div>
         <p class="swac-empty-state" style="display: none;">
-            <?php esc_html_e('No items found matching your search.', 'stateless-wa-commerce'); ?>
+            <?php esc_html_e('No results matching your search.', 'stateless-wa-commerce'); ?>
         </p>
     </div>
     <?php

@@ -37,7 +37,7 @@ add_action('wp_enqueue_scripts', function () {
             'nonce' => wp_create_nonce('wp_rest'),
             'is_admin' => current_user_can('manage_woocommerce'),
             'shop_url' => esc_url(wc_get_page_permalink('shop') ?: home_url('/')),
-            'currency' => function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol() : '₹',
+            'currency' => function_exists('swac_get_currency_symbol') ? swac_get_currency_symbol() : (function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol() : '₹'),
         ]);
     }
 });

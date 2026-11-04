@@ -57,7 +57,7 @@ if (!function_exists('swac_generic_box_html')) {
             return '';
         }
 
-        $currency = function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol() : '$';
+        $currency = function_exists('swac_get_currency_symbol') ? swac_get_currency_symbol() : (function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol() : '₹');
         $savings_formatted = $currency . number_format($total_savings, 2);
 
         $salt_name = function_exists('swac_get_product_salt_name')

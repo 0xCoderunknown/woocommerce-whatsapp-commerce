@@ -61,7 +61,7 @@ add_action('wp_enqueue_scripts', function () {
             ?? (defined('SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES') ? SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES : []);
         $always_free_pins = (array)apply_filters('swac_always_free_shipping_postal_codes', $always_free_pins, null);
         $always_free_codes = array_values(array_unique(array_filter(array_map(function ($c) {
-            return preg_replace('/\D/', '', (string)$c);
+            return function_exists('swac_clean_pincode') ? swac_clean_pincode($c) : preg_replace('/\D/', '', (string)$c);
         }, $always_free_pins))));
 
         $localized_zones = [
@@ -72,12 +72,16 @@ add_action('wp_enqueue_scripts', function () {
             'messages' => $zones['messages'] ?? [],
         ];
 
+        $currency_symbol = function_exists('swac_get_currency_symbol')
+            ? swac_get_currency_symbol()
+            : ($cfg['currency_symbol'] ?? '₹');
+
         $localized_config = [
             'number' => $cfg['phone_number'],
             'name' => $cfg['store_name'],
             'baseUrl' => $cfg['base_url'],
             'cityName' => $cfg['city_name'],
-            'currencySymbol' => $cfg['currency_symbol'],
+            'currencySymbol' => $currency_symbol,
             'free_shipping_at' => $cfg['free_shipping_at'],
             'shipping_charge' => $cfg['shipping_charge'],
             'always_free_shipping_codes' => $always_free_codes,
@@ -102,3 +106,11 @@ add_action('wp_enqueue_scripts', function () {
         wp_localize_script('swac-cart-script', 'swacConfig', $localized_config);
     }
 });
+
+/**
+ * Output dns-prefetch resource hints for WhatsApp gateways (api.whatsapp.com & wa.me).
+ */
+add_action('wp_head', function () {
+    echo '<link rel="dns-prefetch" href="https://api.whatsapp.com">' . "\n";
+    echo '<link rel="dns-prefetch" href="https://wa.me">' . "\n";
+}, 1);

@@ -126,7 +126,9 @@ The wholesale engine (`modules/wholesale/`) enables B2B trade between stockists 
 | **Plugin Entry** | `stateless-wa-commerce.php` | Bootstrap, HPOS declaration, rewrite rules, and module loading. |
 | **Developer Flags** | `features.php` | Single source of truth for toggling lockdown groups and modules. |
 | **Store Config** | `core/config.php` | Merchant WhatsApp number, store name, shipping tiers, city name. |
-| **Zero-Session Core** | `core/catalog-lockdown.php` | `SWAC_Null_Session_Handler`, `/cart/` 302 redirects, AJAX fragment blocker. |
+| **Core Utilities** | `core/helpers.php` | Shared telephone sanitizer, wa.me URL builder, currency & pincode helpers. |
+| **Zero-Session Core** | `core/session-engine.php`, `core/catalog-lockdown.php` | `SWAC_Null_Session_Handler`, `/cart/` 302 redirects, AJAX fragment blocker. |
+| **System Cleanup** | `core/system-cleanup.php` | Tunable bloat cleanups (head bloat, comments, admin menus, script dequeuing). |
 | **Pricing Engine** | `core/pricing-engine.php` | Strike-through MRP HTML formatting, savings calculation, discount %. |
 | **Delivery Engine** | `core/delivery-zones.php`, `core/delivery-cutoff.php` | Pincode zoning, always-free postal codes, Kolkata IST cutoff timers. |
 | **Cache Coordination** | `core/cache-manager.php` | Surgical LiteSpeed / Nginx cache purging for updated products. |

@@ -182,15 +182,16 @@
             }
         });
 
-        // 1. Popup Modal Login Form
-        const modalForm = document.getElementById('swac-retailer-login-form');
-        if (modalForm) {
-            modalForm.addEventListener('submit', function (e) {
+        function bindLoginForm(config) {
+            const form = document.getElementById(config.formId);
+            if (!form) return;
+
+            form.addEventListener('submit', function (e) {
                 e.preventDefault();
-                const phoneInput = document.getElementById('swac-input-phone');
-                const pinInput = document.getElementById('swac-input-pin');
-                const alertEl = document.getElementById('swac-login-msg');
-                const submitBtn = document.getElementById('swac-login-submit');
+                const phoneInput = document.getElementById(config.phoneId);
+                const pinInput = document.getElementById(config.pinId);
+                const alertEl = document.getElementById(config.alertId);
+                const submitBtn = document.getElementById(config.submitId);
 
                 const phone = phoneInput ? phoneInput.value.trim() : '';
                 const pin = pinInput ? pinInput.value.trim() : '';
@@ -205,15 +206,12 @@
 
                 if (submitBtn) {
                     submitBtn.disabled = true;
-                    submitBtn.textContent = 'Verifying...';
+                    submitBtn.textContent = config.verifyingText;
                 }
                 if (alertEl) alertEl.classList.add('swac-b2b-modal-hidden');
 
                 executeRetailerLogin(phone, pin, {
-                    onSuccess: function (retailer) {
-                        closeRetailerModal();
-                        showToast(`Wholesale catalog unlocked for ${retailer.store_name || 'Retailer'}!`);
-                    },
+                    onSuccess: config.onSuccess,
                     onError: function (msg) {
                         if (alertEl) {
                             alertEl.textContent = msg;
@@ -223,59 +221,41 @@
                     onComplete: function () {
                         if (submitBtn) {
                             submitBtn.disabled = false;
-                            submitBtn.textContent = 'Unlock Wholesale Rates';
+                            submitBtn.innerHTML = config.defaultBtnHtml;
                         }
                     }
                 });
             });
         }
+
+        // 1. Popup Modal Login Form
+        bindLoginForm({
+            formId: 'swac-retailer-login-form',
+            phoneId: 'swac-input-phone',
+            pinId: 'swac-input-pin',
+            alertId: 'swac-login-msg',
+            submitId: 'swac-login-submit',
+            verifyingText: 'Verifying...',
+            defaultBtnHtml: 'Unlock Wholesale Rates',
+            onSuccess: function (retailer) {
+                closeRetailerModal();
+                showToast(`Wholesale catalog unlocked for ${retailer.store_name || 'Retailer'}!`);
+            }
+        });
 
         // 2. Shikhar-Style Walled Garden Screen Form
-        const gateForm = document.getElementById('swac-walled-gate-form');
-        if (gateForm) {
-            gateForm.addEventListener('submit', function (e) {
-                e.preventDefault();
-                const phoneInput = document.getElementById('swac-gate-phone');
-                const pinInput = document.getElementById('swac-gate-pin');
-                const alertEl = document.getElementById('swac-gate-msg');
-                const submitBtn = document.getElementById('swac-gate-submit');
-
-                const phone = phoneInput ? phoneInput.value.trim() : '';
-                const pin = pinInput ? pinInput.value.trim() : '';
-
-                if (phone.length < 10 || !pin) {
-                    if (alertEl) {
-                        alertEl.textContent = 'Please enter your 10-digit mobile number and PIN.';
-                        alertEl.classList.remove('swac-b2b-modal-hidden');
-                    }
-                    return;
-                }
-
-                if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.textContent = 'Verifying Credentials...';
-                }
-                if (alertEl) alertEl.classList.add('swac-b2b-modal-hidden');
-
-                executeRetailerLogin(phone, pin, {
-                    onSuccess: function (retailer) {
-                        showToast(`Welcome, ${retailer.store_name || 'Retailer'}! Wholesale catalog unlocked.`);
-                    },
-                    onError: function (msg) {
-                        if (alertEl) {
-                            alertEl.textContent = msg;
-                            alertEl.classList.remove('swac-b2b-modal-hidden');
-                        }
-                    },
-                    onComplete: function () {
-                        if (submitBtn) {
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = '<span>Unlock Wholesale Catalog</span> <span aria-hidden="true">→</span>';
-                        }
-                    }
-                });
-            });
-        }
+        bindLoginForm({
+            formId: 'swac-walled-gate-form',
+            phoneId: 'swac-gate-phone',
+            pinId: 'swac-gate-pin',
+            alertId: 'swac-gate-msg',
+            submitId: 'swac-gate-submit',
+            verifyingText: 'Verifying Credentials...',
+            defaultBtnHtml: '<span>Unlock Wholesale Catalog</span> <span aria-hidden="true">→</span>',
+            onSuccess: function (retailer) {
+                showToast(`Welcome, ${retailer.store_name || 'Retailer'}! Wholesale catalog unlocked.`);
+            }
+        });
     }
 
     // Expose sync globally so other components can trigger it
@@ -283,8 +263,16 @@
 
     // Run on script execution
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-        syncRetailerUI();
-        checkDirectInviteLogin();
-        bindRetailerAuthEvents();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                syncRetailerUI();
+                bindRetailerAuthEvents();
+                checkDirectInviteLogin();
+            });
+        } else {
+            syncRetailerUI();
+            bindRetailerAuthEvents();
+            checkDirectInviteLogin();
+        }
     }
 })();

@@ -21,6 +21,8 @@ if (!function_exists('swac_is_module_active') || !swac_is_module_active('explore
     return;
 }
 
+require_once __DIR__ . '/card-template.php';
+
 function swac_explore_brands_shortcode($atts)
 {
     wp_enqueue_style('swac-explore-style');
@@ -85,48 +87,8 @@ function swac_explore_brands_shortcode($atts)
     <div class="swac-explore-wrapper">
         <div class="swac-brand-grid" id="swac-brand-list">
             <?php foreach ($terms as $term) :
-                $link = get_term_link($term);
-                if (is_wp_error($link)) continue;
-
-                $image_id = get_term_meta($term->term_id, 'thumbnail_id', true);
-                if (!$image_id) {
-                    $image_id = get_term_meta($term->term_id, 'logo_id', true);
-                }
-                $image_url = $image_id ? wp_get_attachment_image_url($image_id, $atts['image_size']) : false;
-                $first_letter = function_exists('swac_get_term_initial') ? swac_get_term_initial((string)($term->name ?? '')) : '#';
-                ?>
-                <div class="swac-brand-card swac-search-item"
-                     data-title="<?php echo esc_attr(strtolower($term->name)); ?>">
-                    <a href="<?php echo esc_url($link); ?>" class="swac-brand-link">
-                        <div class="swac-brand-image-wrap">
-                            <?php if ($image_url) : ?>
-                                <img src="<?php echo esc_url($image_url); ?>"
-                                     alt="<?php echo esc_attr($term->name); ?>"
-                                     class="swac-brand-img"
-                                     loading="lazy">
-                            <?php else : ?>
-                                <div class="swac-brand-placeholder">
-                                    <span><?php echo esc_html($first_letter); ?></span>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                        <div class="swac-brand-meta">
-                            <span class="swac-brand-title"><?php echo esc_html($term->name); ?></span>
-                            <?php if ($term->count > 0) : ?>
-                                <span class="swac-brand-count">
-                                    <?php
-                                    echo sprintf(
-                                    /* translators: %d: product count */
-                                        esc_html(_n('%d product', '%d products', $term->count, 'stateless-wa-commerce')),
-                                        $term->count
-                                    );
-                                    ?>
-                                </span>
-                            <?php endif; ?>
-                        </div>
-                    </a>
-                </div>
-            <?php endforeach; ?>
+                echo swac_render_explore_card($term, (string)$atts['image_size']);
+            endforeach; ?>
         </div>
     </div>
     <?php

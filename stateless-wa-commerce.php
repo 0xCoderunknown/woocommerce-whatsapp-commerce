@@ -54,6 +54,7 @@ add_action('init', function () {
 // (Admin notices → backend/admin-tools.php)
 
 // 📂 CORE SUBSYSTEM
+require_once SWAC_PATH . 'core/helpers.php';
 require_once SWAC_PATH . 'core/pricing-engine.php';
 require_once SWAC_PATH . 'core/delivery-cutoff.php';
 require_once SWAC_PATH . 'core/delivery-zones.php';
@@ -103,6 +104,7 @@ if (swac_is_module_active('pharmacy') && is_dir(SWAC_PATH . 'modules/pharmacy'))
 // 2. Directory Exploration Module
 if (swac_is_module_active('explore') && is_dir(SWAC_PATH . 'modules/explore')) {
     $explore_files = [
+        'modules/explore/card-template.php',
         'modules/explore/brands.php',
         'modules/explore/categories.php',
     ];

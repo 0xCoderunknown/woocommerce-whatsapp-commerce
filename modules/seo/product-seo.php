@@ -148,7 +148,23 @@ add_action('wp_head', function () {
 }, 10);
 
 /**
- * Output Schema.org Product JSON-LD
+ * 4. Output Schema.org Product JSON-LD
+ */
+if (!function_exists('swac_seo_print_jsonld')) {
+    /**
+     * Outputs a structured JSON-LD <script> block directly into document head.
+     *
+     * @param array $schema Schema definition array.
+     * @return void
+     */
+    function swac_seo_print_jsonld(array $schema): void
+    {
+        echo '<script type="application/ld+json">' . "\n";
+        echo wp_json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+        echo "\n" . '</script>' . "\n";
+    }
+}
+/**
  */
 add_action('wp_head', function () {
     if (!function_exists('is_product') || !is_product()) {
