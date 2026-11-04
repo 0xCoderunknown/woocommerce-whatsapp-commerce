@@ -89,6 +89,7 @@ run-tests.cmd
     - `delivery-cutoff.test.js`: IST timezone cutoff windows (morning same-day, afternoon next-day, weekend Monday cutoff).
     - `delimiter-safety.test.js`: WhatsApp base URL `?`/`&` parameter concatenation, address line-break injection sanitization, emoji encoding.
     - `wholesale-schemes.test.js`: Wholesale margins, carton conversions, free goods math, and trade order formatting.
+    - `modular-engines.test.js`: Direct isolated validation of delivery-engine.js and cart-math.js without DOM dependencies.
 - **PHP Verification Runner (`tests/php/runner.js`)**:
     - Validates `stateless-wa-commerce` text domain across all i18n calls.
     - Enforces `session_start`, `setcookie`, and `$_SESSION` bans.

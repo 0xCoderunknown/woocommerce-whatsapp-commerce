@@ -77,11 +77,12 @@ Cloudflare edge caching also depend on your active theme, third-party plugins, a
                            ▼
                Browser / Client-Side DOM
           ┌───────────────────────────────────┐
-          │  assets/js/wa_cart.js (Engine)    │
-          │  - LocalStorage Cart CRUD         │
-          │  - Client-Side Address Capture    │
-          │  - Dynamic Postal Zone Gate       │
-          │  - Live DOM Price Reconciliation  │
+          │   Modular Client State Engine     │
+          │   - delivery-engine.js (Zones/IST)│
+          │   - cart-math.js (Totals & MRP)   │
+          │   - drawer-ui.js (Drawer & UI)    │
+          │   - wa_cart.js (Orchestrator)     │
+          │   - order-serializer.js (Message) │
           └───────────────────────────────────┘
                            │
                            ▼
@@ -205,6 +206,8 @@ define('SWAC_MODULE_PHARMACY', false);
 define('SWAC_MODULE_EXPLORE',  false);
 define('SWAC_MODULE_SEO',       false);
 define('SWAC_MODULE_WHOLESALE', true);  // B2B wholesale pricing, schemes & PIN login
+define('SWAC_CATALOG_MODE',     'open'); // 'open' (default) or 'walled_garden' (HUL Shikhar-style PIN gate)
+define('SWAC_PRIVATE_CATALOG',  false);  // true = blocks search engine crawlers, noindex, 404 /sitemap.xml
 ```
 
 > [!NOTE]

@@ -4,6 +4,7 @@
 
 | Version | Supported |
 |:--------|:----------|
+| 1.6.x   | ✅ Yes     |
 | 1.5.x   | ✅ Yes     |
 | 1.4.x   | ✅ Yes     |
 | 1.3.x   | ✅ Yes     |
@@ -39,7 +40,7 @@ Please include:
 This plugin is a frontend-heavy, zero-session WooCommerce extension. Key areas of security concern include:
 
 - Input sanitization and output escaping in PHP templates
-- `localStorage` cart data handling in `wa_cart.js`
+- `localStorage` cart data handling in client scripts
 - WhatsApp URL construction and customer-entered data encoding
 - Capability checks on admin-only shortcodes and tools
 - Master PIN authentication and SHA-256 tokens in `modules/wholesale/`
