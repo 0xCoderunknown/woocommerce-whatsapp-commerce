@@ -1374,114 +1374,70 @@
     }
 
     // ── Order Submission ─────────────────────────────────────────────────────
-    function buildOrderMessage(cart, details) {
-        // Strip CR/LF from user/retailer fields to preserve WhatsApp formatting.
-        const safeStr = (val) => (val || '').replace(/[\r\n]+/g, ' ').trim();
-        const loy = CONFIG.loyalty;
+    function getOrderSerializer() {
+        if (typeof window !== 'undefined' && window.swacOrderSerializer) {
+            return window.swacOrderSerializer;
+        }
+        if (typeof require === 'function') {
+            try {
+                return require('./order-serializer.js');
+            } catch (e) {
+                // Fallback
+            }
+        }
+        return null;
+    }
 
-        const lines = cart.map((item, idx) => {
+    function buildOrderMessage(cart, details) {
+        const serializer = getOrderSerializer();
+        if (serializer && typeof serializer.buildOrderMessage === 'function') {
+            return serializer.buildOrderMessage(cart, details, {
+                config: CONFIG,
+                formatPrice: fmtInr,
+                computeTotals: computeCartTotals,
+                isLoyaltyActive: isLoyaltyActive,
+                loyaltyChoice: loyaltyChoice,
+                getDeliveryEstimate: getDeliveryEstimate,
+                getSavedRetailer: (typeof getSavedRetailer === 'function') ? getSavedRetailer : null,
+            });
+        }
+
+        // Inline fallback if serializer script is not loaded
+        const safeStr = (val) => (val || '').replace(/[\r\n]+/g, ' ').trim();
+        const lines = (cart || []).map((item, idx) => {
             const rxTag = item.isRx ? '[Rx] ' : '';
             let line = `${idx + 1}. ${rxTag}*${item.name}*`;
-            if (item.qty > 1) {
-                line += ` — Qty: ${item.qty}`;
-            }
-            if (item.cartonPack > 0) {
-                const fullCartons = Math.floor(item.qty / item.cartonPack);
-                const loosePcs = item.qty % item.cartonPack;
-                if (fullCartons > 0 && loosePcs > 0) {
-                    line += ` (${fullCartons} Ctn + ${loosePcs} pcs)`;
-                } else if (fullCartons > 0) {
-                    line += ` (${fullCartons} Carton${fullCartons > 1 ? 's' : ''})`;
-                }
-            }
-            if (item.schemeBadge) {
-                line += `\n   Scheme: ${item.schemeBadge}`;
-            }
+            if (item.qty > 1) line += ` — Qty: ${item.qty}`;
             const unitPriceNum = parseFloat(item.salePrice) || 0;
             if (unitPriceNum > 0) {
-                if (item.qty > 1) {
-                    line += `\n   Price: ${fmtInr(unitPriceNum)} \u00d7 ${item.qty} = ${fmtInr(unitPriceNum * item.qty)}`;
-                } else {
-                    line += `\n   Price: ${fmtInr(unitPriceNum)}`;
-                }
+                line += `\n   Price: ${fmtInr(unitPriceNum)}${item.qty > 1 ? ' × ' + item.qty + ' = ' + fmtInr(unitPriceNum * item.qty) : ''}`;
             } else if (item.price) {
-                line += `\n   Price: ${item.price}${item.qty > 1 ? ' \u00d7 ' + item.qty : ''}`;
+                line += `\n   Price: ${item.price}${item.qty > 1 ? ' × ' + item.qty : ''}`;
             }
             return line;
         });
-
-        const {
-            totalMrp,
-            saleTotal,
-            youSave,
-            savePct,
-            shipping,
-            amountPayable
-        } = computeCartTotals(cart, details ? details.pincode : undefined);
-        const shipLabel = shipping === 0 ? 'FREE' : fmtInr(shipping);
-        const loyaltyActive = isLoyaltyActive(saleTotal);
-
-        const sep = '\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500';
-
+        const totals = computeCartTotals(cart, details ? details.pincode : undefined);
+        const sep = '─────────────────';
         let msg = `Hello ${CONFIG.name}, I'd like to order:\n\n`
             + lines.join('\n\n')
             + `\n\n${sep}`
-            + `\nTotal MRP:      ${fmtInr(totalMrp)}`
-            + `\nDiscount:       ${fmtInr(youSave)} (${savePct}% off)`
-            + `\nShipping:       ${shipLabel}`
-            + `\nTo Pay:         ${fmtInr(amountPayable)}`
+            + `\nTotal MRP:      ${fmtInr(totals.totalMrp)}`
+            + `\nDiscount:       ${fmtInr(totals.youSave)} (${totals.savePct}% off)`
+            + `\nShipping:       ${totals.shipping === 0 ? 'FREE' : fmtInr(totals.shipping)}`
+            + `\nTo Pay:         ${fmtInr(totals.amountPayable)}`
             + `\n${sep}`;
-
-        if (loyaltyChoice === 'yes' && loyaltyActive) {
-            msg += `\n\n\uD83C\uDF81  ${loy.itemLabel} (worth ${fmtInr(loy.itemWorth)}) \u2192 ${fmtInr(loy.itemPrice)} added to order`
-                + `\n${loy.flag}`
-                + `\n${sep}`;
-        }
-
-        const deliveryEstimate = getDeliveryEstimate();
-        if (deliveryEstimate) {
-            msg += `\n\n*Estimated Delivery:* ${deliveryEstimate}`;
-        }
-
-        const savedRetailer = getSavedRetailer();
-        if (savedRetailer && savedRetailer.store_name) {
-            msg += `\n\n🏪 *Retailer:* ${safeStr(savedRetailer.store_name)} (${safeStr(savedRetailer.phone)})`;
-            if (savedRetailer.area) {
-                msg += `\n📍 *Route / Area:* ${safeStr(savedRetailer.area)}`;
-            }
-        }
-
         if (details && details.isB2B) {
             msg += `\n\n🚚 *Dispatch Route:* ${safeStr(details.area || 'Wholesale Delivery Route')}`;
-            if (details.remarks) {
-                msg += `\n📝 *Dispatch Note:* ${safeStr(details.remarks)}`;
-            }
+            if (details.remarks) msg += `\n📝 *Dispatch Note:* ${safeStr(details.remarks)}`;
             msg += `\n${sep}`;
         } else if (details) {
-            msg += `\n\n*Delivery Details:*`
-                + `\nName: ${safeStr(details.name)}`
-                + `\nAddress: ${safeStr(details.address)}`;
-            if (details.landmark) {
-                msg += `\nLandmark: ${safeStr(details.landmark)}`;
-            }
-            if (details.area) {
-                msg += `\nArea: ${safeStr(details.area)}`;
-            }
-            if (details.pincode) {
-                msg += `\nPostal Code: ${details.pincode}` + (CONFIG.cityName ? `, ${CONFIG.cityName}` : '');
-            } else if (CONFIG.cityName) {
-                msg += `\nCity: ${CONFIG.cityName}`;
-            }
+            msg += `\n\n*Delivery Details:*\nName: ${safeStr(details.name)}\nAddress: ${safeStr(details.address)}`;
+            if (details.landmark) msg += `\nLandmark: ${safeStr(details.landmark)}`;
+            if (details.area) msg += `\nArea: ${safeStr(details.area)}`;
+            if (details.pincode) msg += `\nPostal Code: ${details.pincode}` + (CONFIG.cityName ? `, ${CONFIG.cityName}` : '');
             msg += `\n${sep}`;
         }
-
-        const hasRx = cart.some(item => Boolean(item.isRx));
-        if (CONFIG.prescriptionNoteEnabled && CONFIG.prescriptionNote && hasRx) {
-            msg += `\n\n${CONFIG.prescriptionNote}`;
-        }
-
         msg += `\n\nPlease confirm my order.`;
-
         return msg;
     }
 
@@ -1508,8 +1464,10 @@
         }
 
         const message = buildOrderMessage(cart, deliveryDetails);
-        const sep = baseUrl.includes('?') ? '&' : '?';
-        const url = `${baseUrl}${sep}text=${encodeURIComponent(message)}`;
+        const serializer = getOrderSerializer();
+        const url = (serializer && typeof serializer.buildWhatsAppOrderUrl === 'function')
+            ? serializer.buildWhatsAppOrderUrl(baseUrl, message)
+            : `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}text=${encodeURIComponent(message)}`;
         window.open(url, '_blank', 'noopener,noreferrer');
     }
 

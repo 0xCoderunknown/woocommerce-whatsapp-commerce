@@ -26,6 +26,8 @@ All release dates strictly follow the Indian standard date format: **`DD-MM-YYYY
   - Added optional B2B dispatch note/remarks field in cart drawer.
 
 ### Refactored
+- **Client Order Serializer Decomposition**: Extracted WhatsApp message construction and direct launch URL synthesis from `assets/js/wa_cart.js` into standalone 0-dependency module `assets/js/order-serializer.js` with UMD/CommonJS parity and deferred script dependency enqueue.
+- **Admin View Template Decomposition**: Extracted embedded HTML views from `modules/wholesale/retailer-auth.php` and `backend/admin-tools.php` into dedicated view templates (`templates/retailers-admin-page.php`, `templates/missing-images-report.php`).
 - **Architectural Lockdown Decomposition**: Split `core/catalog-lockdown.php` into `core/session-engine.php` (inviolable zero-session invariants) and `core/system-cleanup.php` (tunable bloat cleanups).
 - **Core Helpers & Pricing SRP**: Extracted shared utilities (`swac_get_currency_symbol`, `swac_clean_pincode`, WhatsApp URL builder) into `core/helpers.php`, streamlining `core/pricing-engine.php` into pure pricing computation.
 - **Explore Directory Deduplication**: Created `modules/explore/card-template.php`, eliminating duplicate HTML card loops across brand and category directories.
