@@ -68,16 +68,8 @@ if (!function_exists('swac_render_walled_garden_gate')) {
 
         $cfg = function_exists('swac_get_config') ? swac_get_config() : [];
         $store_name = !empty($cfg['name']) ? $cfg['name'] : (!empty($cfg['store_name']) ? $cfg['store_name'] : get_bloginfo('name'));
-        $base_wa = $cfg['base_url'] ?? '';
-
-        $reg_message = sprintf(
-            /* translators: %s: store name */
-            __("Hello %s, I want to register our retail store for wholesale ordering. Here are our shop details:\n\n• Shop / Store Name:\n• Owner / Contact Person:\n• Delivery Route / Area:\n• Mobile Number:\n\nPlease approve our account and issue our 4-digit PIN.", 'stateless-wa-commerce'),
-            $store_name
-        );
-
-        $whatsapp_reg_url = function_exists('swac_build_whatsapp_url')
-            ? swac_build_whatsapp_url($reg_message, $base_wa)
+        $whatsapp_reg_url = function_exists('swac_b2b_get_registration_whatsapp_url')
+            ? swac_b2b_get_registration_whatsapp_url()
             : '';
         ?>
         <!-- SWAC Shikhar-Style Walled Garden Portal Gate -->
@@ -145,4 +137,5 @@ if (!function_exists('swac_render_walled_garden_gate')) {
         <?php
     }
 }
-add_action('woocommerce_before_main_content', 'swac_render_walled_garden_gate', 5);
+
+add_action('wp_footer', 'swac_render_walled_garden_gate', 5);

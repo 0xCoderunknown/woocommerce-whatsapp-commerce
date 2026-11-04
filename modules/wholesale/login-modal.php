@@ -20,18 +20,8 @@ if (!function_exists('swac_is_module_active') || !swac_is_module_active('wholesa
  * Emits the login modal markup and zero-cost registration CTA in the footer.
  */
 add_action('wp_footer', function () {
-    $cfg = function_exists('swac_get_config') ? swac_get_config() : [];
-    $store_name = $cfg['name'] ?? get_bloginfo('name');
-    $base_wa = $cfg['base_url'] ?? '';
-
-    $reg_message = sprintf(
-    /* translators: %s: store name */
-        __("Hello %s, I want to purchase at wholesale rates. Here are my shop details:\n\n• Shop Name:\n• Owner Name:\n• Area / Pincode:\n• Contact Number:\n\nPlease approve my retailer account and issue my 4-digit PIN.", 'stateless-wa-commerce'),
-        $store_name
-    );
-
-    $whatsapp_reg_url = function_exists('swac_build_whatsapp_url')
-        ? swac_build_whatsapp_url($reg_message, $base_wa)
+    $whatsapp_reg_url = function_exists('swac_b2b_get_registration_whatsapp_url')
+        ? swac_b2b_get_registration_whatsapp_url()
         : '';
     ?>
     <!-- SWAC B2B Retailer Login Modal -->
@@ -101,29 +91,5 @@ add_action('wp_footer', function () {
             </div>
         </div>
     </div>
-
-    <!-- Active Retailer Floating Pill -->
-    <div id="swac-retailer-pill" class="swac-retailer-status-pill swac-b2b-modal-hidden">
-        <span class="swac-pill-store"
-              id="swac-pill-store-name">🏪 <?php esc_html_e('Retailer', 'stateless-wa-commerce'); ?></span>
-        <button type="button" id="swac-pill-logout" class="swac-pill-logout-btn"
-                title="<?php esc_attr_e('Lock wholesale rates & sign out', 'stateless-wa-commerce'); ?>">
-            <?php esc_html_e('Sign Out', 'stateless-wa-commerce'); ?>
-        </button>
-    </div>
     <?php
-}, 30);
-
-
-/**
- * Enqueues the standalone retailer authentication & price gating script.
- */
-add_action('wp_enqueue_scripts', function () {
-    wp_enqueue_script(
-        'swac-retailer-auth',
-        SWAC_URL . 'assets/js/retailer-auth.js',
-        ['swac-cart-script'],
-        SWAC_VERSION,
-        true
-    );
 });
