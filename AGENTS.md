@@ -135,7 +135,7 @@ The wholesale engine (`modules/wholesale/`) enables B2B trade between stockists 
 | **Frontend UI / Drawer** | `frontend/components/cart-drawer.php`, `frontend/enqueue.php` | Floating trigger bubble, slide-out drawer markup, asset localization. |
 | **Single Product** | `frontend/single/product-meta.php`, `frontend/single/notices.php` | `[swac_price_block]`, `[swac_action_row]`, `[swac_delivery_notice]`. |
 | **Client Engine** | `assets/js/wa_cart.js`, `assets/js/order-serializer.js` | 0-dependency cart state machine, DOM price reconciliation, WhatsApp order serialization. |
-| **Wholesale Core** | `modules/wholesale/product-meta.php`, `modules/wholesale/shop-card.php` | PTR meta, margin badge calculation, carton guide, dual-state card gating. |
+| **Wholesale Core** | `modules/wholesale/product-meta.php`, `modules/wholesale/shop-card.php`, `modules/wholesale/walled-garden.php` | PTR meta, margin badge calculation, carton guide, dual-state card gating, walled garden mode. |
 | **Retailer Auth** | `modules/wholesale/retailer-auth.php`, `modules/wholesale/login-modal.php` | Directory registry, 4-digit PIN verification endpoint, login modal. |
 | **Distributor Desk** | `modules/wholesale/frontend-desk.php`, `modules/wholesale/desk-rest.php`, `modules/wholesale/desk-template.php`, `assets/js/distributor-desk.js` | `[swac_distributor_portal]`, quick rate sheet, camera upload, CSV sync. |
 | **Retailer Auth (JS)** | `assets/js/retailer-auth.js` | Client-side 4-digit PIN verification modal, status pill, and class toggle. |
