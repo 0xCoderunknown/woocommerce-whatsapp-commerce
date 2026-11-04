@@ -33,13 +33,25 @@ add_action('wp_enqueue_scripts', function () {
         'in_footer' => true,
     ]);
 
-    // 4. WhatsApp Cart Engine & Order Serializer (order-serializer.js, wa_cart.js)
+    // 4. WhatsApp Cart Engine & Submodules (delivery-engine.js, cart-math.js, order-serializer.js, wa_cart.js)
     if (!is_admin()) {
-        wp_enqueue_script('swac-order-serializer', SWAC_URL . 'assets/js/order-serializer.js', [], SWAC_VERSION, [
+        wp_enqueue_script('swac-delivery-engine', SWAC_URL . 'assets/js/delivery-engine.js', [], SWAC_VERSION, [
             'strategy' => 'defer',
             'in_footer' => true,
         ]);
-        wp_enqueue_script('swac-cart-script', SWAC_URL . 'assets/js/wa_cart.js', ['swac-order-serializer'], SWAC_VERSION, [
+        wp_enqueue_script('swac-cart-math', SWAC_URL . 'assets/js/cart-math.js', ['swac-delivery-engine'], SWAC_VERSION, [
+            'strategy' => 'defer',
+            'in_footer' => true,
+        ]);
+        wp_enqueue_script('swac-order-serializer', SWAC_URL . 'assets/js/order-serializer.js', ['swac-cart-math'], SWAC_VERSION, [
+            'strategy' => 'defer',
+            'in_footer' => true,
+        ]);
+        wp_enqueue_script('swac-cart-script', SWAC_URL . 'assets/js/wa_cart.js', [
+            'swac-delivery-engine',
+            'swac-cart-math',
+            'swac-order-serializer',
+        ], SWAC_VERSION, [
             'strategy' => 'defer',
             'in_footer' => true,
         ]);

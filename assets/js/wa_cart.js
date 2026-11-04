@@ -51,6 +51,27 @@
     const STORAGE_KEY = 'swac_cart';
     const CUSTOMER_STORAGE_KEY = 'swac_customer_details';
 
+    // ── Submodule Resolvers (Zero-build modular architecture) ─────────────────
+    function getDeliveryEngine() {
+        if (typeof window !== 'undefined' && window.swacDelivery) {
+            return window.swacDelivery;
+        }
+        if (typeof require === 'function') {
+            try { return require('./delivery-engine.js'); } catch (e) {}
+        }
+        return null;
+    }
+
+    function getCartMath() {
+        if (typeof window !== 'undefined' && window.swacCartMath) {
+            return window.swacCartMath;
+        }
+        if (typeof require === 'function') {
+            try { return require('./cart-math.js'); } catch (e) {}
+        }
+        return null;
+    }
+
     // ── Persistent Customer / Delivery Metadata ──────────────────────────────
     function getCustomerDetails() {
         try {
@@ -111,6 +132,10 @@
     let alwaysFreeSet = null;
 
     function getZoneSets() {
+        const engine = getDeliveryEngine();
+        if (engine && typeof engine.getZoneSets === 'function') {
+            return engine.getZoneSets(safeWindow.swacZones, typeof CONFIG !== 'undefined' ? CONFIG : safeWindow.swacCommerce);
+        }
         if (!sameDaySet || sameDaySet.size === 0 || !alwaysFreeSet) {
             const zonesData = safeWindow.swacZones || {};
             const configData = safeWindow.swacCommerce || safeWindow.swacConfig || {};
@@ -126,6 +151,10 @@
     }
 
     function isAlwaysFreePincode(pincode) {
+        const engine = getDeliveryEngine();
+        if (engine && typeof engine.isAlwaysFreePincode === 'function') {
+            return engine.isAlwaysFreePincode(pincode, safeWindow.swacZones, typeof CONFIG !== 'undefined' ? CONFIG : safeWindow.swacCommerce);
+        }
         if (!pincode) return false;
         const clean = String(pincode).replace(/\D/g, '');
         if (!clean) return false;
@@ -134,6 +163,10 @@
     }
 
     function evaluateDeliveryZone(pincode) {
+        const engine = getDeliveryEngine();
+        if (engine && typeof engine.evaluateDeliveryZone === 'function') {
+            return engine.evaluateDeliveryZone(pincode, safeWindow.swacZones, typeof CONFIG !== 'undefined' ? CONFIG : safeWindow.swacCommerce);
+        }
         if (!pincode) return null;
         const clean = String(pincode).replace(/\D/g, '');
         if (clean.length < 3) return null;
@@ -287,6 +320,10 @@
     const fmtInr = fmtPrice;
 
     function isLoyaltyActive(saleTotal) {
+        const math = getCartMath();
+        if (math && typeof math.isLoyaltyActive === 'function') {
+            return math.isLoyaltyActive(saleTotal, CONFIG);
+        }
         return CONFIG.loyalty.enabled && CONFIG.loyalty.itemLabel.length > 0 && CONFIG.loyalty.threshold > 0 && saleTotal >= CONFIG.loyalty.threshold;
     }
 
@@ -933,7 +970,15 @@
 
     // ── Calculations ─────────────────────────────────────────────────────────
     function computeCartTotals(cart, pincode) {
+        const math = getCartMath();
         const code = pincode !== undefined ? pincode : getCurrentPincode();
+        if (math && typeof math.computeCartTotals === 'function') {
+            return math.computeCartTotals(cart, code, {
+                config: CONFIG,
+                isAlwaysFreePincode: isAlwaysFreePincode,
+                loyaltyChoice: loyaltyChoice,
+            });
+        }
         const isAlwaysFree = isAlwaysFreePincode(code);
 
         const freeAt = CONFIG.freeShippingAt;
@@ -1800,12 +1845,20 @@
     // Reconciles static HTML with active store timezone to prevent stale notices
     // when pages are served from static full-page cache across cutoff boundaries.
     function getKolkataFormattedDate(baseIstDate, daysAhead) {
+        const engine = getDeliveryEngine();
+        if (engine && typeof engine.getKolkataFormattedDate === 'function') {
+            return engine.getKolkataFormattedDate(baseIstDate, daysAhead);
+        }
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const target = new Date(baseIstDate.getTime() + (daysAhead * 24 * 60 * 60 * 1000));
         return `${target.getUTCDate()} ${months[target.getUTCMonth()]}`;
     }
 
     function getKolkataDeliveryCutoffMessage(customNow) {
+        const engine = getDeliveryEngine();
+        if (engine && typeof engine.getKolkataDeliveryCutoffMessage === 'function') {
+            return engine.getKolkataDeliveryCutoffMessage(customNow, CONFIG);
+        }
         const now = (customNow instanceof Date) ? customNow : new Date();
         const offsetHours = (typeof CONFIG.timezoneOffset === 'number') ? CONFIG.timezoneOffset : 0;
         const istDate = new Date(now.getTime() + (offsetHours * 60 * 60 * 1000));
@@ -1832,6 +1885,10 @@
     }
 
     function getKolkataDeliveryEstimate(customNow) {
+        const engine = getDeliveryEngine();
+        if (engine && typeof engine.getKolkataDeliveryEstimate === 'function') {
+            return engine.getKolkataDeliveryEstimate(customNow, CONFIG);
+        }
         const now = (customNow instanceof Date) ? customNow : new Date();
         const offsetHours = (typeof CONFIG.timezoneOffset === 'number') ? CONFIG.timezoneOffset : 0;
         const istDate = new Date(now.getTime() + (offsetHours * 60 * 60 * 1000));
@@ -1915,6 +1972,10 @@
             },
             setZonesData: function (data) {
                 safeWindow.swacZones = data;
+                const engine = getDeliveryEngine();
+                if (engine && typeof engine.resetZoneSets === 'function') {
+                    engine.resetZoneSets();
+                }
                 sameDaySet = null;
                 outskirtsSet = null;
                 alwaysFreeSet = null;
