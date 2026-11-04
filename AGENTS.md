@@ -125,18 +125,19 @@ The wholesale engine (`modules/wholesale/`) enables B2B trade between stockists/
 | Subsystem | Directory / Files | Primary Responsibility |
 | :--- | :--- | :--- |
 | **Plugin Entry** | stateless-wa-commerce.php | Bootstrap, HPOS declaration, rewrite rules, and module loading. |
-| **Developer Flags** | eatures.php | Single source of truth for toggling lockdown groups and modules. |
+| **Developer Flags** | features.php | Single source of truth for toggling lockdown groups and modules. |
 | **Store Config** | core/config.php | Merchant WhatsApp number, store name, shipping tiers, city name. |
 | **Zero-Session Core** | core/catalog-lockdown.php | SWAC_Null_Session_Handler, /cart/ 302 redirects, AJAX fragment blocker. |
 | **Pricing Engine** | core/pricing-engine.php | Strike-through MRP HTML formatting, savings calculation, discount %. |
 | **Delivery Engine** | core/delivery-zones.php, core/delivery-cutoff.php | Pincode zoning, always-free postal codes, Kolkata IST cutoff timers. |
 | **Cache Coordination** | core/cache-manager.php | Surgical LiteSpeed / Nginx cache purging for updated products. |
-| **Frontend UI / Drawer** | rontend/components/cart-drawer.php, rontend/enqueue.php | Floating trigger bubble, slide-out drawer markup, asset localization. |
-| **Single Product** | rontend/single/product-meta.php, rontend/single/notices.php | [swac_price_block], [swac_action_row], [swac_delivery_notice]. |
-| **Client Engine** | ssets/js/wa_cart.js | 0-dependency cart state machine, DOM price reconciliation, WhatsApp serialization. |
+| **Frontend UI / Drawer** | frontend/components/cart-drawer.php, frontend/enqueue.php | Floating trigger bubble, slide-out drawer markup, asset localization. |
+| **Single Product** | frontend/single/product-meta.php, frontend/single/notices.php | [swac_price_block], [swac_action_row], [swac_delivery_notice]. |
+| **Client Engine** | assets/js/wa_cart.js | 0-dependency cart state machine, DOM price reconciliation, WhatsApp serialization. |
 | **Wholesale Core** | modules/wholesale/product-meta.php, modules/wholesale/shop-card.php | PTR meta, margin badge calculation, carton guide, dual-state card gating. |
 | **Retailer Auth** | modules/wholesale/retailer-auth.php, modules/wholesale/login-modal.php | Directory registry, 4-digit PIN verification endpoint, login modal. |
-| **Distributor Desk** | modules/wholesale/frontend-desk.php, ssets/js/distributor-desk.js | [swac_distributor_portal], quick rate sheet, camera upload, CSV sync. |
+| **Distributor Desk** | modules/wholesale/frontend-desk.php, modules/wholesale/desk-rest.php, modules/wholesale/desk-template.php, assets/js/distributor-desk.js | [swac_distributor_portal], quick rate sheet, camera upload, CSV sync. |
+| **Retailer Auth (JS)** | assets/js/retailer-auth.js | Client-side 4-digit PIN verification modal, status pill, and class toggle. |
 | **Pharmacy Module** | modules/pharmacy/ | Salt composition explorer, prescription flags (isRx), pack size badges. |
 | **Explore Module** | modules/explore/ | Brand and category directory grids with live client-side search. |
 | **SEO Module** | modules/seo/ | Static JSON-LD Product & WebSite schema, canonical tags, OpenGraph meta. |
@@ -160,8 +161,7 @@ The wholesale engine (`modules/wholesale/`) enables B2B trade between stockists/
 ### 7.3. Product Post Meta Keys
 - _swac_b2b_ptr: Wholesale Price to Retailer (float).
 - _swac_b2b_carton_pack: Number of individual units packed per master shipping carton (integer).
-- _swac_b2b_scheme_type: Promotional scheme mode (
-one, ree_goods, 	ier_discount, cash_discount, custom).
+- _swac_b2b_scheme_type: Promotional scheme mode (none, free_goods, tier_discount, cash_discount, custom).
 - _swac_b2b_scheme_buy: Buy quantity (X) for free goods scheme (integer).
 - _swac_b2b_scheme_free: Free bonus quantity (Y) for free goods scheme (integer).
 - _swac_b2b_scheme_tiers: Slabs string for volume discounts (e.g. 10:2%, 25:5%).
@@ -196,7 +196,7 @@ When modifying or refactoring this codebase, AI agents MUST avoid these common m
 2. ❌ **Do NOT reintroduce WooCommerce Cart sessions**:
    - Never call WC()->cart->add_to_cart(), WC()->session->set(), or session_start().
 3. ❌ **Do NOT introduce external frontend dependencies**:
-   - Do NOT import jQuery, React, Vue, Alpine, or external CDNs into frontend assets. Keep ssets/js/wa_cart.js strictly 0-dependency vanilla JavaScript.
+   - Do NOT import jQuery, React, Vue, Alpine, or external CDNs into frontend assets. Keep assets/js/wa_cart.js strictly 0-dependency vanilla JavaScript.
 4. ❌ **Do NOT break Breakdance Builder parity**:
    - Store owners use Breakdance Builder visually. All shortcodes ([swac_action_row], [swac_price_block], [swac_distributor_portal]) must output self-contained, valid HTML that renders without theme conflicts.
 5. ❌ **Do NOT use unhoisted scoped helpers across functions**:

@@ -107,3 +107,17 @@ add_action('wp_footer', function () {
     </div>
     <?php
 }, 30);
+
+
+/**
+ * Enqueues the standalone retailer authentication & price gating script.
+ */
+add_action('wp_enqueue_scripts', function () {
+    wp_enqueue_script(
+        'swac-retailer-auth',
+        SWAC_URL . 'assets/js/retailer-auth.js',
+        ['swac-cart'],
+        SWAC_VERSION,
+        true
+    );
+});
