@@ -103,7 +103,7 @@ if (!function_exists('swac_b2b_format_price_block_html')) {
  * 1. Replaces standard loop price with Wholesale Pricing Block (Gated).
  */
 add_filter('woocommerce_get_price_html', function ($price_html, $product) {
-    if (!$product instanceof WC_Product) {
+    if (is_admin() || !$product instanceof WC_Product) {
         return $price_html;
     }
 

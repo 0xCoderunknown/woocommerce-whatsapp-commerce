@@ -9,6 +9,19 @@ All release dates strictly follow the Indian standard date format: **`DD-MM-YYYY
 
 ---
 
+## [1.5.1] — 04-11-2026
+
+### Fixed
+- **PHP Parse Error in Action Row Shortcode**: Resolved template output boundary issue where return statement was outside PHP execution tags in rontend/single/product-meta.php.
+- **Timing Attack Hardening**: Secured 4-digit PIN verification in modules/wholesale/retailer-auth.php and Master PIN verification in modules/wholesale/desk-rest.php using hash_equals().
+- **Dynamic Auth Token Salt**: Hardened wholesale token generation with WordPress core wp_salt('auth') dynamic salt in etailer-auth.php.
+- **CSV Upload Format Validation**: Added strict .csv / .txt file extension validation for distributor desk rate sheet imports in desk-rest.php.
+- **Admin Price Filter Guard**: Added is_admin() guards on woocommerce_get_price_html in rchive-loop.php and shop-card.php to prevent frontend markup leaking into wp-admin product tables and AJAX requests.
+- **Admin Notice Privilege Check**: Updated is_admin localized config key in rontend/enqueue.php to check current_user_can('manage_woocommerce') instead of is_user_logged_in().
+- **Cache Purge Revision Check**: Guarded product save purge handler in core/cache-manager.php with wp_is_post_revision().
+- **Path Constant Normalization**: Removed redundant trailing slash concatenations on SWAC_PATH and SWAC_URL in core/config.php.
+
+---
 ## [1.5.0] — 03-11-2026
 
 ### Added

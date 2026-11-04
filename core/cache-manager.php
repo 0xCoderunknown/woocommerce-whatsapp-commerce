@@ -85,6 +85,10 @@ if (!function_exists('swac_on_product_save')) {
             return;
         }
 
+        if (wp_is_post_revision($post_id)) {
+            return;
+        }
+
         if (get_post_type($post_id) !== 'product') {
             return;
         }

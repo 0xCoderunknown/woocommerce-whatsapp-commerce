@@ -77,7 +77,7 @@ add_filter('woocommerce_loop_add_to_cart_link', function ($button_html, $product
  * 3. Unified Price Display for Loop Cards
  */
 add_filter('woocommerce_get_price_html', function ($price_html, $product) {
-    if (!$product instanceof WC_Product) {
+    if (is_admin() || !$product instanceof WC_Product) {
         return $price_html;
     }
 

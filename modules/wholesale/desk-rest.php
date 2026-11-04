@@ -131,7 +131,7 @@ function swac_rest_desk_auth(WP_REST_Request $request): WP_REST_Response
         $configured_pin = strlen($raw_phone) >= 4 ? substr($raw_phone, -4) : '1234';
     }
 
-    if ($pin !== $configured_pin) {
+    if (!hash_equals($configured_pin, $pin)) {
         return new WP_REST_Response([
             'success' => false,
             'message' => __('Incorrect Master PIN. Please try again.', 'stateless-wa-commerce'),
@@ -477,6 +477,15 @@ function swac_rest_desk_import_csv(WP_REST_Request $request): WP_REST_Response
         return new WP_REST_Response([
             'success' => false,
             'message' => __('No CSV file uploaded.', 'stateless-wa-commerce'),
+        ], 400);
+    }
+
+    $filename = $files['file']['name'] ?? '';
+    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    if ($ext !== 'csv' && $ext !== 'txt') {
+        return new WP_REST_Response([
+            'success' => false,
+            'message' => __('Invalid file format. Please upload a valid CSV file.', 'stateless-wa-commerce'),
         ], 400);
     }
 

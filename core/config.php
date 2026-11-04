@@ -152,13 +152,13 @@ define('SWAC_LOYALTY_FLAG', 'OFFER ACCEPTED ✅');
 // ═══════════════════════════════════════════════════════════════════════════════
 
 if (!defined('SWAC_PATH')) {
-    define('SWAC_PATH', plugin_dir_path(dirname(__FILE__)) . '/');
+    define('SWAC_PATH', plugin_dir_path(dirname(__FILE__)));
 }
 if (!defined('SWAC_URL')) {
-    define('SWAC_URL', plugin_dir_url(dirname(__FILE__)) . '/');
+    define('SWAC_URL', plugin_dir_url(dirname(__FILE__)));
 }
 if (!defined('SWAC_VERSION')) {
-    define('SWAC_VERSION', '1.5.0');
+    define('SWAC_VERSION', '1.5.1');
 }
 
 if (!function_exists('swac_get_config')) {

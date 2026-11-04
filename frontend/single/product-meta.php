@@ -120,7 +120,7 @@ if (!function_exists('swac_action_row_shortcode')) {
             );
         }
 
-                $b2b = function_exists('swac_b2b_get_product_data')
+        $b2b = function_exists('swac_b2b_get_product_data')
             ? swac_b2b_get_product_data($product)
             : ['is_b2b' => false, 'carton_pack' => 0, 'scheme_badge' => '', 'ptr' => 0, 'mrp' => 0];
 
@@ -214,7 +214,7 @@ if (!function_exists('swac_action_row_shortcode')) {
                 </button>
             </div>
         <?php endif; ?>
-        return (string)ob_get_clean();
+        <?php return (string)ob_get_clean();
     }
 }
 add_shortcode('swac_action_row', 'swac_action_row_shortcode');
@@ -226,3 +226,4 @@ add_shortcode('swac_action_row', 'swac_action_row_shortcode');
 add_filter('woocommerce_product_single_add_to_cart_text', function ($text, $product = null) {
     return (string)apply_filters('swac_single_button_text', __('Add to Order', 'stateless-wa-commerce'), $product);
 }, 10, 2);
+

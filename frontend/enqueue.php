@@ -82,7 +82,7 @@ add_action('wp_enqueue_scripts', function () {
             'shipping_charge'            => $cfg['shipping_charge'],
             'always_free_shipping_codes' => $always_free_codes,
             'rest_url'                   => esc_url_raw(rest_url()),
-            'is_admin'                   => is_user_logged_in(),
+            'is_admin'                   => current_user_can('manage_woocommerce'),
             'prescription_note_enabled'  => (bool)$cfg['prescription_note_enabled'],
             'prescription_note'          => $cfg['prescription_note'],
             'max_cart_items'             => (int)($cfg['max_cart_items'] ?? 10),

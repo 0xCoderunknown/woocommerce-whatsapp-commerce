@@ -151,7 +151,7 @@ function swac_rest_retailer_login(WP_REST_Request $request): WP_REST_Response
         ], 403);
     }
 
-    if ((string)$matched_retailer['pin'] !== $raw_pin) {
+    if (!hash_equals((string)$matched_retailer['pin'], (string)$raw_pin)) {
         return new WP_REST_Response([
             'success' => false,
             'message' => __('Incorrect 4-digit PIN. Please re-enter or request PIN from distributor.', 'stateless-wa-commerce'),
@@ -159,7 +159,7 @@ function swac_rest_retailer_login(WP_REST_Request $request): WP_REST_Response
     }
 
     // Generate lightweight authentication token
-    $salt = defined('AUTH_KEY') ? AUTH_KEY : 'swac-b2b-token-salt';
+    $salt = function_exists('wp_salt') ? wp_salt('auth') : (defined('AUTH_KEY') ? AUTH_KEY : 'swac-b2b-token-salt');
     $token = hash_hmac('sha256', $clean_10 . '|' . $raw_pin, $salt);
 
     return new WP_REST_Response([

@@ -91,4 +91,4 @@ if (!function_exists('swac_is_always_free_shipping_postal_code')) {
 
         return in_array($clean, $clean_list, true);
     }
-}
+}
