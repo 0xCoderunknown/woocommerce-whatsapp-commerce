@@ -43,7 +43,6 @@ if (!function_exists('swac_calculate_price_data')) {
             'is_discounted' => $is_discounted,
             'savings_amount' => $savings_amount,
             'discount_percentage' => $discount_percentage,
-            'price_html' => $product->get_price_html(),
         ];
     }
 }

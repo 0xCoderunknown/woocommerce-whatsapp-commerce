@@ -77,13 +77,17 @@ add_filter('woocommerce_loop_add_to_cart_link', function ($button_html, $product
  * 3. Unified Price Display for Loop Cards
  */
 add_filter('woocommerce_get_price_html', function ($price_html, $product) {
-    if (is_admin() || !$product instanceof WC_Product) {
+    static $rendering = false;
+    if ($rendering || is_admin() || !$product instanceof WC_Product) {
         return $price_html;
     }
 
     if (!function_exists('is_product') || !is_product()) {
         if (function_exists('swac_format_price_block_html')) {
-            return swac_format_price_block_html($product, true);
+            $rendering = true;
+            $output = swac_format_price_block_html($product, true);
+            $rendering = false;
+            return $output;
         }
     }
 

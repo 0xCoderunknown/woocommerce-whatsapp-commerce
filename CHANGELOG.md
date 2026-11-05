@@ -20,6 +20,10 @@ All release dates strictly follow the Indian standard date format: **`DD-MM-YYYY
   - Server-side shorthand scheme notation parser converting `"10+1"`, `"12+1 FREE"`, `"10:2%"`, `"2% CD"` directly into structured promotional scheme data.
   - Introduced Minimum Order Quantity (`_swac_b2b_moq`) post-meta across REST controllers and WooCommerce wholesale admin panels.
 
+### Fixed
+- **Loop Price Infinite Recursion**: Removed recursive `$product->get_price_html()` call inside `swac_calculate_price_data()` and added re-entrancy protection to `woocommerce_get_price_html` filter in `frontend/archive/archive-loop.php` to prevent memory exhaustion during product list rendering.
+- **Localhost SSL Redirect Guard**: Prevented canonical HTTPS 301 redirection and CSP `upgrade-insecure-requests` headers on local development environments (`localhost`, `127.0.0.1`, `.test`, `.local`) and corrected subdirectory URL path resolution in `integrations/ssl-security.php`.
+
 ---
 
 ## [1.6.0] — 04-11-2026
