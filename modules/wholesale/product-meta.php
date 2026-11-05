@@ -35,6 +35,7 @@ function swac_b2b_get_product_data($product): array
             'mrp' => 0.0,
             'margin_amount' => 0.0,
             'margin_percent' => 0.0,
+            'moq' => 1,
             'carton_pack' => 0,
             'scheme_type' => 'none',
             'scheme_text' => '',
@@ -103,6 +104,11 @@ function swac_b2b_get_product_data($product): array
         }
     }
 
+    $moq = (int)get_post_meta($product_id, '_swac_b2b_moq', true);
+    if ($moq < 1) {
+        $moq = 1;
+    }
+
     $is_b2b = ($has_explicit_ptr || $carton_pack > 0 || $scheme_type !== 'none');
 
     return [
@@ -111,6 +117,7 @@ function swac_b2b_get_product_data($product): array
         'mrp' => $mrp,
         'margin_amount' => $margin_amount,
         'margin_percent' => $margin_percent,
+        'moq' => $moq,
         'carton_pack' => $carton_pack,
         'scheme_type' => $scheme_type,
         'scheme_text' => $scheme_text,
@@ -143,6 +150,7 @@ add_action('woocommerce_product_data_panels', function () {
     $product_id = $post->ID;
     $ptr = get_post_meta($product_id, '_swac_b2b_ptr', true);
     $carton_pack = get_post_meta($product_id, '_swac_b2b_carton_pack', true);
+    $moq = get_post_meta($product_id, '_swac_b2b_moq', true) ?: '1';
     $scheme_type = get_post_meta($product_id, '_swac_b2b_scheme_type', true) ?: 'none';
     $scheme_buy = get_post_meta($product_id, '_swac_b2b_scheme_buy', true);
     $scheme_free = get_post_meta($product_id, '_swac_b2b_scheme_free', true);
@@ -177,6 +185,17 @@ add_action('woocommerce_product_data_panels', function () {
                 'value' => $carton_pack,
                 'placeholder' => __('e.g. 144', 'stateless-wa-commerce'),
                 'custom_attributes' => ['min' => '0', 'step' => '1'],
+            ]);
+
+            woocommerce_wp_text_input([
+                'id' => '_swac_b2b_moq',
+                'label' => __('Minimum Order Quantity (MOQ)', 'stateless-wa-commerce'),
+                'description' => __('Minimum units a retailer must order per line item (default: 1).', 'stateless-wa-commerce'),
+                'desc_tip' => true,
+                'type' => 'number',
+                'value' => $moq,
+                'placeholder' => '1',
+                'custom_attributes' => ['min' => '1', 'step' => '1'],
             ]);
 
             woocommerce_wp_select([
@@ -257,6 +276,11 @@ add_action('woocommerce_process_product_meta', function (int $post_id) {
     if (isset($_POST['_swac_b2b_carton_pack'])) {
         $pack = absint(wp_unslash($_POST['_swac_b2b_carton_pack']));
         update_post_meta($post_id, '_swac_b2b_carton_pack', $pack);
+    }
+
+    if (isset($_POST['_swac_b2b_moq'])) {
+        $moq = max(1, absint(wp_unslash($_POST['_swac_b2b_moq'])));
+        update_post_meta($post_id, '_swac_b2b_moq', $moq);
     }
 
     if (isset($_POST['_swac_b2b_scheme_type'])) {

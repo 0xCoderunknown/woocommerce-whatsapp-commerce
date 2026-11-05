@@ -9,6 +9,19 @@ All release dates strictly follow the Indian standard date format: **`DD-MM-YYYY
 
 ---
 
+## [1.7.0] — 05-11-2026
+
+### Added
+- **Distributor Counter-Speed In-Place Quick-Update Grid**:
+  - Live in-place tabular editor in `[swac_distributor_portal]` with tab-through inputs for Rate (PTR), Retail MRP, Promotional Scheme, and MOQ.
+  - 1-Tap Stock Pill button for instantaneous toggling between `[ 🟢 IN STOCK ]` and `[ 🔴 OUT OF STOCK ]` with optimistic UI response.
+  - Auto-save on blur and field commit with subtle inline sync feedback (`Saving...` → `Saved ✓`).
+  - High-speed `POST /wp-json/swac/v1/desk/fast-row-update` REST endpoint executing targeted updates without full `WC_Product::save()` lifecycle overhead.
+  - Server-side shorthand scheme notation parser converting `"10+1"`, `"12+1 FREE"`, `"10:2%"`, `"2% CD"` directly into structured promotional scheme data.
+  - Introduced Minimum Order Quantity (`_swac_b2b_moq`) post-meta across REST controllers and WooCommerce wholesale admin panels.
+
+---
+
 ## [1.6.0] — 04-11-2026
 
 ### Added

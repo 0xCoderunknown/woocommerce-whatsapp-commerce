@@ -155,99 +155,279 @@
         if (!tbody) return;
 
         if (products.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#64748b;">No products found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:#64748b;">No products found.</td></tr>';
             return;
         }
 
         tbody.innerHTML = products.map(item => `
-            <tr data-id="${item.id}">
-                <td>
+            <tr data-id="${item.id}" class="swac-fast-row">
+                <td class="swac-col-product">
                     <div class="swac-desk-item-cell">
                         <img src="${esc(item.thumb)}" class="swac-desk-thumb" alt="" loading="lazy">
-                        <div>
-                            <strong>${esc(item.name)}</strong>
-                            ${item.brand ? `<div style="font-size:11px; color:#64748b;">${esc(item.brand)}</div>` : ''}
-                            ${item.scheme_badge ? `<span style="display:inline-block; font-size:11px; background:#fffbeb; color:#b45309; padding:1px 5px; border-radius:3px; margin-top:2px;">🎁 ${esc(item.scheme_badge)}</span>` : ''}
+                        <div class="swac-desk-item-info">
+                            <strong class="swac-desk-item-title">${esc(item.name)}</strong>
+                            ${item.brand ? `<div class="swac-desk-item-brand">${esc(item.brand)}</div>` : ''}
                         </div>
                     </div>
                 </td>
-                <td>
-                    <button type="button" class="swac-stock-toggle-btn ${item.in_stock ? 'swac-stock-toggle-btn--in' : 'swac-stock-toggle-btn--out'}" data-id="${item.id}" data-stock="${item.in_stock ? '1' : '0'}">
-                        ${item.in_stock ? '🟢 In Stock' : '🔴 Out of Stock'}
+                <td class="swac-col-stock">
+                    <button type="button" 
+                            class="swac-stock-toggle-btn ${item.in_stock ? 'swac-stock-toggle-btn--in' : 'swac-stock-toggle-btn--out'}" 
+                            data-id="${item.id}" 
+                            data-stock="${item.in_stock ? '1' : '0'}"
+                            title="Click to toggle stock status">
+                        ${item.in_stock ? '🟢 IN STOCK' : '🔴 OUT OF STOCK'}
                     </button>
                 </td>
-                <td>
-                    <input type="number" step="0.01" class="swac-table-input swac-mrp-input" data-id="${item.id}" value="${item.mrp || ''}">
+                <td class="swac-col-ptr">
+                    <input type="number" 
+                           step="0.01" 
+                           min="0" 
+                           class="swac-table-input swac-fast-input swac-ptr-input" 
+                           data-id="${item.id}" 
+                           data-field="ptr" 
+                           data-last-saved="${item.ptr || ''}" 
+                           value="${item.ptr || ''}" 
+                           placeholder="0.00"
+                           title="Base Wholesale Rate (PTR)">
                 </td>
-                <td>
-                    <input type="number" step="0.01" class="swac-table-input swac-ptr-input" data-id="${item.id}" value="${item.ptr || ''}">
+                <td class="swac-col-mrp">
+                    <input type="number" 
+                           step="0.01" 
+                           min="0" 
+                           class="swac-table-input swac-fast-input swac-mrp-input" 
+                           data-id="${item.id}" 
+                           data-field="mrp" 
+                           data-last-saved="${item.mrp || ''}" 
+                           value="${item.mrp || ''}" 
+                           placeholder="0.00"
+                           title="Retail MRP">
                 </td>
-                <td>
-                    <input type="number" step="1" class="swac-table-input swac-carton-input" data-id="${item.id}" value="${item.carton_pack || ''}" placeholder="—">
+                <td class="swac-col-scheme">
+                    <input type="text" 
+                           class="swac-table-input swac-fast-input swac-scheme-input" 
+                           data-id="${item.id}" 
+                           data-field="scheme_shorthand" 
+                           data-last-saved="${esc(item.scheme_shorthand || '')}" 
+                           value="${esc(item.scheme_shorthand || '')}" 
+                           placeholder="e.g. 10+1"
+                           title="Scheme (e.g. 10+1, 10:2%, 2% CD)">
                 </td>
-                <td style="text-align:right;">
-                    <button type="button" class="swac-desk-btn swac-desk-btn--primary swac-save-rate-btn" data-id="${item.id}" style="height:32px; padding:0 10px; font-size:12px;">
-                        Save
-                    </button>
+                <td class="swac-col-moq">
+                    <input type="number" 
+                           step="1" 
+                           min="1" 
+                           class="swac-table-input swac-fast-input swac-moq-input" 
+                           data-id="${item.id}" 
+                           data-field="moq" 
+                           data-last-saved="${item.moq || '1'}" 
+                           value="${item.moq || '1'}" 
+                           placeholder="1"
+                           title="Minimum Order Quantity">
+                </td>
+                <td class="swac-col-status" style="text-align:right;">
+                    <span class="swac-row-sync-status" data-id="${item.id}"></span>
                 </td>
             </tr>
         `).join('');
+    }
+
+    // Helper: Fast In-Place Cell Auto-Save
+    function saveCell(input) {
+        if (!input || !input.dataset.id || !input.dataset.field) return;
+
+        const productId = input.dataset.id;
+        const field = input.dataset.field;
+        const value = (input.value || '').trim();
+        const lastSaved = (input.dataset.lastSaved || '').trim();
+
+        if (value === lastSaved) {
+            return; // No change, skip network request
+        }
+
+        const row = input.closest('tr');
+        const statusSpan = row ? row.querySelector('.swac-row-sync-status') : null;
+
+        if (statusSpan) {
+            statusSpan.innerHTML = '<span class="swac-sync-badge swac-sync-saving">Saving...</span>';
+        }
+
+        fetch(restUrl + 'swac/v1/desk/fast-row-update', {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({
+                id: productId,
+                field: field,
+                value: value
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.success) {
+                    input.dataset.lastSaved = value;
+
+                    // Update local cache allProducts
+                    const item = allProducts.find(p => String(p.id) === String(productId));
+                    if (item) {
+                        if (field === 'ptr') item.ptr = parseFloat(value) || 0;
+                        else if (field === 'mrp') item.mrp = parseFloat(value) || 0;
+                        else if (field === 'scheme_shorthand') item.scheme_shorthand = value;
+                        else if (field === 'moq') item.moq = parseInt(value, 10) || 1;
+                    }
+
+                    if (statusSpan) {
+                        statusSpan.innerHTML = '<span class="swac-sync-badge swac-sync-saved">Saved ✓</span>';
+                        clearTimeout(statusSpan._timer);
+                        statusSpan._timer = setTimeout(() => {
+                            if (statusSpan.textContent.includes('Saved')) {
+                                statusSpan.innerHTML = '';
+                            }
+                        }, 1800);
+                    }
+                } else {
+                    if (statusSpan) {
+                        statusSpan.innerHTML = '<span class="swac-sync-badge swac-sync-error">⚠️ Error</span>';
+                    }
+                    showToast('Failed to save ' + field + ': ' + (data && data.message ? data.message : 'Error'));
+                }
+            })
+            .catch(() => {
+                if (statusSpan) {
+                    statusSpan.innerHTML = '<span class="swac-sync-badge swac-sync-error">⚠️ Error</span>';
+                }
+                showToast('Network error saving ' + field + '.');
+            });
+    }
+
+    // Helper: 1-Tap Stock Pill Toggle
+    function toggleStock(stockBtn) {
+        if (!stockBtn || !stockBtn.dataset.id) return;
+
+        const id = stockBtn.dataset.id;
+        const currentStock = stockBtn.dataset.stock === '1';
+        const newStock = !currentStock;
+        const row = stockBtn.closest('tr');
+        const statusSpan = row ? row.querySelector('.swac-row-sync-status') : null;
+
+        // Optimistic UI toggle
+        stockBtn.disabled = true;
+        stockBtn.dataset.stock = newStock ? '1' : '0';
+        stockBtn.className = 'swac-stock-toggle-btn ' + (newStock ? 'swac-stock-toggle-btn--in' : 'swac-stock-toggle-btn--out');
+        stockBtn.textContent = newStock ? '🟢 IN STOCK' : '🔴 OUT OF STOCK';
+
+        if (statusSpan) {
+            statusSpan.innerHTML = '<span class="swac-sync-badge swac-sync-saving">Saving...</span>';
+        }
+
+        fetch(restUrl + 'swac/v1/desk/fast-row-update', {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({
+                id: id,
+                field: 'in_stock',
+                value: newStock
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+                stockBtn.disabled = false;
+                if (data && data.success) {
+                    const item = allProducts.find(p => String(p.id) === String(id));
+                    if (item) {
+                        item.in_stock = newStock;
+                    }
+
+                    if (statusSpan) {
+                        statusSpan.innerHTML = '<span class="swac-sync-badge swac-sync-saved">Saved ✓</span>';
+                        clearTimeout(statusSpan._timer);
+                        statusSpan._timer = setTimeout(() => {
+                            if (statusSpan.textContent.includes('Saved')) {
+                                statusSpan.innerHTML = '';
+                            }
+                        }, 1800);
+                    }
+                } else {
+                    // Revert on failure
+                    stockBtn.dataset.stock = currentStock ? '1' : '0';
+                    stockBtn.className = 'swac-stock-toggle-btn ' + (currentStock ? 'swac-stock-toggle-btn--in' : 'swac-stock-toggle-btn--out');
+                    stockBtn.textContent = currentStock ? '🟢 IN STOCK' : '🔴 OUT OF STOCK';
+                    if (statusSpan) {
+                        statusSpan.innerHTML = '<span class="swac-sync-badge swac-sync-error">⚠️ Error</span>';
+                    }
+                    showToast('Failed to update stock: ' + (data && data.message ? data.message : 'Error'));
+                }
+            })
+            .catch(() => {
+                stockBtn.disabled = false;
+                stockBtn.dataset.stock = currentStock ? '1' : '0';
+                stockBtn.className = 'swac-stock-toggle-btn ' + (currentStock ? 'swac-stock-toggle-btn--in' : 'swac-stock-toggle-btn--out');
+                stockBtn.textContent = currentStock ? '🟢 IN STOCK' : '🔴 OUT OF STOCK';
+                if (statusSpan) {
+                    statusSpan.innerHTML = '<span class="swac-sync-badge swac-sync-error">⚠️ Error</span>';
+                }
+                showToast('Network error updating stock.');
+            });
     }
 
     function initRateTableEvents() {
         const tbody = document.getElementById('swac-rates-tbody');
         if (!tbody) return;
 
-        // 1. Stock Status Toggle
+        // 1. 1-Tap Stock Pill Button Click
         tbody.addEventListener('click', function (e) {
             const stockBtn = e.target.closest('.swac-stock-toggle-btn');
             if (stockBtn) {
-                const id = stockBtn.dataset.id;
-                const currentStock = stockBtn.dataset.stock === '1';
-                const newStock = !currentStock;
-
-                stockBtn.disabled = true;
-                fetch(restUrl + 'swac/v1/desk/quick-update', {
-                    method: 'POST',
-                    headers: getHeaders(),
-                    body: JSON.stringify({id, in_stock: newStock})
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        stockBtn.disabled = false;
-                        if (data && data.success) {
-                            stockBtn.dataset.stock = newStock ? '1' : '0';
-                            stockBtn.className = `swac-stock-toggle-btn ${newStock ? 'swac-stock-toggle-btn--in' : 'swac-stock-toggle-btn--out'}`;
-                            stockBtn.textContent = newStock ? '🟢 In Stock' : '🔴 Out of Stock';
-                            showToast('Stock status updated.');
-                        }
-                    });
-                return;
-            }
-
-            // 2. Save Rate Button
-            const saveBtn = e.target.closest('.swac-save-rate-btn');
-            if (saveBtn) {
-                saveRowRate(saveBtn.dataset.id);
+                toggleStock(stockBtn);
             }
         });
 
-        // 3. Enter key inside input saves the row
+        // 2. Auto-save on blur / focusout for in-place inputs
+        tbody.addEventListener('focusout', function (e) {
+            const input = e.target.closest('.swac-fast-input');
+            if (input) {
+                saveCell(input);
+            }
+        });
+
+        // 3. Auto-save on change event
+        tbody.addEventListener('change', function (e) {
+            const input = e.target.closest('.swac-fast-input');
+            if (input) {
+                saveCell(input);
+            }
+        });
+
+        // 4. Enter key inside input commits and blurs
         tbody.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
-                const input = e.target.closest('.swac-table-input');
-                if (input && input.dataset.id) {
+                const input = e.target.closest('.swac-fast-input');
+                if (input) {
                     e.preventDefault();
-                    saveRowRate(input.dataset.id);
+                    input.blur();
                 }
             }
         });
 
-        // 4. Live Search
+        // 5. Instant Live Search (DOM Filter)
         const searchInput = document.getElementById('swac-rates-search');
         if (searchInput) {
             let debounceTimer;
             searchInput.addEventListener('input', function () {
+                clearTimeout(debounceTimer);
+                const q = this.value.toLowerCase().trim();
+                debounceTimer = setTimeout(() => {
+                    if (!q) {
+                        renderRateTable(allProducts);
+                    } else {
+                        const filtered = allProducts.filter(p =>
+                            (p.name && p.name.toLowerCase().includes(q)) ||
+                            (p.brand && p.brand.toLowerCase().includes(q))
+                        );
+                        renderRateTable(filtered);
+                    }
+                }, 100);
+            });
+        }
                 clearTimeout(debounceTimer);
                 const q = this.value.toLowerCase().trim();
                 debounceTimer = setTimeout(() => {

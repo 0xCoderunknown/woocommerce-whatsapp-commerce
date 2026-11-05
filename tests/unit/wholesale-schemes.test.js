@@ -1,4 +1,4 @@
-const {test, describe, beforeEach} = require('node:test');
+const { test, describe, beforeEach } = require('node:test');
 const assert = require('node:assert/strict');
 const waCart = require('../../assets/js/wa_cart.js');
 
@@ -10,7 +10,7 @@ describe('Wholesale Schemes & B2B Cart Calculations', () => {
             freeShippingAt: 10000,
             shippingCharge: 0,
             alwaysFreeShippingCodes: [],
-            loyalty: {enabled: false}
+            loyalty: { enabled: false }
         });
     });
 
@@ -116,5 +116,71 @@ describe('Wholesale Schemes & B2B Cart Calculations', () => {
         assert.match(msg, /Dispatch Route:\* Fancy Bazar Route #3/);
         assert.match(msg, /Dispatch Note:\* Ship via Assam Bengal Transport/);
         assert.doesNotMatch(msg, /Postal Code:/);
+    });
+
+    test('should reliably parse shorthand scheme notations into schema types', () => {
+        function parseScheme(shorthand) {
+            const clean = (shorthand || '').trim();
+            if (!clean || clean.toLowerCase() === 'none' || clean === '-') {
+                return { scheme_type: 'none' };
+            }
+            const freeGoods = clean.match(/^\s*(\d+)\s*\+\s*(\d+)(?:\s+FREE)?\s*$/i);
+            if (freeGoods) {
+                return {
+                    scheme_type: 'free_goods',
+                    scheme_buy: parseInt(freeGoods[1], 10),
+                    scheme_free: parseInt(freeGoods[2], 10)
+                };
+            }
+            if (/^\s*\d+\s*:\s*\d+(?:\.\d+)?%/i.test(clean)) {
+                return {
+                    scheme_type: 'tier_discount',
+                    scheme_tiers: clean
+                };
+            }
+            const cd = clean.match(/^\s*(\d+(?:\.\d+)?)\s*%\s*CD\s*$/i);
+            if (cd) {
+                return {
+                    scheme_type: 'cash_discount',
+                    scheme_cd: parseFloat(cd[1])
+                };
+            }
+            return {
+                scheme_type: 'custom',
+                scheme_custom: clean
+            };
+        }
+
+        // 1. Free goods
+        assert.deepEqual(parseScheme('10+1'), { scheme_type: 'free_goods', scheme_buy: 10, scheme_free: 1 });
+        assert.deepEqual(parseScheme('12+1 FREE'), { scheme_type: 'free_goods', scheme_buy: 12, scheme_free: 1 });
+        assert.deepEqual(parseScheme(' 24 + 2 '), { scheme_type: 'free_goods', scheme_buy: 24, scheme_free: 2 });
+
+        // 2. Volume tiers
+        assert.deepEqual(parseScheme('10:2%'), { scheme_type: 'tier_discount', scheme_tiers: '10:2%' });
+        assert.deepEqual(parseScheme('10:2%, 25:5%'), { scheme_type: 'tier_discount', scheme_tiers: '10:2%, 25:5%' });
+
+        // 3. Cash discount
+        assert.deepEqual(parseScheme('2% CD'), { scheme_type: 'cash_discount', scheme_cd: 2 });
+        assert.deepEqual(parseScheme('2.5%CD'), { scheme_type: 'cash_discount', scheme_cd: 2.5 });
+
+        // 4. None / Empty
+        assert.deepEqual(parseScheme(''), { scheme_type: 'none' });
+        assert.deepEqual(parseScheme('none'), { scheme_type: 'none' });
+        assert.deepEqual(parseScheme('-'), { scheme_type: 'none' });
+
+        // 5. Custom promotional text
+        assert.deepEqual(parseScheme('Diwali Special 5% Off'), { scheme_type: 'custom', scheme_custom: 'Diwali Special 5% Off' });
+    });
+
+    test('should clamp MOQ to minimum of 1', () => {
+        const clampMoq = (val) => Math.max(1, parseInt(val, 10) || 1);
+
+        assert.equal(clampMoq(0), 1);
+        assert.equal(clampMoq(-5), 1);
+        assert.equal(clampMoq(''), 1);
+        assert.equal(clampMoq(null), 1);
+        assert.equal(clampMoq(6), 6);
+        assert.equal(clampMoq('12'), 12);
     });
 });

@@ -72,6 +72,13 @@ add_action('rest_api_init', function () {
         'permission_callback' => 'swac_desk_is_authorized',
     ]);
 
+    // 3b. High-Speed In-Place Row Update (<100ms counter grid)
+    register_rest_route('swac/v1', '/desk/fast-row-update', [
+        'methods' => 'POST',
+        'callback' => 'swac_rest_desk_fast_row_update',
+        'permission_callback' => 'swac_desk_is_authorized',
+    ]);
+
     // 4. Create New Product
     register_rest_route('swac/v1', '/desk/create-product', [
         'methods' => 'POST',
@@ -149,6 +156,87 @@ function swac_rest_desk_auth(WP_REST_Request $request): WP_REST_Response
 }
 
 /**
+ * Parses shorthand scheme text into structured scheme configuration.
+ *
+ * Supported formats:
+ * - Free goods: "10+1", "12+1 FREE", "12 + 1" => free_goods (buy=10, free=1)
+ * - Tier discount: "10:2%", "10:2%, 25:5%" => tier_discount
+ * - Cash discount: "2% CD", "2%CD" => cash_discount (cd=2)
+ * - Empty / none: "" or "none" or "-" => none
+ * - Anything else: => custom
+ *
+ * @param string $shorthand Shorthand notation.
+ * @return array Parsed configuration.
+ */
+function swac_parse_scheme_shorthand(string $shorthand): array
+{
+    $clean = trim($shorthand);
+    if ($clean === '' || strcasecmp($clean, 'none') === 0 || $clean === '-') {
+        return [
+            'scheme_type' => 'none',
+        ];
+    }
+
+    // Pattern 1: Free goods: X+Y or X+Y FREE
+    if (preg_match('/^\s*(\d+)\s*\+\s*(\d+)(?:\s+FREE)?\s*$/i', $clean, $matches)) {
+        return [
+            'scheme_type' => 'free_goods',
+            'scheme_buy' => (int)$matches[1],
+            'scheme_free' => (int)$matches[2],
+        ];
+    }
+
+    // Pattern 2: Tier discount: X:Y% (single or multiple comma-separated slabs)
+    if (preg_match('/^\s*\d+\s*:\s*\d+(?:\.\d+)?%/i', $clean)) {
+        return [
+            'scheme_type' => 'tier_discount',
+            'scheme_tiers' => sanitize_text_field($clean),
+        ];
+    }
+
+    // Pattern 3: Cash discount: X% CD
+    if (preg_match('/^\s*(\d+(?:\.\d+)?)\s*%\s*CD\s*$/i', $clean, $matches)) {
+        return [
+            'scheme_type' => 'cash_discount',
+            'scheme_cd' => (float)$matches[1],
+        ];
+    }
+
+    // Pattern 4: Custom tag
+    return [
+        'scheme_type' => 'custom',
+        'scheme_custom' => sanitize_text_field($clean),
+    ];
+}
+
+/**
+ * Generates shorthand string representation from stored product scheme meta.
+ *
+ * @param int $product_id Product ID.
+ * @return string Shorthand representation.
+ */
+function swac_get_scheme_shorthand(int $product_id): string
+{
+    $type = (string)get_post_meta($product_id, '_swac_b2b_scheme_type', true);
+    if ($type === 'free_goods') {
+        $buy = get_post_meta($product_id, '_swac_b2b_scheme_buy', true);
+        $free = get_post_meta($product_id, '_swac_b2b_scheme_free', true);
+        return ($buy !== '' && $free !== '') ? "{$buy}+{$free}" : '';
+    }
+    if ($type === 'tier_discount') {
+        return (string)get_post_meta($product_id, '_swac_b2b_scheme_tiers', true);
+    }
+    if ($type === 'cash_discount') {
+        $cd = get_post_meta($product_id, '_swac_b2b_scheme_cd', true);
+        return ($cd !== '' && (float)$cd > 0) ? "{$cd}% CD" : '';
+    }
+    if ($type === 'custom') {
+        return (string)get_post_meta($product_id, '_swac_b2b_scheme_custom', true);
+    }
+    return '';
+}
+
+/**
  * Returns products for the daily quick rate sheet.
  */
 function swac_rest_desk_get_products(WP_REST_Request $request): WP_REST_Response
@@ -186,6 +274,11 @@ function swac_rest_desk_get_products(WP_REST_Request $request): WP_REST_Response
         $brand_terms = get_the_terms($product->get_id(), $brand_tax);
         $brand = (!empty($brand_terms) && !is_wp_error($brand_terms)) ? current($brand_terms)->name : '';
 
+        $moq = (int)get_post_meta($product->get_id(), '_swac_b2b_moq', true);
+        if ($moq < 1) {
+            $moq = 1;
+        }
+
         $items[] = [
             'id' => $product->get_id(),
             'name' => $product->get_name(),
@@ -194,8 +287,10 @@ function swac_rest_desk_get_products(WP_REST_Request $request): WP_REST_Response
             'in_stock' => $product->is_in_stock(),
             'mrp' => $b2b['mrp'],
             'ptr' => $b2b['ptr'],
+            'moq' => $moq,
             'carton_pack' => $b2b['carton_pack'],
             'scheme_type' => $b2b['scheme_type'],
+            'scheme_shorthand' => swac_get_scheme_shorthand($product->get_id()),
             'scheme_badge' => $b2b['scheme_badge'],
             'permalink' => $product->get_permalink(),
         ];
@@ -270,6 +365,139 @@ function swac_rest_desk_quick_update(WP_REST_Request $request): WP_REST_Response
     return new WP_REST_Response([
         'success' => true,
         'message' => __('Rate & Scheme updated.', 'stateless-wa-commerce'),
+    ], 200);
+}
+
+/**
+ * High-Speed In-Place Row Update for Distributor Counter Grid.
+ *
+ * Designed for <100ms execution:
+ * - Bypasses heavy WC_Product::save() lifecycle.
+ * - Uses wc_update_product_stock_status() for direct stock toggles.
+ * - Writes directly to post-meta for wholesale keys.
+ * - Synchronizes retail MRP to both _regular_price and _price.
+ * - Parses shorthand scheme notation ("10+1", "10:2%", "2% CD", etc.).
+ * - Bypasses heavy global cache purge storms on individual cell updates.
+ *
+ * @param WP_REST_Request $request Incoming REST request.
+ * @return WP_REST_Response
+ */
+function swac_rest_desk_fast_row_update(WP_REST_Request $request): WP_REST_Response
+{
+    $params = $request->get_json_params() ?: $request->get_body_params();
+    $product_id = absint($params['id'] ?? 0);
+
+    if (!$product_id || get_post_type($product_id) !== 'product') {
+        return new WP_REST_Response([
+            'success' => false,
+            'message' => __('Invalid product ID.', 'stateless-wa-commerce'),
+        ], 404);
+    }
+
+    $updated_fields = [];
+
+    // 0. Support single-field format: { id, field, value }
+    if (isset($params['field']) && array_key_exists('value', $params)) {
+        $field_name = sanitize_key((string)$params['field']);
+        $params[$field_name] = $params['value'];
+    }
+
+    // 1. Stock Status (1-Tap Toggle)
+    if (array_key_exists('in_stock', $params)) {
+        $val = $params['in_stock'];
+        $in_stock = filter_var($val, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        if ($in_stock === null) {
+            $in_stock = (!empty($val) && $val !== '0');
+        }
+        $status = $in_stock ? 'instock' : 'outofstock';
+        if (function_exists('wc_update_product_stock_status')) {
+            wc_update_product_stock_status($product_id, $status);
+        } else {
+            update_post_meta($product_id, '_stock_status', $status);
+        }
+        $updated_fields[] = 'in_stock';
+    }
+
+    // 2. Base Wholesale Rate (PTR)
+    if (array_key_exists('ptr', $params)) {
+        $ptr = (float)$params['ptr'];
+        update_post_meta($product_id, '_swac_b2b_ptr', $ptr > 0 ? (string)$ptr : '');
+        $updated_fields[] = 'ptr';
+    }
+
+    // 3. Retail MRP (Synchronized to both _regular_price and _price)
+    if (array_key_exists('mrp', $params)) {
+        $mrp = (float)$params['mrp'];
+        if ($mrp > 0) {
+            update_post_meta($product_id, '_regular_price', (string)$mrp);
+            update_post_meta($product_id, '_price', (string)$mrp);
+            if (function_exists('wc_delete_product_transients')) {
+                wc_delete_product_transients($product_id);
+            }
+            $updated_fields[] = 'mrp';
+        }
+    }
+
+    // 4. Scheme Shorthand (e.g. "10+1", "10:2%", "2% CD", or custom)
+    if (array_key_exists('scheme_shorthand', $params) || array_key_exists('scheme', $params)) {
+        $shorthand_val = (string)($params['scheme_shorthand'] ?? $params['scheme']);
+        $parsed = swac_parse_scheme_shorthand($shorthand_val);
+
+        update_post_meta($product_id, '_swac_b2b_scheme_type', $parsed['scheme_type']);
+        if ($parsed['scheme_type'] === 'free_goods') {
+            update_post_meta($product_id, '_swac_b2b_scheme_buy', (string)$parsed['scheme_buy']);
+            update_post_meta($product_id, '_swac_b2b_scheme_free', (string)$parsed['scheme_free']);
+            delete_post_meta($product_id, '_swac_b2b_scheme_tiers');
+            delete_post_meta($product_id, '_swac_b2b_scheme_cd');
+            delete_post_meta($product_id, '_swac_b2b_scheme_custom');
+        } elseif ($parsed['scheme_type'] === 'tier_discount') {
+            update_post_meta($product_id, '_swac_b2b_scheme_tiers', $parsed['scheme_tiers']);
+            delete_post_meta($product_id, '_swac_b2b_scheme_buy');
+            delete_post_meta($product_id, '_swac_b2b_scheme_free');
+            delete_post_meta($product_id, '_swac_b2b_scheme_cd');
+            delete_post_meta($product_id, '_swac_b2b_scheme_custom');
+        } elseif ($parsed['scheme_type'] === 'cash_discount') {
+            update_post_meta($product_id, '_swac_b2b_scheme_cd', (string)$parsed['scheme_cd']);
+            delete_post_meta($product_id, '_swac_b2b_scheme_buy');
+            delete_post_meta($product_id, '_swac_b2b_scheme_free');
+            delete_post_meta($product_id, '_swac_b2b_scheme_tiers');
+            delete_post_meta($product_id, '_swac_b2b_scheme_custom');
+        } elseif ($parsed['scheme_type'] === 'custom') {
+            update_post_meta($product_id, '_swac_b2b_scheme_custom', $parsed['scheme_custom']);
+            delete_post_meta($product_id, '_swac_b2b_scheme_buy');
+            delete_post_meta($product_id, '_swac_b2b_scheme_free');
+            delete_post_meta($product_id, '_swac_b2b_scheme_tiers');
+            delete_post_meta($product_id, '_swac_b2b_scheme_cd');
+        } else {
+            // none
+            delete_post_meta($product_id, '_swac_b2b_scheme_buy');
+            delete_post_meta($product_id, '_swac_b2b_scheme_free');
+            delete_post_meta($product_id, '_swac_b2b_scheme_tiers');
+            delete_post_meta($product_id, '_swac_b2b_scheme_cd');
+            delete_post_meta($product_id, '_swac_b2b_scheme_custom');
+        }
+        $updated_fields[] = 'scheme_shorthand';
+    }
+
+    // 5. Minimum Order Quantity (MOQ)
+    if (array_key_exists('moq', $params)) {
+        $moq = max(1, absint($params['moq']));
+        update_post_meta($product_id, '_swac_b2b_moq', (string)$moq);
+        $updated_fields[] = 'moq';
+    }
+
+    // 6. Optional Carton Pack Guide
+    if (array_key_exists('carton_pack', $params)) {
+        $carton = max(0, absint($params['carton_pack']));
+        update_post_meta($product_id, '_swac_b2b_carton_pack', $carton > 0 ? (string)$carton : '');
+        $updated_fields[] = 'carton_pack';
+    }
+
+    return new WP_REST_Response([
+        'success' => true,
+        'id' => $product_id,
+        'updated_fields' => $updated_fields,
+        'message' => __('Row updated.', 'stateless-wa-commerce'),
     ], 200);
 }
 

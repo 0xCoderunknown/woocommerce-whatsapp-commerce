@@ -87,20 +87,21 @@ if (!defined('ABSPATH')) {
             </div>
 
             <div class="swac-desk-table-wrapper">
-                <table class="swac-desk-table">
+                <table class="swac-desk-table swac-fast-grid">
                     <thead>
                     <tr>
-                        <th style="width:36%;"><?php esc_html_e('Item / Brand', 'stateless-wa-commerce'); ?></th>
-                        <th style="width:14%;"><?php esc_html_e('Stock', 'stateless-wa-commerce'); ?></th>
-                        <th style="width:14%;"><?php esc_html_e('MRP (₹)', 'stateless-wa-commerce'); ?></th>
-                        <th style="width:14%;"><?php esc_html_e('Rate / PTR (₹)', 'stateless-wa-commerce'); ?></th>
-                        <th style="width:12%;"><?php esc_html_e('Carton', 'stateless-wa-commerce'); ?></th>
-                        <th style="width:10%; text-align:right;"><?php esc_html_e('Action', 'stateless-wa-commerce'); ?></th>
+                        <th style="width:28%;"><?php esc_html_e('Item / Brand', 'stateless-wa-commerce'); ?></th>
+                        <th style="width:16%;"><?php esc_html_e('Stock', 'stateless-wa-commerce'); ?></th>
+                        <th style="width:13%;"><?php esc_html_e('Rate / PTR (₹)', 'stateless-wa-commerce'); ?></th>
+                        <th style="width:13%;"><?php esc_html_e('Retail MRP (₹)', 'stateless-wa-commerce'); ?></th>
+                        <th style="width:14%;"><?php esc_html_e('Scheme', 'stateless-wa-commerce'); ?></th>
+                        <th style="width:8%;"><?php esc_html_e('MOQ', 'stateless-wa-commerce'); ?></th>
+                        <th style="width:8%; text-align:right;"><?php esc_html_e('Status', 'stateless-wa-commerce'); ?></th>
                     </tr>
                     </thead>
                     <tbody id="swac-rates-tbody">
                     <tr>
-                        <td colspan="6"
+                        <td colspan="7"
                             style="text-align:center; padding:30px; color:#64748b;"><?php esc_html_e('Loading products...', 'stateless-wa-commerce'); ?></td>
                     </tr>
                     </tbody>

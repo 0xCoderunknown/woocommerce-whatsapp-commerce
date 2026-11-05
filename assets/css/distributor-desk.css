@@ -279,6 +279,7 @@
     font-weight: 700;
     width: 80px;
     color: #0f172a;
+    transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .swac-table-input:focus {
@@ -287,15 +288,87 @@
     background: #ecfdf5;
 }
 
+/* Fast Grid Input Dimensions & Alignments */
+.swac-ptr-input,
+.swac-mrp-input {
+    width: 88px;
+    text-align: right;
+}
+
+.swac-scheme-input {
+    width: 110px;
+    text-align: left;
+}
+
+.swac-moq-input {
+    width: 55px;
+    text-align: center;
+}
+
+/* In-Row Sync Status */
+.swac-row-sync-status {
+    display: inline-block;
+    min-width: 64px;
+    text-align: right;
+}
+
+.swac-sync-badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 4px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    transition: opacity 0.25s ease;
+}
+
+.swac-sync-saving {
+    color: #64748b;
+    background: #f1f5f9;
+}
+
+.swac-sync-saved {
+    color: #059669;
+    background: #ecfdf5;
+}
+
+.swac-sync-error {
+    color: #dc2626;
+    background: #fef2f2;
+}
+
+/* Table Item Cell info */
+.swac-desk-item-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.swac-desk-item-title {
+    font-size: 0.88rem;
+    color: #0f172a;
+    line-height: 1.25;
+}
+
+.swac-desk-item-brand {
+    font-size: 0.72rem;
+    color: #64748b;
+    margin-top: 2px;
+}
+
 /* Stock Toggle Button */
 .swac-stock-toggle-btn {
     background: none;
     border: 1px solid transparent;
-    padding: 4px 8px;
+    padding: 4px 10px;
     border-radius: 20px;
     font-size: 0.75rem;
     font-weight: 700;
     cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+    letter-spacing: 0.02em;
     transition: all 0.15s ease;
 }
 
@@ -336,6 +409,21 @@
 }
 
 /* Mobile Breakpoints */
+@media (max-width: 768px) {
+    .swac-desk-table-wrapper {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .swac-fast-grid {
+        min-width: 680px;
+    }
+
+    .swac-table-input {
+        height: 36px;
+        font-size: 0.92rem;
+    }
+}
+
 @media (max-width: 640px) {
     .swac-desk-grid-2,
     .swac-desk-grid-3 {
