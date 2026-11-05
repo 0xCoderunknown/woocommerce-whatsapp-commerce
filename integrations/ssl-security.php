@@ -55,8 +55,8 @@ add_action('template_redirect', function () {
     $host = isset($_SERVER['HTTP_HOST']) ? (string)$_SERVER['HTTP_HOST'] : '';
     $clean_host = preg_replace('/:\d+$/', '', $host);
     $is_local = in_array($clean_host, ['localhost', '127.0.0.1', '::1'], true)
-        || (substr($clean_host, -5) === '.test')
-        || (substr($clean_host, -6) === '.local')
+        || str_ends_with($clean_host, '.test')
+        || str_ends_with($clean_host, '.local')
         || (function_exists('wp_get_environment_type') && in_array(wp_get_environment_type(), ['local', 'development'], true));
 
     if ($is_local) {
@@ -94,8 +94,8 @@ add_action('send_headers', function () {
     $host = isset($_SERVER['HTTP_HOST']) ? (string)$_SERVER['HTTP_HOST'] : '';
     $clean_host = preg_replace('/:\d+$/', '', $host);
     $is_local = in_array($clean_host, ['localhost', '127.0.0.1', '::1'], true)
-        || (substr($clean_host, -5) === '.test')
-        || (substr($clean_host, -6) === '.local')
+        || str_ends_with($clean_host, '.test')
+        || str_ends_with($clean_host, '.local')
         || (function_exists('wp_get_environment_type') && in_array(wp_get_environment_type(), ['local', 'development'], true));
 
     if ($is_local) {

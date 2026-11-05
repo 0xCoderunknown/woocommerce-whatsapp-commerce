@@ -172,7 +172,7 @@ if (swac_is_lockdown_enabled('admin_cleanup')) {
                 $task = isset($_GET['task']) ? sanitize_text_field(wp_unslash($_GET['task'])) : '';
                 $path = isset($_GET['path']) ? sanitize_text_field(wp_unslash($_GET['path'])) : '';
 
-                if ($task === 'products' || strpos($path, 'add-product') !== false) {
+                if ($task === 'products' || str_contains($path, 'add-product')) {
                     wp_safe_redirect(admin_url('post-new.php?post_type=product'));
                     exit;
                 }

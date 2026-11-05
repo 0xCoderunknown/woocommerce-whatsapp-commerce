@@ -98,7 +98,7 @@ function swac_rest_desk_auth(WP_REST_Request $request): WP_REST_Response
     update_option('swac_b2b_master_hash', [
         'hash' => hash('sha256', $token),
         'expires' => time() + (30 * DAY_IN_SECONDS),
-    ]);
+    ], false);
 
     return new WP_REST_Response([
         'success' => true,

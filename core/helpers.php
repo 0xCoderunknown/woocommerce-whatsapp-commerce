@@ -84,7 +84,7 @@ if (!function_exists('swac_build_whatsapp_url')) {
         $clean_message = str_replace(["\r\n", "\r"], "\n", $message);
         $encoded_message = rawurlencode($clean_message);
 
-        $separator = (strpos($base_url, '?') !== false) ? '&' : '?';
+        $separator = str_contains($base_url, '?') ? '&' : '?';
 
         return $base_url . $separator . 'text=' . $encoded_message;
     }

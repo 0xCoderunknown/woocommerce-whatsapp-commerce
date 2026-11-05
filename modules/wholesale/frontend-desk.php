@@ -31,7 +31,10 @@ add_action('wp_enqueue_scripts', function () {
     global $post;
     if (is_a($post, 'WP_Post') && (has_shortcode($post->post_content, 'swac_distributor_portal') || has_shortcode($post->post_content, 'swac_frontend_admin'))) {
         wp_enqueue_style('swac-desk-style', SWAC_URL . 'assets/css/distributor-desk.css', [], SWAC_VERSION);
-        wp_enqueue_script('swac-desk-script', SWAC_URL . 'assets/js/distributor-desk.js', [], SWAC_VERSION, true);
+        wp_enqueue_script('swac-desk-script', SWAC_URL . 'assets/js/distributor-desk.js', [], SWAC_VERSION, [
+            'strategy' => 'defer',
+            'in_footer' => true,
+        ]);
         wp_localize_script('swac-desk-script', 'swacDeskConfig', [
             'rest_url' => esc_url_raw(rest_url()),
             'nonce' => wp_create_nonce('wp_rest'),

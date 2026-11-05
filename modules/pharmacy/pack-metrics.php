@@ -53,7 +53,7 @@ if (!function_exists('swac_resolve_product_pack_size')) {
 
         if (preg_match($pattern, $term_name, $term_matches)) {
             $matched_word = $term_matches[1];
-            if ($qty > 1 && !$has_measurement_unit && substr(strtolower($matched_word), -1) !== 's') {
+            if ($qty > 1 && !$has_measurement_unit && !str_ends_with(strtolower($matched_word), 's')) {
                 $plural_word = $matched_word . 's';
                 $resolved_size = preg_replace('/\b' . preg_quote($matched_word, '/') . '\b/i', $plural_word, $term_name);
             }
@@ -61,11 +61,11 @@ if (!function_exists('swac_resolve_product_pack_size')) {
             $form_word = ucfirst(strtolower($matches[1]));
 
             if ($qty > 1 && !$has_measurement_unit) {
-                if (substr(strtolower($form_word), -1) !== 's') {
+                if (!str_ends_with(strtolower($form_word), 's')) {
                     $form_word .= 's';
                 }
             } else {
-                if (substr(strtolower($form_word), -1) === 's' && substr(strtolower($form_word), -2) !== 'ss') {
+                if (str_ends_with(strtolower($form_word), 's') && !str_ends_with(strtolower($form_word), 'ss')) {
                     $form_word = preg_replace('/s$/i', '', $form_word);
                 }
             }

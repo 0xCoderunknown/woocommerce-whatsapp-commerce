@@ -61,7 +61,7 @@ if (!function_exists('swac_button_shortcode')) {
 
         $wa_url = function_exists('swac_build_whatsapp_url')
             ? swac_build_whatsapp_url($message, $base_url)
-            : $base_url . ((strpos($base_url, '?') !== false) ? '&' : '?') . 'text=' . rawurlencode($message);
+            : $base_url . (str_contains($base_url, '?') ? '&' : '?') . 'text=' . rawurlencode($message);
 
         $class_name = 'swac-btn';
         if ($fullwidth) {

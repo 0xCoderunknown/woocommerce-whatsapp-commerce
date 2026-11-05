@@ -289,5 +289,5 @@ add_action('init', function () {
         }
     }
 
-    update_option('swac_cron_cleaned', 1);
+    update_option('swac_cron_cleaned', 1, false);
 }, 20);

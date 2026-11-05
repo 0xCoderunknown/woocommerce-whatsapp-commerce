@@ -66,7 +66,7 @@ function swac_rest_desk_save_settings(WP_REST_Request $request): WP_REST_Respons
     if (!empty($params['master_pin'])) {
         $pin = sanitize_text_field((string)$params['master_pin']);
         if (strlen($pin) >= 4) {
-            update_option('swac_b2b_master_pin', $pin);
+            update_option('swac_b2b_master_pin', $pin, false);
         } else {
             return new WP_REST_Response([
                 'success' => false,

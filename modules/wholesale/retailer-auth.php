@@ -70,7 +70,7 @@ function swac_save_approved_retailer(array $data): bool
         'created_at' => $retailers[$phone]['created_at'] ?? gmdate('d-m-Y'),
     ];
 
-    return update_option(SWAC_RETAILER_OPTION, $retailers);
+    return update_option(SWAC_RETAILER_OPTION, $retailers, false);
 }
 
 /**
@@ -85,7 +85,7 @@ function swac_delete_approved_retailer(string $phone): bool
     $retailers = swac_get_approved_retailers();
     if (isset($retailers[$phone])) {
         unset($retailers[$phone]);
-        return update_option(SWAC_RETAILER_OPTION, $retailers);
+        return update_option(SWAC_RETAILER_OPTION, $retailers, false);
     }
     return false;
 }
@@ -266,7 +266,7 @@ function swac_render_retailers_admin_page()
         } elseif ($action === 'update_master_pin') {
             $master_pin = sanitize_text_field($_POST['master_pin'] ?? '');
             if (strlen($master_pin) >= 4) {
-                update_option('swac_b2b_master_pin', $master_pin);
+                update_option('swac_b2b_master_pin', $master_pin, false);
                 $message = __('Master Desk PIN updated successfully.', 'stateless-wa-commerce');
             } else {
                 $error = __('Master PIN must be at least 4 digits.', 'stateless-wa-commerce');

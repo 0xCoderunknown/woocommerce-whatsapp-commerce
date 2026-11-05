@@ -9,6 +9,18 @@ All release dates strictly follow the Indian standard date format: **`DD-MM-YYYY
 
 ---
 
+## [1.7.2] — 05-11-2026
+
+### Performance & Modernization
+- **Autoload Optimization (WordPress 6.6+)**: Explicitly passed `autoload = false` to `swac_b2b_approved_retailers`, `swac_b2b_master_hash`, `swac_b2b_master_pin`, and `swac_cron_cleaned` to keep `wp_load_alloptions` lean and prevent B2B directories from bloating static catalog page loads.
+- **Modern Script Loading (WordPress 6.3+)**: Updated `swac-desk-script` enqueueing in `modules/wholesale/frontend-desk.php` to use `['strategy' => 'defer', 'in_footer' => true]`.
+- **PHP 8.2 Baseline & Modern Primitives**:
+  - Declared `Requires PHP: 8.2` in primary plugin header.
+  - Replaced legacy `strpos` substring searches with native `str_contains` in URL builders and admin handlers.
+  - Replaced legacy `substr` checks with native `str_ends_with` across SSL local domain detectors and pharmacy pack metrics.
+
+---
+
 ## [1.7.1] — 05-11-2026
 
 ### Added
