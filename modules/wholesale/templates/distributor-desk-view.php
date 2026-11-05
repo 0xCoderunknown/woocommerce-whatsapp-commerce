@@ -47,6 +47,10 @@ if (!defined('ABSPATH')) {
                    class="swac-desk-btn swac-desk-btn--outline" target="_blank" rel="noopener">
                     <?php esc_html_e('View Live Shop ↗', 'stateless-wa-commerce'); ?>
                 </a>
+                <button type="button" id="swac-desk-lock-btn" class="swac-desk-btn swac-desk-btn--outline"
+                        style="margin-left:8px;" title="<?php esc_attr_e('Lock Distributor Desk', 'stateless-wa-commerce'); ?>">
+                    🔒 <?php esc_html_e('Lock', 'stateless-wa-commerce'); ?>
+                </button>
             </div>
         </header>
 

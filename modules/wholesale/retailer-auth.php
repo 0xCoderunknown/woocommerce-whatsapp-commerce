@@ -133,6 +133,17 @@ add_action('rest_api_init', function () {
  */
 function swac_rest_retailer_login(WP_REST_Request $request): WP_REST_Response
 {
+    $ip = sanitize_text_field(wp_unslash((string)($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1')));
+    $rate_key = 'swac_ret_rate_' . md5($ip);
+    $attempts = (int)get_transient($rate_key);
+
+    if ($attempts >= 10) {
+        return new WP_REST_Response([
+            'success' => false,
+            'message' => __('Too many failed login attempts. Please wait 15 minutes before trying again.', 'stateless-wa-commerce'),
+        ], 429);
+    }
+
     $params = $request->get_json_params();
     if (empty($params)) {
         $params = $request->get_body_params();
@@ -176,11 +187,15 @@ function swac_rest_retailer_login(WP_REST_Request $request): WP_REST_Response
     }
 
     if (!hash_equals((string)$matched_retailer['pin'], (string)$raw_pin)) {
+        $attempts++;
+        set_transient($rate_key, $attempts, 15 * MINUTE_IN_SECONDS);
         return new WP_REST_Response([
             'success' => false,
             'message' => __('Incorrect 4-digit PIN. Please re-enter or request PIN from distributor.', 'stateless-wa-commerce'),
         ], 403);
     }
+
+    delete_transient($rate_key);
 
     // Generate lightweight authentication token
     $salt = function_exists('wp_salt') ? wp_salt('auth') : (defined('AUTH_KEY') ? AUTH_KEY : 'swac-b2b-token-salt');

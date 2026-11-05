@@ -99,6 +99,24 @@
                     });
             });
         }
+        const lockBtn = document.getElementById('swac-desk-lock-btn');
+        if (lockBtn) {
+            lockBtn.addEventListener('click', function () {
+                if (masterToken) {
+                    fetch(restUrl + 'swac/v1/desk/logout', {
+                        method: 'POST',
+                        headers: getHeaders(true)
+                    }).catch(() => {});
+                }
+                masterToken = '';
+                sessionStorage.removeItem('swac_master_token');
+                document.getElementById('swac-desk-app')?.classList.add('swac-desk-hidden');
+                document.getElementById('swac-desk-login-box')?.classList.remove('swac-desk-hidden');
+                const pinInput = document.getElementById('swac-desk-pin-input');
+                if (pinInput) pinInput.value = '';
+                showToast('Distributor Desk locked.');
+            });
+        }
     }
 
     // ── 2. Tab Navigation ─────────────────────────────────────────────────────
@@ -426,21 +444,6 @@
                         renderRateTable(filtered);
                     }
                 }, 100);
-            });
-        }
-                clearTimeout(debounceTimer);
-                const q = this.value.toLowerCase().trim();
-                debounceTimer = setTimeout(() => {
-                    if (!q) {
-                        renderRateTable(allProducts);
-                    } else {
-                        const filtered = allProducts.filter(p =>
-                            (p.name && p.name.toLowerCase().includes(q)) ||
-                            (p.brand && p.brand.toLowerCase().includes(q))
-                        );
-                        renderRateTable(filtered);
-                    }
-                }, 150);
             });
         }
 

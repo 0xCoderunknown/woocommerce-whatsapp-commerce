@@ -9,6 +9,19 @@ All release dates strictly follow the Indian standard date format: **`DD-MM-YYYY
 
 ---
 
+## [1.7.1] — 05-11-2026
+
+### Security & Hardening
+- **Distributor Master PIN Hardening**: Removed predictable fallback to merchant phone number or default passcode; Distributor Desk fails closed if unconfigured in settings.
+- **Brute-Force Rate Limiting**: Added IP-based attempt throttling on Master Desk and Retailer login endpoints to block automated PIN guessing.
+- **Session Expiry & Quick Lock**: Added 30-day sliding token lifespan for warehouse staff and a one-tap Lock action in the Distributor Desk header.
+
+### Performance & Fixes
+- **Lightweight Legacy Desk Actions**: Replaced full WooCommerce lifecycle hooks (`$product->save()`) in legacy rate sheet updates with direct meta and stock updates.
+- **Counter Grid Script Fix**: Cleaned up duplicate debounce handler in live search input.
+
+---
+
 ## [1.7.0] — 05-11-2026
 
 ### Added

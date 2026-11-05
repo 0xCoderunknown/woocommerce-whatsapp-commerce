@@ -38,9 +38,18 @@ function swac_desk_is_authorized(?WP_REST_Request $request = null): bool
     }
 
     if (!empty($token)) {
-        $stored_hash = get_option('swac_b2b_master_hash', '');
-        if (!empty($stored_hash) && hash_equals($stored_hash, hash('sha256', $token))) {
-            return true;
+        $stored = get_option('swac_b2b_master_hash', '');
+        $token_hash = hash('sha256', $token);
+        if (is_array($stored)) {
+            $hash = (string)($stored['hash'] ?? '');
+            $expires = (int)($stored['expires'] ?? 0);
+            if (!empty($hash) && ($expires === 0 || time() <= $expires) && hash_equals($hash, $token_hash)) {
+                return true;
+            }
+        } elseif (is_string($stored) && !empty($stored)) {
+            if (hash_equals($stored, $token_hash)) {
+                return true;
+            }
         }
     }
 
@@ -56,6 +65,13 @@ add_action('rest_api_init', function () {
         'methods' => 'POST',
         'callback' => 'swac_rest_desk_auth',
         'permission_callback' => '__return_true',
+    ]);
+
+    // 1b. Master Logout
+    register_rest_route('swac/v1', '/desk/logout', [
+        'methods' => 'POST',
+        'callback' => 'swac_rest_desk_logout',
+        'permission_callback' => 'swac_desk_is_authorized',
     ]);
 
     // 2. Fetch Catalog Items for Quick Rate Sheet
@@ -124,6 +140,17 @@ add_action('rest_api_init', function () {
  */
 function swac_rest_desk_auth(WP_REST_Request $request): WP_REST_Response
 {
+    $ip = sanitize_text_field(wp_unslash((string)($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1')));
+    $rate_key = 'swac_desk_rate_' . md5($ip);
+    $attempts = (int)get_transient($rate_key);
+
+    if ($attempts >= 5) {
+        return new WP_REST_Response([
+            'success' => false,
+            'message' => __('Too many failed login attempts. Please wait 15 minutes before trying again.', 'stateless-wa-commerce'),
+        ], 429);
+    }
+
     $params = $request->get_json_params() ?: $request->get_body_params();
     $pin = sanitize_text_field((string)($params['pin'] ?? ''));
 
@@ -133,25 +160,45 @@ function swac_rest_desk_auth(WP_REST_Request $request): WP_REST_Response
 
     $configured_pin = (string)get_option('swac_b2b_master_pin', '');
     if (empty($configured_pin)) {
-        $cfg = function_exists('swac_get_config') ? swac_get_config() : [];
-        $raw_phone = $cfg['phone_number'] ?? '';
-        $configured_pin = strlen($raw_phone) >= 4 ? substr($raw_phone, -4) : '1234';
+        return new WP_REST_Response([
+            'success' => false,
+            'message' => __('Distributor Master PIN is not configured. Please set the Master PIN in wp-admin.', 'stateless-wa-commerce'),
+        ], 503);
     }
 
     if (!hash_equals($configured_pin, $pin)) {
+        $attempts++;
+        set_transient($rate_key, $attempts, 15 * MINUTE_IN_SECONDS);
         return new WP_REST_Response([
             'success' => false,
             'message' => __('Incorrect Master PIN. Please try again.', 'stateless-wa-commerce'),
         ], 403);
     }
 
+    delete_transient($rate_key);
+
     $token = wp_generate_password(32, false);
-    update_option('swac_b2b_master_hash', hash('sha256', $token));
+    update_option('swac_b2b_master_hash', [
+        'hash' => hash('sha256', $token),
+        'expires' => time() + (30 * DAY_IN_SECONDS),
+    ]);
 
     return new WP_REST_Response([
         'success' => true,
         'token' => $token,
         'message' => __('Access Granted.', 'stateless-wa-commerce'),
+    ], 200);
+}
+
+/**
+ * Handles master session logout.
+ */
+function swac_rest_desk_logout(WP_REST_Request $request): WP_REST_Response
+{
+    delete_option('swac_b2b_master_hash');
+    return new WP_REST_Response([
+        'success' => true,
+        'message' => __('Logged out successfully.', 'stateless-wa-commerce'),
     ], 200);
 }
 
@@ -322,7 +369,8 @@ function swac_rest_desk_quick_update(WP_REST_Request $request): WP_REST_Response
     if (isset($params['mrp'])) {
         $mrp = (float)$params['mrp'];
         if ($mrp > 0) {
-            $product->set_regular_price($mrp);
+            update_post_meta($product_id, '_regular_price', (string)$mrp);
+            update_post_meta($product_id, '_price', (string)$mrp);
         }
     }
 
@@ -349,13 +397,20 @@ function swac_rest_desk_quick_update(WP_REST_Request $request): WP_REST_Response
         }
     }
 
-    // 5. Update Stock Status
+    // 5. Update Stock Status (fast path via wc_update_product_stock_status)
     if (isset($params['in_stock'])) {
         $in_stock = (bool)$params['in_stock'];
-        $product->set_stock_status($in_stock ? 'instock' : 'outofstock');
+        $new_status = $in_stock ? 'instock' : 'outofstock';
+        if (function_exists('wc_update_product_stock_status')) {
+            wc_update_product_stock_status($product_id, $new_status);
+        } else {
+            update_post_meta($product_id, '_stock_status', $new_status);
+        }
     }
 
-    $product->save();
+    if (function_exists('wc_delete_product_transients')) {
+        wc_delete_product_transients($product_id);
+    }
 
     // Trigger selective cache purge if available
     if (function_exists('swac_purge_product_cache')) {
