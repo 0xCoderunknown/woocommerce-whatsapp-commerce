@@ -56,6 +56,7 @@
             document.getElementById('swac-desk-app')?.classList.remove('swac-desk-hidden');
             loadProducts();
             loadRetailers();
+            loadSettings();
         }
 
         const authForm = document.getElementById('swac-desk-auth-form');
@@ -83,6 +84,7 @@
                             document.getElementById('swac-desk-app').classList.remove('swac-desk-hidden');
                             loadProducts();
                             loadRetailers();
+                            loadSettings();
                             showToast('Distributor Desk unlocked.');
                         } else {
                             if (errBox) {
@@ -138,6 +140,9 @@
                     document.getElementById('swac-tab-add')?.classList.add('swac-desk-tab-content--active');
                 } else if (targetId === 'tab-retailers') {
                     document.getElementById('swac-tab-retailers')?.classList.add('swac-desk-tab-content--active');
+                } else if (targetId === 'tab-settings') {
+                    document.getElementById('swac-tab-settings')?.classList.add('swac-desk-tab-content--active');
+                    loadSettings();
                 }
             });
         });
@@ -740,11 +745,94 @@
         document.getElementById('swac-retailers-refresh')?.addEventListener('click', () => loadRetailers());
     }
 
+    // ── 6. Tab 4: Store Settings Engine ───────────────────────────────────────
+    function loadSettings() {
+        fetch(restUrl + 'swac/v1/desk/settings', {
+            method: 'GET',
+            headers: getHeaders(false)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.success && data.settings) {
+                    const s = data.settings;
+                    const phoneEl = document.getElementById('swac-set-phone');
+                    const nameEl = document.getElementById('swac-set-store-name');
+                    const cityEl = document.getElementById('swac-set-city');
+                    const freeShipEl = document.getElementById('swac-set-free-ship');
+                    const shipChargeEl = document.getElementById('swac-set-ship-charge');
+                    const disclaimerEl = document.getElementById('swac-set-disclaimer');
+                    const pinEl = document.getElementById('swac-set-master-pin');
+
+                    if (phoneEl) phoneEl.value = s.phone_number || '';
+                    if (nameEl) nameEl.value = s.store_name || '';
+                    if (cityEl) cityEl.value = s.city_name || '';
+                    if (freeShipEl) freeShipEl.value = s.free_shipping_at || 0;
+                    if (shipChargeEl) shipChargeEl.value = s.shipping_charge || 0;
+                    if (disclaimerEl) disclaimerEl.value = s.order_disclaimer || '';
+                    if (pinEl) pinEl.value = '';
+                }
+            })
+            .catch(() => {});
+    }
+
+    function initSettingsEvents() {
+        const settingsForm = document.getElementById('swac-desk-settings-form');
+        if (settingsForm) {
+            settingsForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const saveBtn = document.getElementById('swac-settings-save-btn');
+                const origText = saveBtn ? saveBtn.textContent : '';
+                if (saveBtn) {
+                    saveBtn.disabled = true;
+                    saveBtn.textContent = 'Saving...';
+                }
+
+                const payload = {
+                    phone_number: document.getElementById('swac-set-phone')?.value.trim() || '',
+                    store_name: document.getElementById('swac-set-store-name')?.value.trim() || '',
+                    city_name: document.getElementById('swac-set-city')?.value.trim() || '',
+                    free_shipping_at: parseFloat(document.getElementById('swac-set-free-ship')?.value) || 0,
+                    shipping_charge: parseFloat(document.getElementById('swac-set-ship-charge')?.value) || 0,
+                    order_disclaimer: document.getElementById('swac-set-disclaimer')?.value.trim() || '',
+                    master_pin: document.getElementById('swac-set-master-pin')?.value.trim() || ''
+                };
+
+                fetch(restUrl + 'swac/v1/desk/settings', {
+                    method: 'POST',
+                    headers: getHeaders(true),
+                    body: JSON.stringify(payload)
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (saveBtn) {
+                            saveBtn.disabled = false;
+                            saveBtn.textContent = origText;
+                        }
+                        if (data && data.success) {
+                            showToast(data.message || 'Store settings saved.');
+                            const pinEl = document.getElementById('swac-set-master-pin');
+                            if (pinEl) pinEl.value = '';
+                        } else {
+                            showToast('Error: ' + (data.message || ''));
+                        }
+                    })
+                    .catch(() => {
+                        if (saveBtn) {
+                            saveBtn.disabled = false;
+                            saveBtn.textContent = origText;
+                        }
+                        showToast('Server connection error.');
+                    });
+            });
+        }
+    }
+
     // ── Bootstrap Desk ────────────────────────────────────────────────────────
     initAuth();
     initTabs();
     initRateTableEvents();
     initAddProductForm();
     initRetailerEvents();
+    initSettingsEvents();
 
 })();

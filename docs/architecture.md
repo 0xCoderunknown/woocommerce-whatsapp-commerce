@@ -191,16 +191,23 @@ Warehouse dispatch clerks can read carton and scheme totals instantly without ma
 To eliminate the friction of navigating WordPress admin screens on mobile phones, `modules/wholesale/` exposes the
 `[swac_distributor_portal]` shortcode:
 
-1. **Master PIN Authentication**: Phone access is authenticated via a 4-to-8 digit master
-   passcode (`swac_b2b_master_pin`). Successful entry returns a cryptographically secure token checked on subsequent
-   REST calls via `X-SWAC-Master-Token`.
-2. **Instant Rate Tweaker**: An in-memory search spreadsheet table allows dispatchers to update PTR, MRP, Carton pack,
-   scheme rules, and stock status (`instock`/`outofstock`) inline.
-3. **1-Click CSV Sync**:
+1. **Master PIN Authentication & Rate Limiting**: Phone access is authenticated via a 4-to-8 digit master
+   passcode (`swac_b2b_master_pin`). Fail-closed design ensures missing configuration denies access. Protected by IP-based
+   rate limiting (5 attempts / 15 min lock). Successful entry issues a token with a 30-day sliding expiry and 1-tap `🔒 Lock`
+   invalidation.
+2. **Counter-Speed Quick-Update Grid (`/desk/fast-row-update`)**: An in-place tabular spreadsheet editor enabling sub-100ms
+   updates for Rate (PTR), Retail MRP, MOQ, and shorthand schemes (`10+1`, `10:2%`, `2% CD`), plus 1-tap stock pill toggling
+   (`instock`/`outofstock`) bypassing heavy `WC_Product::save()` lifecycle hooks.
+3. **Store & Delivery Settings (`/desk/settings`)**: Mobile-friendly tab allowing distributors to adjust WhatsApp contact,
+   store display title, city focus, free delivery cutoff thresholds, and flat delivery fees directly with dynamic `wp_options` fallbacks.
+4. **1-Click CSV Sync**:
     - `GET /wp-json/swac/v1/desk/export-csv`: Streams catalog rates as a UTF-8 BOM CSV, directly editable in Microsoft
       Excel.
     - `POST /wp-json/swac/v1/desk/import-csv`: Bulk updates product rates, carton packs, and stock states idempotently,
       triggering automatic cache invalidation.
+5. **Modular Controller Architecture**: The REST backend is decomposed into domain-specific sub-controllers under
+   `modules/wholesale/rest/` (`auth.php`, `products.php`, `shorthand.php`, `create-product.php`, `retailers.php`, `csv.php`,
+   `settings.php`) for maintainability.
 
 ---
 

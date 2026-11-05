@@ -45,7 +45,7 @@ if (!defined('ABSPATH')) {
  * ✅ Enable if: pure commerce store, no editorial content whatsoever.
  * ❌ Leave OFF if: you have a blog, news section, or any 'post' content.
  */
-define('SWAC_DISABLE_BLOG', false);
+define('SWAC_DISABLE_BLOG', true);
 
 /**
  * Disable the block editor (Gutenberg) site-wide.
@@ -57,7 +57,7 @@ define('SWAC_DISABLE_BLOG', false);
  * ✅ Enable if: your entire workflow uses the classic editor everywhere.
  * ❌ Leave OFF if: you use blocks for pages, blog posts, or landing content.
  */
-define('SWAC_DISABLE_BLOCK_EDITOR', false);
+define('SWAC_DISABLE_BLOCK_EDITOR', true);
 
 /**
  * Streamline product editor tabs in wp-admin.
@@ -68,7 +68,7 @@ define('SWAC_DISABLE_BLOCK_EDITOR', false);
  * ✅ Enable if: pure simple-product catalog without variations or attributes.
  * ❌ Leave OFF (default) if: you sell variable products (sizes, colors) or use product attributes.
  */
-define('SWAC_STREAMLINE_PRODUCT_TABS', false);
+define('SWAC_STREAMLINE_PRODUCT_TABS', true);
 
 /**
  * Enable AJAX Select2 dropdowns for taxonomies in wp-admin product editor.

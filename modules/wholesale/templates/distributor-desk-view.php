@@ -66,6 +66,9 @@ if (!defined('ABSPATH')) {
             <button type="button" class="swac-desk-tab-btn" data-tab="tab-retailers" role="tab">
                 🏪 <?php esc_html_e('Approved Retailers', 'stateless-wa-commerce'); ?>
             </button>
+            <button type="button" class="swac-desk-tab-btn" data-tab="tab-settings" role="tab">
+                ⚙️ <?php esc_html_e('Store Settings', 'stateless-wa-commerce'); ?>
+            </button>
         </nav>
 
         <!-- Notification Toast / Banner -->
@@ -289,6 +292,83 @@ if (!defined('ABSPATH')) {
                             </div>
                         </form>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: STORE SETTINGS -->
+        <section id="swac-tab-settings" class="swac-desk-tab-content">
+            <div style="max-width:680px; margin:0 auto;">
+                <div class="swac-desk-card">
+                    <h2 style="margin-top:0; font-size:1.25rem;">
+                        ⚙️ <?php esc_html_e('Store Contact & Delivery Settings', 'stateless-wa-commerce'); ?>
+                    </h2>
+                    <p style="font-size:0.85rem; color:#64748b; margin-bottom:20px;">
+                        <?php esc_html_e('Configure your public WhatsApp number, store title, delivery fees, and order footer note. Changes reflect instantly.', 'stateless-wa-commerce'); ?>
+                    </p>
+
+                    <form id="swac-desk-settings-form">
+                        <div class="swac-desk-field">
+                            <label><strong><?php esc_html_e('WhatsApp Business Phone *', 'stateless-wa-commerce'); ?></strong></label>
+                            <input type="tel" id="swac-set-phone" name="phone_number" class="swac-desk-input" required
+                                   placeholder="<?php esc_attr_e('e.g. 919876543210 (Country code + number)', 'stateless-wa-commerce'); ?>">
+                            <small style="color:#64748b; font-size:0.75rem; display:block; margin-top:4px;">
+                                <?php esc_html_e('E.164 format without "+" or spaces (e.g. 919876543210 for India).', 'stateless-wa-commerce'); ?>
+                            </small>
+                        </div>
+
+                        <div class="swac-desk-field" style="margin-top:14px;">
+                            <label><strong><?php esc_html_e('Store Display Name', 'stateless-wa-commerce'); ?></strong></label>
+                            <input type="text" id="swac-set-store-name" name="store_name" class="swac-desk-input"
+                                   placeholder="<?php esc_attr_e('e.g. Mahabir Pharmaceuticals', 'stateless-wa-commerce'); ?>">
+                        </div>
+
+                        <div class="swac-desk-field" style="margin-top:14px;">
+                            <label><strong><?php esc_html_e('City / Territory Focus', 'stateless-wa-commerce'); ?></strong></label>
+                            <input type="text" id="swac-set-city" name="city_name" class="swac-desk-input"
+                                   placeholder="<?php esc_attr_e('e.g. Guwahati', 'stateless-wa-commerce'); ?>">
+                        </div>
+
+                        <div style="display:flex; gap:12px; margin-top:14px; flex-wrap:wrap;">
+                            <div class="swac-desk-field" style="flex:1; min-width:180px;">
+                                <label><strong><?php esc_html_e('Free Delivery Above (₹)', 'stateless-wa-commerce'); ?></strong></label>
+                                <input type="number" step="any" min="0" id="swac-set-free-ship" name="free_shipping_at" class="swac-desk-input"
+                                       placeholder="0.00">
+                                <small style="color:#64748b; font-size:0.75rem; display:block; margin-top:4px;">
+                                    <?php esc_html_e('Orders above this amount get free delivery. 0 = always charge.', 'stateless-wa-commerce'); ?>
+                                </small>
+                            </div>
+                            <div class="swac-desk-field" style="flex:1; min-width:180px;">
+                                <label><strong><?php esc_html_e('Flat Delivery Fee (₹)', 'stateless-wa-commerce'); ?></strong></label>
+                                <input type="number" step="any" min="0" id="swac-set-ship-charge" name="shipping_charge" class="swac-desk-input"
+                                       placeholder="0.00">
+                                <small style="color:#64748b; font-size:0.75rem; display:block; margin-top:4px;">
+                                    <?php esc_html_e('Applied when order is below free threshold. 0 = free.', 'stateless-wa-commerce'); ?>
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="swac-desk-field" style="margin-top:14px;">
+                            <label><strong><?php esc_html_e('WhatsApp Order Note / Disclaimer', 'stateless-wa-commerce'); ?></strong></label>
+                            <textarea id="swac-set-disclaimer" name="order_disclaimer" class="swac-desk-input" rows="2"
+                                      placeholder="<?php esc_attr_e('⚡ Final bill & stock availability will be confirmed on WhatsApp.', 'stateless-wa-commerce'); ?>"></textarea>
+                        </div>
+
+                        <div class="swac-desk-field" style="margin-top:14px; padding-top:14px; border-top:1px dashed #cbd5e1;">
+                            <label><strong><?php esc_html_e('Change Master PIN (Optional)', 'stateless-wa-commerce'); ?></strong></label>
+                            <input type="password" id="swac-set-master-pin" name="master_pin" maxlength="12" class="swac-desk-input"
+                                   placeholder="•••• (Leave blank to keep unchanged)">
+                            <small style="color:#64748b; font-size:0.75rem; display:block; margin-top:4px;">
+                                <?php esc_html_e('Passcode used to unlock this Distributor Desk. Minimum 4 digits.', 'stateless-wa-commerce'); ?>
+                            </small>
+                        </div>
+
+                        <div style="margin-top:20px;">
+                            <button type="submit" id="swac-settings-save-btn" class="swac-desk-btn swac-desk-btn--primary" style="width:100%; height:44px;">
+                                💾 <?php esc_html_e('Save Store Settings', 'stateless-wa-commerce'); ?>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </section>

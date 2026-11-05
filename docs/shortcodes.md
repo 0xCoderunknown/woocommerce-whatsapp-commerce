@@ -231,15 +231,15 @@ It serves as the definitive reference for visual page builders (Breakdance, Elem
 ### `[swac_distributor_portal]`
 
 - **Aliases**: `[swac_frontend_admin]`
-- **Purpose**: Embeds a zero-admin, mobile-friendly Frontend Distributor Desk on any Breakdance or theme page (
-  e.g. `/distributor/`). Enables wholesalers and dispatch clerks to:
-    1. Tweak daily wholesale rates (PTR), MRPs, carton conversions, active schemes, and stock status in an
-       instant-search spreadsheet table.
-    2. Add new products via single-screen form with direct phone camera / gallery photo upload.
-    3. Manage and approve retailer accounts and assign 4-digit PINs.
-    4. 1-Click CSV rate sheet export and bulk rate/stock import.
-- **Access**: Authorized automatically for logged-in WordPress administrators, or secured via Master PIN prompt for
-  phone access without WordPress login.
+- **Purpose**: Embeds a zero-admin, mobile-friendly Frontend Distributor Desk on any Breakdance or theme page (e.g. `/distributor/`). Enables wholesalers, sales reps, and dispatch clerks to:
+    1. **Counter-Speed Quick-Update Grid**: Tab through Rate (PTR), Retail MRP, MOQ, and Scheme inputs with auto-save on blur, plus 1-tap Stock Pill toggling (`[ 🟢 IN STOCK ]` / `[ 🔴 OUT OF STOCK ]`) executing in `<100ms` via `/desk/fast-row-update`.
+    2. **Shorthand Scheme Notation**: Input single promotional strings (`"10+1"`, `"12+1 FREE"`, `"10:2%"`, `"2% CD"`) automatically parsed into structured wholesale schema.
+    3. **Fast Product Entry**: Add new simple products via single-screen mobile form with direct phone camera / gallery photo upload.
+    4. **Retailer Account Management**: View, approve, edit, and delete wholesale retailer accounts and assign 4-digit PINs.
+    5. **Store & Delivery Settings**: Manage WhatsApp business number, store name, city focus, free shipping cutoff, flat delivery charge, order disclaimer, and Master PIN directly from mobile with zero `wp-admin` access.
+    6. **1-Click CSV Synchronization**: UTF-8 BOM CSV catalog export (Excel-compatible) and bulk rate/stock CSV import.
+    7. **Session Security & Quick Lock**: Protected by Master PIN with IP rate-limiting, 30-day sliding token lifespan, and a 1-tap `🔒 Lock` button in the header.
+- **Access**: Authorized automatically for logged-in WordPress administrators, or secured via Master PIN prompt for phone access without WordPress login.
 - **Example**:
   ```text
   [swac_distributor_portal]

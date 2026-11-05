@@ -138,7 +138,7 @@ The wholesale engine (`modules/wholesale/`) enables B2B trade between stockists 
 | **Client Engine** | `assets/js/wa_cart.js`, `assets/js/drawer-ui.js`, `assets/js/delivery-engine.js`, `assets/js/cart-math.js`, `assets/js/order-serializer.js` | 0-dependency cart state machine, drawer presentation, delivery cutoff math, cart totals, DOM price reconciliation, WhatsApp order serialization. |
 | **Wholesale Core** | `modules/wholesale/product-meta.php`, `modules/wholesale/shop-card.php`, `modules/wholesale/walled-garden.php` | PTR meta, margin badge calculation, carton guide, dual-state card gating, walled garden mode. |
 | **Retailer Auth** | `modules/wholesale/retailer-auth.php`, `modules/wholesale/login-modal.php` | Directory registry, 4-digit PIN verification endpoint, login modal. |
-| **Distributor Desk** | `modules/wholesale/frontend-desk.php`, `modules/wholesale/desk-rest.php`, `modules/wholesale/desk-template.php`, `modules/wholesale/templates/distributor-desk-view.php`, `assets/js/distributor-desk.js` | `[swac_distributor_portal]`, quick rate sheet, camera upload, CSV sync. |
+| **Distributor Desk** | `modules/wholesale/frontend-desk.php`, `modules/wholesale/desk-rest.php`, `modules/wholesale/rest/`, `modules/wholesale/desk-template.php`, `modules/wholesale/templates/distributor-desk-view.php`, `assets/js/distributor-desk.js` | `[swac_distributor_portal]`, quick rate sheet, camera upload, CSV sync. |
 | **Retailer Auth (JS)** | `assets/js/retailer-auth.js` | Client-side 4-digit PIN verification modal, status pill, and class toggle. |
 | **Pharmacy Module** | `modules/pharmacy/` | Salt composition explorer, prescription flags (`isRx`), pack size badges. |
 | **Explore Module** | `modules/explore/` | Brand and category directory grids with live client-side search. |
@@ -159,12 +159,19 @@ The wholesale engine (`modules/wholesale/`) enables B2B trade between stockists 
 
 - `swac_b2b_approved_retailers`: Keyed array of registered retailers `[ phone => { phone, pin, store_name, owner_name, area, status, created_at } ]`.
 - `swac_b2b_master_pin`: Plain master passcode for Distributor Desk mobile unlock.
-- `swac_b2b_master_hash`: SHA-256 hash of currently active master session token.
+- `swac_b2b_master_hash`: SHA-256 hash or array `[ hash, expires ]` of currently active master session token.
 - `swac_cron_cleaned`: One-time flag indicating obsolete WooCommerce background sessions cron was unregistered.
+- `swac_store_phone`: Overridden WhatsApp business phone number (string).
+- `swac_store_name`: Overridden store display name (string).
+- `swac_city_name`: Overridden store city / territory focus (string).
+- `swac_free_shipping_at`: Overridden free delivery subtotal threshold (float).
+- `swac_shipping_charge`: Overridden flat delivery charge (float).
+- `swac_order_disclaimer`: Overridden footer disclaimer on outgoing WhatsApp order messages (string).
 
 ### 7.3. Product Post Meta Keys
 
 - `_swac_b2b_ptr`: Wholesale Price to Retailer (float).
+- `_swac_b2b_moq`: Minimum Order Quantity for B2B wholesale trade (integer, default 1).
 - `_swac_b2b_carton_pack`: Number of individual units packed per master shipping carton (integer).
 - `_swac_b2b_scheme_type`: Promotional scheme mode (`none`, `free_goods`, `tier_discount`, `cash_discount`, `custom`).
 - `_swac_b2b_scheme_buy`: Buy quantity (X) for free goods scheme (integer).
@@ -179,10 +186,14 @@ The wholesale engine (`modules/wholesale/`) enables B2B trade between stockists 
 
 | Endpoint | Method | Permission | Purpose |
 |:---|:---|:---|:---|
-| `/wp-json/swac/v1/retailer-login` | `POST` | Public | Authenticates retailer via Phone + 4-digit PIN. |
-| `/wp-json/swac/v1/desk/auth` | `POST` | Public | Validates Master PIN and issues Distributor Desk token. |
+| `/wp-json/swac/v1/retailer-login` | `POST` | Public (Rate-Limited) | Authenticates retailer via Phone + 4-digit PIN. |
+| `/wp-json/swac/v1/desk/auth` | `POST` | Public (Rate-Limited) | Validates Master PIN and issues Distributor Desk token. |
+| `/wp-json/swac/v1/desk/logout` | `POST` | Authorized | Invalidates master session token immediately. |
 | `/wp-json/swac/v1/desk/products` | `GET` | Authorized | Returns catalog items with PTR and schemes for rate sheet. |
 | `/wp-json/swac/v1/desk/quick-update` | `POST` | Authorized | Inline updates MRP, PTR, Carton, Scheme, and Stock. |
+| `/wp-json/swac/v1/desk/fast-row-update` | `POST` | Authorized | High-speed (<100ms) counter-grid update for PTR, MRP, scheme shorthand, MOQ, and stock. |
+| `/wp-json/swac/v1/desk/settings` | `GET` | Authorized | Retrieves store contact, delivery charges, and order disclaimer. |
+| `/wp-json/swac/v1/desk/settings` | `POST` | Authorized | Saves store contact, delivery charges, disclaimer, and optional Master PIN. |
 | `/wp-json/swac/v1/desk/create-product` | `POST` | Authorized | Creates new simple product with phone camera photo upload. |
 | `/wp-json/swac/v1/desk/retailers` | `GET` | Authorized | Fetches approved retailer directory. |
 | `/wp-json/swac/v1/desk/save-retailer` | `POST` | Authorized | Creates or edits approved retailer account and PIN. |

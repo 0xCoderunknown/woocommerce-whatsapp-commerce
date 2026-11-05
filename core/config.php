@@ -164,16 +164,17 @@ if (!function_exists('swac_get_config')) {
     /**
      * Assemble and return the resolved plugin configuration array.
      *
-     * Reads from the constants defined above. Applies the swac_commerce_config
-     * filter for programmatic overrides (e.g. from a mu-plugin or theme).
+     * Reads from wp_options database settings with fallback to constants defined above.
+     * Applies the swac_commerce_config filter for programmatic overrides.
      *
+     * @param bool $refresh Force reload configuration without using static cache.
      * @return array<string, mixed>
      */
-    function swac_get_config(): array
+    function swac_get_config(bool $refresh = false): array
     {
         static $resolved_config = null;
 
-        if ($resolved_config !== null) {
+        if ($resolved_config !== null && !$refresh) {
             return $resolved_config;
         }
 
@@ -181,20 +182,38 @@ if (!function_exists('swac_get_config')) {
             ? get_woocommerce_currency_symbol()
             : '$';
 
-        $store_name = SWAC_STORE_NAME !== '' ? SWAC_STORE_NAME : (get_bloginfo('name') ?: 'Store');
+        $db_store_name = get_option('swac_store_name', null);
+        $store_name = ($db_store_name !== null && $db_store_name !== '')
+            ? (string)$db_store_name
+            : (SWAC_STORE_NAME !== '' ? SWAC_STORE_NAME : (get_bloginfo('name') ?: 'Store'));
+
+        $db_phone = get_option('swac_store_phone', null);
+        $phone_number = ($db_phone !== null && $db_phone !== '') ? (string)$db_phone : SWAC_PHONE;
+
+        $db_city = get_option('swac_city_name', null);
+        $city_name = ($db_city !== null && $db_city !== '') ? (string)$db_city : SWAC_CITY_NAME;
+
+        $db_free_ship = get_option('swac_free_shipping_at', null);
+        $free_shipping_at = $db_free_ship !== null ? (float)$db_free_ship : (float)SWAC_FREE_SHIPPING_AT;
+
+        $db_ship_charge = get_option('swac_shipping_charge', null);
+        $shipping_charge = $db_ship_charge !== null ? (float)$db_ship_charge : (float)SWAC_SHIPPING_CHARGE;
+
+        $db_disclaimer = get_option('swac_order_disclaimer', null);
+        $order_disclaimer = $db_disclaimer !== null ? (string)$db_disclaimer : SWAC_ORDER_DISCLAIMER;
 
         $defaults = [
-            'phone_number' => SWAC_PHONE,
+            'phone_number' => $phone_number,
             'store_name' => $store_name,
             'base_url' => '',
-            'free_shipping_at' => (float)SWAC_FREE_SHIPPING_AT,
-            'shipping_charge' => (float)SWAC_SHIPPING_CHARGE,
+            'free_shipping_at' => $free_shipping_at,
+            'shipping_charge' => $shipping_charge,
             'always_free_shipping_postal_codes' => (array)(defined('SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES') ? SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES : []),
             'currency_symbol' => $currency_symbol,
-            'city_name' => SWAC_CITY_NAME,
+            'city_name' => $city_name,
             'max_cart_items' => (int)SWAC_MAX_CART_ITEMS,
             'max_qty_per_item' => (int)SWAC_MAX_QTY_PER_ITEM,
-            'order_disclaimer' => SWAC_ORDER_DISCLAIMER,
+            'order_disclaimer' => $order_disclaimer,
             // Prescription note: pharmacy module concern — set via swac_commerce_config filter when pharmacy module is active.
             'prescription_note_enabled' => false,
             'prescription_note' => '',

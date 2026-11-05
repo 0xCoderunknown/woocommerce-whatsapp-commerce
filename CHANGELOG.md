@@ -11,13 +11,17 @@ All release dates strictly follow the Indian standard date format: **`DD-MM-YYYY
 
 ## [1.7.1] — 05-11-2026
 
+### Added
+- **Store Contact & Delivery Settings**: Added frontend Store Settings tab to Distributor Desk for direct mobile management of WhatsApp business phone, store title, delivery fees, and order footer disclaimer.
+
 ### Security & Hardening
 - **Distributor Master PIN Hardening**: Removed predictable fallback to merchant phone number or default passcode; Distributor Desk fails closed if unconfigured in settings.
 - **Brute-Force Rate Limiting**: Added IP-based attempt throttling on Master Desk and Retailer login endpoints to block automated PIN guessing.
 - **Session Expiry & Quick Lock**: Added 30-day sliding token lifespan for warehouse staff and a one-tap Lock action in the Distributor Desk header.
 
-### Performance & Fixes
+### Performance & Architectural Refactoring
 - **Lightweight Legacy Desk Actions**: Replaced full WooCommerce lifecycle hooks (`$product->save()`) in legacy rate sheet updates with direct meta and stock updates.
+- **Wholesale REST Controller Modularization**: Restructured wholesale REST controllers into clean, domain-specific modules (`modules/wholesale/rest/`) for enhanced maintainability.
 - **Counter Grid Script Fix**: Cleaned up duplicate debounce handler in live search input.
 
 ---
