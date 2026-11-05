@@ -36,9 +36,10 @@ Any pull request, refactor, or AI-generated edit **MUST NOT** violate these non-
 2. **No Guest Cookies**:
     - Never issue cookies (`setcookie`, `woocommerce_set_cart_cookies`) to guests or catalog visitors.
     - Any cookie headers sent to public guests break LiteSpeed and reverse-proxy static page caching.
-3. **Preserve Shortcodes & Backward-Compatibility Aliases**:
-    - Never break or remove existing shortcodes. Consult [docs/shortcodes.md](docs/shortcodes.md) before making shortcode edits.
-    - Preserve legacy aliases (`[g1_*]`, `[cdr_*]`) and function shims to prevent breaking existing sites.
+3. **Unified Shortcode Architecture (`swac_*`)**:
+    - All shortcodes and public template tags strictly use the unified `swac_*` namespace.
+    - Legacy aliases (`[g1_*]`, `[cdr_*]`) and old shims have been completely migrated and purged in v1.7.3+.
+    - Never introduce un-namespaced or custom third-party prefixed shortcodes. Consult [docs/shortcodes.md](docs/shortcodes.md) before making shortcode edits.
 4. **4-Way Version Synchronization**:
     - When bumping the plugin version, update all four files in tandem:
         1. [stateless-wa-commerce.php](file:///stateless-wa-commerce.php) (`Version: X.Y.Z`)

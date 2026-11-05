@@ -52,9 +52,6 @@ if (!function_exists('swac_render_delivery_notice')) {
 add_shortcode('swac_delivery_notice', function () {
     return swac_render_delivery_notice();
 });
-add_shortcode('g1_delivery_notice', function () {
-    return swac_render_delivery_notice();
-});
 
 add_action('woocommerce_after_add_to_cart_button', function () {
     if (function_exists('is_product') && !is_product()) {

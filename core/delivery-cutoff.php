@@ -67,16 +67,3 @@ if (!function_exists('swac_get_delivery_cutoff_message')) {
         return (string)apply_filters('swac_delivery_cutoff_message', $default_message, $day, $hour, $timestamp);
     }
 }
-
-if (!function_exists('g1_get_delivery_cutoff_message')) {
-    /**
-     * Backward-compatibility alias for legacy delivery cutoff function.
-     *
-     * @param int|null $timestamp
-     * @return string
-     */
-    function g1_get_delivery_cutoff_message(?int $timestamp = null): string
-    {
-        return swac_get_delivery_cutoff_message($timestamp);
-    }
-}

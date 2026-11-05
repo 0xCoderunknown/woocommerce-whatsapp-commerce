@@ -57,7 +57,6 @@ function swac_composition_tag_shortcode()
 }
 
 add_shortcode('swac_composition_tag', 'swac_composition_tag_shortcode');
-add_shortcode('g1_composition_tag', 'swac_composition_tag_shortcode');
 
 /**
  * Regulatory Rx Badge Shortcode: [swac_rx_badge]

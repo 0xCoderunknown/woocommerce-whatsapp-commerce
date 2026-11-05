@@ -9,6 +9,20 @@ All release dates strictly follow the Indian standard date format: **`DD-MM-YYYY
 
 ---
 
+## [1.7.3] — 05-11-2026
+
+### Removed & Migrated (Legacy Compatibility Purge)
+- **Purged Legacy `g1_*` & `cdr_*` Shims**: Completely purged old backward-compatibility aliases and shims across all subsystems in favor of the canonical `swac_*` architecture:
+  - Purged `g1_get_delivery_cutoff_message()` in `core/delivery-cutoff.php`.
+  - Purged `[cdr_whatsapp_button]` and `cdr_whatsapp_button_shortcode()` in `frontend/components/whatsapp-button.php`.
+  - Purged `[g1_delivery_notice]` in `frontend/single/delivery-notice.php`.
+  - Purged `[cdr_generic_box]`, `[g1_generic_box]`, and `cdr_generic_box_html()` in `modules/pharmacy/generic-upsell.php`.
+  - Purged `[g1_composition_tag]` in `modules/pharmacy/product-meta.php`.
+  - Cleaned legacy CSS classes `.cdr-alt-salt` and `.cdr-totals-loyalty .cdr-loyalty-gift-icon`.
+- **Documentation Alignment**: Updated `AGENTS.md` and `docs/shortcodes.md` to reflect the clean unified `swac_*` namespace without obsolete legacy aliases.
+
+---
+
 ## [1.7.2] — 05-11-2026
 
 ### Performance & Modernization

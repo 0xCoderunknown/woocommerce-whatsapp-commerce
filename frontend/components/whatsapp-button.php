@@ -68,8 +68,8 @@ if (!function_exists('swac_button_shortcode')) {
             $class_name .= ' swac-btn--fullwidth';
         }
 
-        $svg_icon = ($show_icon && (function_exists('swac_icon_svg') || function_exists('cdr_wa_icon_svg')))
-            ? (function_exists('swac_icon_svg') ? swac_icon_svg() : cdr_wa_icon_svg())
+        $svg_icon = ($show_icon && function_exists('swac_icon_svg'))
+            ? swac_icon_svg()
             : '';
 
         return sprintf(
@@ -83,18 +83,3 @@ if (!function_exists('swac_button_shortcode')) {
 }
 
 add_shortcode('swac_button', 'swac_button_shortcode');
-add_shortcode('cdr_whatsapp_button', 'swac_button_shortcode');
-
-if (!function_exists('cdr_whatsapp_button_shortcode')) {
-    /**
-     * Backward-compatibility alias for WhatsApp button shortcode handler.
-     *
-     * @param array|string $atts
-     * @param string|null $content
-     * @return string
-     */
-    function cdr_whatsapp_button_shortcode($atts = [], ?string $content = null): string
-    {
-        return swac_button_shortcode($atts, $content);
-    }
-}

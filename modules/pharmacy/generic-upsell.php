@@ -104,7 +104,7 @@ if (!function_exists('swac_generic_box_html')) {
                         <a href="<?php echo $alt_permalink; ?>"><?php echo esc_html(get_the_title($generic_post)); ?></a>
                     </h3>
                     <?php if (!empty($salt_name)) : ?>
-                        <div class="swac-alt-salt cdr-alt-salt"><?php echo esc_html($salt_name); ?></div>
+                        <div class="swac-alt-salt"><?php echo esc_html($salt_name); ?></div>
                     <?php endif; ?>
                     <?php if (!empty($alt_pack_size)) : ?>
                         <div class="swac-alt-pack">📦 <?php echo esc_html($alt_pack_size); ?></div>
@@ -148,19 +148,3 @@ function swac_generic_box_shortcode()
 }
 
 add_shortcode('swac_generic_box', 'swac_generic_box_shortcode');
-add_shortcode('cdr_generic_box', 'swac_generic_box_shortcode');
-add_shortcode('g1_generic_box', 'swac_generic_box_shortcode');
-
-if (!function_exists('cdr_generic_box_html')) {
-    /**
-     * Backward-compatibility alias for generic alternate box HTML generator.
-     *
-     * @param WC_Product $main_product
-     * @param WP_Post $generic_post
-     * @return string
-     */
-    function cdr_generic_box_html(WC_Product $main_product, $generic_post): string
-    {
-        return swac_generic_box_html($main_product, $generic_post);
-    }
-}

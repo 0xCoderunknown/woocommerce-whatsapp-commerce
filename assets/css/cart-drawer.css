@@ -547,8 +547,7 @@
     font-style: italic;
 }
 
-.cdr-totals-loyalty .cdr-loyalty-gift-icon,
-.swac-totals-loyalty .cdr-loyalty-gift-icon {
+.swac-totals-loyalty .swac-loyalty-gift-icon {
     font-style: normal;
     display: inline-block;
     margin-right: 5px;

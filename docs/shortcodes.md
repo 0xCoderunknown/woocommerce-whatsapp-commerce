@@ -46,7 +46,6 @@ It serves as the definitive reference for visual page builders (Breakdance, Elem
     - `fullwidth` (`'yes'` | `'no'`): Toggles 100% full-width block expansion. Default: `'no'`.
     - `icon` (`'yes'` | `'no'`): Toggles rendering of the WhatsApp SVG icon. Set to `'no'` when providing custom emoji
       or icon prefixes in `text`. Default: `'yes'`.
-- **Aliases**: `[cdr_whatsapp_button]`
 - **Examples**:
   ```text
   [swac_button text="Chat with Us" message="I have a question about my order." fullwidth="yes"]
@@ -106,7 +105,6 @@ It serves as the definitive reference for visual page builders (Breakdance, Elem
     - **Morning Window** (Mon–Sat < 12:00 PM): `"Order before 12 noon for same-day delivery"`
     - **Weekday Afternoon Window** (Mon–Fri ≥ 12:00 PM): `"Order now to receive it by tomorrow (6 Oct)"`
     - **Weekend Window** (Sat ≥ 12:00 PM or Sun): `"Order now to get it by Monday (5 Oct)"`
-- **Aliases**: `[g1_delivery_notice]`
 - **Example**:
   ```text
   [swac_delivery_notice]
