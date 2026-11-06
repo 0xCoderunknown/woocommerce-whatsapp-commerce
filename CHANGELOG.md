@@ -9,6 +9,15 @@ All release dates strictly follow the Indian standard date format: **`DD-MM-YYYY
 
 ---
 
+## [1.7.6] — 06-11-2026
+
+### Fixed & Enhanced
+- **Breakdance "Theme Disabled" Canvas Fixed Width**:
+  - Replaced relative `width: 100%` with explicit `width: 1200px !important; max-width: 100% !important; flex: 1 1 1200px;` on `.swac-desk-container`.
+  - Ensures the Distributor Desk enforces its authoritative 1200px desktop boundary even on completely blank Breakdance pages without containers, sections, or theme wrappers.
+
+---
+
 ## [1.7.5] — 06-11-2026
 
 ### Fixed & Enhanced

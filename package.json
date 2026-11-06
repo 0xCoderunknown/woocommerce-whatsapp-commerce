@@ -1,6 +1,6 @@
 {
   "name": "woocommerce-whatsapp-commerce",
-  "version": "1.7.5",
+  "version": "1.7.6",
   "description": "Zero-session catalog lockdown and client-side WhatsApp commerce engine for WooCommerce",
   "main": "assets/js/wa_cart.js",
   "scripts": {
