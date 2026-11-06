@@ -1,41 +1,73 @@
 # Shortcodes Reference Manual
 
 This document is the **authoritative single source of truth** for all shortcodes available in **Stateless WhatsApp Commerce for WooCommerce**.
-It serves as the definitive reference for visual page builders (Breakdance, Elementor, Bricks), theme templates, and developers.
+It serves as the definitive reference for visual page builders (Breakdance, Elementor, Bricks), custom theme templates, and store engineers.
 
 > 📖 **Related Documentation**:
 > - Technical Architecture: [docs/architecture.md](architecture.md)
 > - Store Configuration & Setup: [README.md](../README.md)
 > - Maintainer & AI Operating Manual: [AGENTS.md](../AGENTS.md)
 
+---
+
+## Architectural Separation: Base Layer vs. Modular Subsystems
+
+The plugin separates presentation tags into two architectural tiers:
+
+1. **Base Layer (Core Commerce & Storefront)**:
+   The foundational, zero-session catalog primitives. These provide WhatsApp order routing, strike-through MRP formatting, delivery cutoff timers, quantity action rows, and catalog maintenance audit tools. They operate out of the box with zero module dependencies.
+2. **Modular Subsystems (`modules/`)**:
+   Domain-specific enhancements that can be individually enabled or disabled in `features.php`:
+   - **Explore Directory Module (`modules/explore/`)**: Directory browsing for brands, parent-child taxonomy grids, and instant client-side directory search.
+   - **Pharmacy Subsystem (`modules/pharmacy/`)**: Clinical medicine features including active salt formulas, generic substitution savings boxes, Rx badges, and sizing guides.
+   - **Wholesale & B2B Subsystem (`modules/wholesale/`)**: Trade ordering, carton packing logic, approved retailer directory, and the complete frontend Distributor Desk.
 
 ---
 
 ## Quick Reference Index
 
-| Primary Shortcode              | Purpose                                                                            | Key Attributes                                                           |
-|:-------------------------------|:-----------------------------------------------------------------------------------|:-------------------------------------------------------------------------|
-| `[swac_button]`                | Customizable WhatsApp order/contact button                                         | `text`, `message`, `fullwidth`, `icon`                                   |
-| `[swac_price_block]`           | Hero price display (Current price, MRP strike, discount %)                         | `context` (`single` \| `card`)                                           |
-| `[swac_pack_size]`             | Packaging unit badge (e.g. "10 Tablets", "500 ml").                                | None                                                                     |
-| `[swac_price_pack_hierarchy]`  | Unified price and pack size container                                              | `context` (`single` \| `card`)                                           |
-| `[swac_action_row]`            | Add to Order quantity controls & WhatsApp button                                   | None                                                                     |
-| `[swac_delivery_notice]`       | Timezone-aware dispatch cutoff notice                                              | None                                                                     |
-| `[swac_stock_status]`          | Single product out-of-stock safety net badge                                       | None                                                                     |
-| `[swac_explore_brands]`        | Alphabetical brand directory grid with live search                                 | `hide_empty`, `orderby`, `order`, `image_size`                           |
-| `[swac_categories_grid]`       | Category explorer grid under a parent category slug                                | `parent_slug` (required), `hide_empty`, `orderby`, `order`, `image_size` |
-| `[swac_directory_search]`      | Real-time client-side live search input for directory grids                        | `placeholder`                                                            |
-| `[swac_generic_box]`           | Verified generic clinical alternate comparison & savings box                       | None                                                                     |
-| `[swac_composition_tag]`       | Clickable medicine active pharmaceutical salt tag                                  | None                                                                     |
-| `[swac_rx_badge]`              | Prescription required regulatory badge                                             | None                                                                     |
-| `[swac_size_chart]`            | Diaper & apparel size chart accordion                                              | None                                                                     |
-| `[swac_explore_salts]`         | Alphabetical chemical composition directory grid                                   | `columns`, `hide_empty`, `orderby`, `order`                              |
-| `[swac_missing_images_finder]` | Catalog audit table finding products missing images                                | `limit` (default: `200`)                                                 |
-| `[swac_distributor_portal]`    | Frontend mobile-first distributor workspace (rates, product entry, PINs, CSV sync) | None                                                                     |
+### Base Layer (Core Commerce)
+| Shortcode | Purpose | Key Attributes |
+|:---|:---|:---|
+| `[swac_button]` | Customizable WhatsApp action/order button | `text`, `message`, `fullwidth`, `icon` |
+| `[swac_price_block]` | Hero price display with regular price strike & discount % | `context` (`single` \| `card`) |
+| `[swac_pack_size]` | Packaging unit badge (e.g. "10 Tablets", "500 ml") | None |
+| `[swac_price_pack_hierarchy]` | Unified price block and pack size container | `context` (`single` \| `card`) |
+| `[swac_action_row]` | Add to Order quantity controls & WhatsApp button | None |
+| `[swac_delivery_notice]` | Timezone-aware dispatch cutoff notice | None |
+| `[swac_stock_status]` | Out-of-stock safety net indicator | None |
+| `[swac_missing_images_finder]` | Low-memory catalog audit report for missing images | `limit` (default: `200`) |
+
+### Module 1: Explore Directory (`modules/explore/`)
+| Shortcode | Purpose | Key Attributes |
+|:---|:---|:---|
+| `[swac_explore_brands]` | Alphabetical brand directory grid with live search | `hide_empty`, `orderby`, `order`, `image_size` |
+| `[swac_categories_grid]` | Category explorer grid under a parent category slug | `parent_slug` (required), `hide_empty`, `orderby`, `order`, `image_size` |
+| `[swac_directory_search]` | Real-time client-side live search input for directory grids | `placeholder` |
+
+### Module 2: Pharmacy & Clinical Chemistry (`modules/pharmacy/`)
+| Shortcode | Purpose | Key Attributes |
+|:---|:---|:---|
+| `[swac_generic_box]` | Clinical generic alternate comparison & savings box | None |
+| `[swac_composition_tag]` | Clickable medicine active pharmaceutical salt tag | None |
+| `[swac_rx_badge]` | Prescription required regulatory badge | None |
+| `[swac_size_chart]` | Diaper & apparel size chart accordion | None |
+| `[swac_explore_salts]` | Alphabetical chemical composition directory grid | `columns`, `hide_empty`, `orderby`, `order` |
+
+### Module 3: Wholesale & B2B Trade (`modules/wholesale/`)
+| Shortcode | Purpose | Key Attributes |
+|:---|:---|:---|
+| `[swac_distributor_portal]` | Frontend mobile-first distributor workspace (rates, stock, PINs, CSV) | None (Secured by Master PIN / Admin) |
 
 ---
 
-## 1. Universal & Component Shortcodes
+# PART I: BASE LAYER SHORTCODES
+
+The Base Layer contains universal storefront elements, single-product commerce controls, and catalog maintenance diagnostics.
+
+---
+
+## 1. Universal & Call-to-Action Shortcodes
 
 ### `[swac_button]`
 
@@ -44,8 +76,7 @@ It serves as the definitive reference for visual page builders (Breakdance, Elem
     - `text` (string): Button label. Default: `'Order on WhatsApp'`.
     - `message` (string): Pre-filled text passed to WhatsApp. Default: `'Hello ' . get_bloginfo('name') . '.'`.
     - `fullwidth` (`'yes'` | `'no'`): Toggles 100% full-width block expansion. Default: `'no'`.
-    - `icon` (`'yes'` | `'no'`): Toggles rendering of the WhatsApp SVG icon. Set to `'no'` when providing custom emoji
-      or icon prefixes in `text`. Default: `'yes'`.
+    - `icon` (`'yes'` | `'no'`): Toggles rendering of the WhatsApp SVG icon. Set to `'no'` when providing custom emoji or icon prefixes in `text`. Default: `'yes'`.
 - **Examples**:
   ```text
   [swac_button text="Chat with Us" message="I have a question about my order." fullwidth="yes"]
@@ -56,14 +87,13 @@ It serves as the definitive reference for visual page builders (Breakdance, Elem
 
 ---
 
-## 2. Single Product Shortcodes
+## 2. Single Product Commerce Controls
 
 ### `[swac_price_block]`
 
 - **Purpose**: Renders the authoritative price block with real-time regular price strike and percentage discount badge.
 - **Attributes**:
-    - `context` (`'single'` | `'card'`): Chooses between hero single product typography or compact archive card
-      typography. Default: `'single'`.
+    - `context` (`'single'` | `'card'`): Chooses between hero single product typography or compact archive card typography. Default: `'single'`.
 - **Example**:
   ```text
   [swac_price_block context="single"]
@@ -80,8 +110,7 @@ It serves as the definitive reference for visual page builders (Breakdance, Elem
 
 ### `[swac_price_pack_hierarchy]`
 
-- **Purpose**: Unified hero container bundling both the price block (`[swac_price_block]`) and pack size
-  badge (`[swac_pack_size]`).
+- **Purpose**: Unified hero container bundling both the price block (`[swac_price_block]`) and pack size badge (`[swac_pack_size]`).
 - **Attributes**:
     - `context` (`'single'` | `'card'`): Typography styling mode. Default: `'single'`.
 - **Example**:
@@ -91,8 +120,8 @@ It serves as the definitive reference for visual page builders (Breakdance, Elem
 
 ### `[swac_action_row]`
 
-- **Purpose**: Single product Add to Order row containing quantity increment/decrement controls and the WhatsApp add
-  button.
+- **Purpose**: Single product Add to Order row containing quantity increment/decrement controls and the WhatsApp add button.
+- **Attributes**: None.
 - **Example**:
   ```text
   [swac_action_row]
@@ -100,11 +129,11 @@ It serves as the definitive reference for visual page builders (Breakdance, Elem
 
 ### `[swac_delivery_notice]`
 
-- **Purpose**: Displays a live, timezone-aware delivery cutoff notice based on the configured delivery schedule,
-  complete with dynamic calendar date stamping `(j M)`.
+- **Purpose**: Displays a live, timezone-aware delivery cutoff notice based on the configured delivery schedule, complete with dynamic calendar date stamping `(j M)`.
     - **Morning Window** (Mon–Sat < 12:00 PM): `"Order before 12 noon for same-day delivery"`
     - **Weekday Afternoon Window** (Mon–Fri ≥ 12:00 PM): `"Order now to receive it by tomorrow (6 Oct)"`
     - **Weekend Window** (Sat ≥ 12:00 PM or Sun): `"Order now to get it by Monday (5 Oct)"`
+- **Attributes**: None.
 - **Example**:
   ```text
   [swac_delivery_notice]
@@ -113,6 +142,7 @@ It serves as the definitive reference for visual page builders (Breakdance, Elem
 ### `[swac_stock_status]`
 
 - **Purpose**: Fail-safe out-of-stock indicator that displays reliably even in custom page builder templates.
+- **Attributes**: None.
 - **Example**:
   ```text
   [swac_stock_status]
@@ -120,7 +150,30 @@ It serves as the definitive reference for visual page builders (Breakdance, Elem
 
 ---
 
-## 3. Directory & Explorer Shortcodes
+## 3. Catalog Maintenance & Diagnostics
+
+### `[swac_missing_images_finder]`
+
+- **Purpose**: Generates a low-memory catalog diagnostic report in the WordPress admin or a private frontend page, identifying published products lacking featured thumbnails, sorted with in-stock products first.
+- **Access**: Restricted strictly to users with `manage_woocommerce` capability.
+- **Attributes**:
+    - `limit` (int): Maximum items to report. Default: `200`. Max: `1000`.
+- **Example**:
+  ```text
+  [swac_missing_images_finder limit="500"]
+  ```
+
+---
+
+# PART II: MODULAR SUBSYSTEMS
+
+The following shortcodes belong to optional, specialized modules located under `modules/`. Each module can be toggled via `features.php`.
+
+---
+
+## Module 1: Explore Directory Subsystem (`modules/explore/`)
+
+Provides high-speed catalog directory exploration for brands and categories with 0-dependency client-side live filtering.
 
 ### `[swac_explore_brands]`
 
@@ -151,8 +204,7 @@ It serves as the definitive reference for visual page builders (Breakdance, Elem
 
 ### `[swac_directory_search]`
 
-- **Purpose**: High-speed client-side search box that filters `.swac-brand-card` and `.swac-category-card` elements on
-  the page in real time without server requests.
+- **Purpose**: High-speed client-side search box that filters `.swac-brand-card` and `.swac-category-card` elements on the page in real time without server roundtrips.
 - **Attributes**:
     - `placeholder` (string): Search input placeholder text. Default: `'Search...'`.
 - **Example**:
@@ -162,12 +214,14 @@ It serves as the definitive reference for visual page builders (Breakdance, Elem
 
 ---
 
-## 4. Pharmacy Subsystem Shortcodes
+## Module 2: Pharmacy Subsystem (`modules/pharmacy/`)
+
+Dedicated to clinical pharmacy, chemical compositions, and healthcare regulatory requirements.
 
 ### `[swac_generic_box]`
 
-- **Purpose**: Verified generic clinical alternate comparison box, showing active salt formula match and savings
-  calculation.
+- **Purpose**: Verified generic clinical alternate comparison box, showing active chemical salt formula match and savings calculation.
+- **Attributes**: None.
 - **Example**:
   ```text
   [swac_generic_box]
@@ -176,6 +230,7 @@ It serves as the definitive reference for visual page builders (Breakdance, Elem
 ### `[swac_composition_tag]`
 
 - **Purpose**: Renders the active chemical salt formula badge linked to its composition archive.
+- **Attributes**: None.
 - **Example**:
   ```text
   [swac_composition_tag]
@@ -184,6 +239,7 @@ It serves as the definitive reference for visual page builders (Breakdance, Elem
 ### `[swac_rx_badge]`
 
 - **Purpose**: Prescription Required regulatory notice badge for prescription medications.
+- **Attributes**: None.
 - **Example**:
   ```text
   [swac_rx_badge]
@@ -192,6 +248,7 @@ It serves as the definitive reference for visual page builders (Breakdance, Elem
 ### `[swac_size_chart]`
 
 - **Purpose**: Diaper and apparel sizing accordion guide.
+- **Attributes**: None.
 - **Example**:
   ```text
   [swac_size_chart]
@@ -212,19 +269,9 @@ It serves as the definitive reference for visual page builders (Breakdance, Elem
 
 ---
 
-## 5. Administrative Diagnostic Tools & Portals
+## Module 3: Wholesale & B2B Trade Subsystem (`modules/wholesale/`)
 
-### `[swac_missing_images_finder]`
-
-- **Purpose**: Generates a low-memory catalog diagnostic report in the WordPress admin or private frontend page,
-  identifying published products lacking featured thumbnails, sorted by in-stock products first.
-- **Access**: Restricted strictly to users with `manage_woocommerce` capability.
-- **Attributes**:
-    - `limit` (int): Maximum items to report. Default: `200`. Max: `1000`.
-- **Example**:
-  ```text
-  [swac_missing_images_finder limit="500"]
-  ```
+Empowers stockists and distributors with counter-speed rate management, wholesale carton ordering, and mobile administrative controls.
 
 ### `[swac_distributor_portal]`
 
@@ -232,7 +279,7 @@ It serves as the definitive reference for visual page builders (Breakdance, Elem
 - **Purpose**: Embeds a zero-admin, mobile-friendly Frontend Distributor Desk on any Breakdance or theme page (e.g. `/distributor/`). Enables wholesalers, sales reps, and dispatch clerks to:
     1. **Counter-Speed Quick-Update Grid**: Tab through Rate (PTR), Retail MRP, MOQ, and Scheme inputs with auto-save on blur, plus 1-tap Stock Pill toggling (`[ 🟢 IN STOCK ]` / `[ 🔴 OUT OF STOCK ]`) executing in `<100ms` via `/desk/fast-row-update`.
     2. **Shorthand Scheme Notation**: Input single promotional strings (`"10+1"`, `"12+1 FREE"`, `"10:2%"`, `"2% CD"`) automatically parsed into structured wholesale schema.
-    3. **Fast Product Entry**: Add new simple products via single-screen mobile form with direct phone camera / gallery photo upload.
+    3. **Fast Product Entry**: Add new simple products via a single-screen mobile form with direct phone camera / gallery photo upload.
     4. **Retailer Account Management**: View, approve, edit, and delete wholesale retailer accounts and assign 4-digit PINs.
     5. **Store & Delivery Settings**: Manage WhatsApp business number, store name, city focus, free shipping cutoff, flat delivery charge, order disclaimer, and Master PIN directly from mobile with zero `wp-admin` access.
     6. **1-Click CSV Synchronization**: UTF-8 BOM CSV catalog export (Excel-compatible) and bulk rate/stock CSV import.
