@@ -23,22 +23,29 @@ if (!function_exists('swac_get_catalog_mode') || swac_get_catalog_mode() !== 'wa
 
 /**
  * 1. Synchronous <head> script to pre-apply .swac-retailer-auth before first paint.
- * Eliminates FOUC (flash of unauthenticated content) for returning retailers.
+ * Eliminates FOUC (flash of unauthenticated content) for returning retailers and logged-in admins.
  */
 add_action('wp_head', function () {
     if (is_admin()) {
         return;
     }
+    $is_manager = current_user_can('manage_woocommerce');
     ?>
     <script>
     (function(){
         try {
+            var isManager = <?php echo $is_manager ? 'true' : 'false'; ?>;
+            var masterToken = localStorage.getItem('swac_b2b_master_token');
             var raw = localStorage.getItem('swac_b2b_retailer');
+            var isRetailer = false;
             if (raw) {
                 var parsed = JSON.parse(raw);
                 if (parsed && parsed.token) {
-                    document.documentElement.classList.add('swac-retailer-auth');
+                    isRetailer = true;
                 }
+            }
+            if (isManager || masterToken || isRetailer) {
+                document.documentElement.classList.add('swac-retailer-auth');
             }
         } catch(e){}
     })();
@@ -47,10 +54,10 @@ add_action('wp_head', function () {
 }, 1);
 
 /**
- * 2. Adds .swac-walled-garden-mode body class on all frontend pages.
+ * 2. Adds .swac-walled-garden-mode body class on all frontend pages for guests.
  */
 add_filter('body_class', function (array $classes): array {
-    if (!is_admin()) {
+    if (!is_admin() && !current_user_can('manage_woocommerce')) {
         $classes[] = 'swac-walled-garden-mode';
     }
     return $classes;
@@ -62,7 +69,7 @@ add_filter('body_class', function (array $classes): array {
 if (!function_exists('swac_render_walled_garden_gate')) {
     function swac_render_walled_garden_gate(): void
     {
-        if (is_admin()) {
+        if (is_admin() || current_user_can('manage_woocommerce')) {
             return;
         }
 

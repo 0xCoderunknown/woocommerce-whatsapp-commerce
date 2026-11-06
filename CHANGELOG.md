@@ -9,6 +9,16 @@ All release dates strictly follow the Indian standard date format: **`DD-MM-YYYY
 
 ---
 
+## [1.7.4] — 06-11-2026
+
+### Fixed & Enhanced
+- **Walled Garden Store Owner & Admin Bypass**:
+  - Automatically exempted logged-in WordPress Administrators and Store Managers (`current_user_can('manage_woocommerce')`) from the frontend Walled Garden gate screen, allowing direct access to the `/shop/` catalog and unlocked rate views.
+  - Added support for Distributor Master Tokens (`swac_b2b_master_token`) in client-side auth state (`retailer-auth.js` and `<head>` script) so distributors who unlock the mobile Distributor Desk are recognized on the storefront with a `👑 Distributor Admin` status pill without needing a dummy retailer account.
+  - Supported clearing `swac_b2b_master_token` on status pill logout.
+
+---
+
 ## [1.7.3] — 05-11-2026
 
 ### Removed & Migrated (Legacy Compatibility Purge)

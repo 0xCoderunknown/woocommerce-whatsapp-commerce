@@ -40,11 +40,26 @@
         const pill = document.getElementById('swac-retailer-pill');
         const pillName = document.getElementById('swac-pill-store-name');
 
-        if (retailer && retailer.token) {
+        let masterToken = null;
+        try {
+            masterToken = localStorage.getItem('swac_b2b_master_token');
+        } catch (e) {}
+
+        const isAdmin = (body && body.classList.contains('logged-in')) || root.classList.contains('swac-retailer-auth');
+
+        if ((retailer && retailer.token) || masterToken || isAdmin) {
             root.classList.add('swac-retailer-auth');
             if (body) body.classList.add('swac-retailer-auth');
             if (pill) pill.classList.remove('swac-b2b-modal-hidden');
-            if (pillName) pillName.textContent = `🏪 ${retailer.store_name || 'Retailer'}`;
+            if (pillName) {
+                if (retailer && retailer.store_name) {
+                    pillName.textContent = `🏪 ${retailer.store_name}`;
+                } else if (masterToken || isAdmin) {
+                    pillName.textContent = '👑 Distributor Admin';
+                } else {
+                    pillName.textContent = '🏪 Retailer';
+                }
+            }
         } else {
             root.classList.remove('swac-retailer-auth');
             if (body) body.classList.remove('swac-retailer-auth');
@@ -175,6 +190,7 @@
                 e.preventDefault();
                 try {
                     localStorage.removeItem(RETAILER_STORAGE_KEY);
+                    localStorage.removeItem('swac_b2b_master_token');
                 } catch (err) {}
                 syncRetailerUI();
                 showToast('Signed out. Wholesale portal locked.');
