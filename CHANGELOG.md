@@ -9,6 +9,16 @@ All release dates strictly follow the Indian standard date format: **`DD-MM-YYYY
 
 ---
 
+## [1.7.5] — 06-11-2026
+
+### Fixed & Enhanced
+- **Distributor Desk Layout Stability & Width Jitter Fix**:
+  - Enforced `width: 100% !important; max-width: 1200px; align-self: stretch; flex: 1 1 100%;` on `.swac-desk-container` to lock the workspace width in all page builders and theme container layouts.
+  - Locked header (`.swac-desk-header`), tabs bar (`.swac-desk-tabs`), and all tab contents to uniform 100% width so switching tabs or searching never shrinks or shifts the top layout.
+  - Added `table-layout: fixed` and `min-width: 820px` to the rates table (`.swac-fast-grid`) so column boundaries and search empty states remain rock-solid without horizontal jitter.
+
+---
+
 ## [1.7.4] — 06-11-2026
 
 ### Fixed & Enhanced

@@ -178,7 +178,7 @@
         if (!tbody) return;
 
         if (products.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:#64748b;">No products found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="swac-rates-empty-cell" style="text-align:center; padding:48px 20px; color:#64748b; font-size:0.95rem;">🔍 No products found matching your search.</td></tr>';
             return;
         }
 

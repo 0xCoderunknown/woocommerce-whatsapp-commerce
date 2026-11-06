@@ -118,7 +118,7 @@ if (!defined('ABSPATH')) {
 
         <!-- TAB 2: FAST PRODUCT ENTRY -->
         <section id="swac-tab-add" class="swac-desk-tab-content">
-            <div class="swac-desk-card" style="max-width:680px; margin:0 auto;">
+            <div class="swac-desk-card" style="max-width:820px; margin:0 auto; width:100%;">
                 <h2 style="margin:0 0 16px 0; font-size:1.25rem;">
                     ➕ <?php esc_html_e('Add New Wholesale Product', 'stateless-wa-commerce'); ?></h2>
                 <form id="swac-add-product-form" enctype="multipart/form-data">
@@ -226,7 +226,7 @@ if (!defined('ABSPATH')) {
 
         <!-- TAB 3: APPROVED RETAILERS DESK -->
         <section id="swac-tab-retailers" class="swac-desk-tab-content">
-            <div style="display:flex; gap:20px; flex-wrap:wrap;">
+            <div style="display:flex; gap:20px; flex-wrap:wrap; width:100%;">
                 <!-- Retailers List -->
                 <div style="flex:2; min-width:320px;">
                     <div class="swac-desk-toolbar">
@@ -298,8 +298,8 @@ if (!defined('ABSPATH')) {
 
         <!-- TAB 4: STORE SETTINGS -->
         <section id="swac-tab-settings" class="swac-desk-tab-content">
-            <div style="max-width:680px; margin:0 auto;">
-                <div class="swac-desk-card">
+            <div style="max-width:820px; margin:0 auto; width:100%;">
+                <div class="swac-desk-card" style="width:100%;">
                     <h2 style="margin-top:0; font-size:1.25rem;">
                         ⚙️ <?php esc_html_e('Store Contact & Delivery Settings', 'stateless-wa-commerce'); ?>
                     </h2>
