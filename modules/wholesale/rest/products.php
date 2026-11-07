@@ -185,6 +185,26 @@ function swac_rest_desk_fast_row_update(WP_REST_Request $request): WP_REST_Respo
         $params[$field_name] = $params['value'];
     }
 
+    // Role-based authorization: staff can ONLY toggle stock
+    $role = function_exists('swac_desk_get_auth_role') ? swac_desk_get_auth_role($request) : 'owner';
+    if ($role === 'staff') {
+        $restricted_keys = ['ptr', 'mrp', 'scheme', 'scheme_shorthand', 'moq', 'carton', 'carton_pack'];
+        foreach ($restricted_keys as $key) {
+            if (array_key_exists($key, $params)) {
+                return new WP_REST_Response([
+                    'success' => false,
+                    'message' => __('Staff accounts are authorized for stock toggles only. Price and scheme updates require Owner PIN.', 'stateless-wa-commerce'),
+                ], 403);
+            }
+        }
+        if (!array_key_exists('in_stock', $params)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('No stock update parameter provided.', 'stateless-wa-commerce'),
+            ], 400);
+        }
+    }
+
     // 1. Stock Status (1-Tap Toggle)
     if (array_key_exists('in_stock', $params)) {
         $val = $params['in_stock'];

@@ -14,7 +14,8 @@
     const cfg = window.swacDeskConfig || {};
     const restUrl = cfg.rest_url || '/wp-json/';
     const isWpAdmin = root.dataset.auth === '1';
-    let masterToken = sessionStorage.getItem('swac_master_token') || '';
+    let masterToken = sessionStorage.getItem('swac_master_token') || localStorage.getItem('swac_b2b_master_token') || '';
+    let userRole = isWpAdmin ? 'owner' : (localStorage.getItem('swac_desk_role') || 'owner');
     let allProducts = [];
 
     // Helper: Auth Headers
@@ -49,14 +50,37 @@
         }[m]));
     }
 
+    // Role UI Application
+    function applyRoleUI() {
+        const badge = document.getElementById('swac-desk-role-badge');
+        if (userRole === 'staff') {
+            root.classList.add('swac-desk-role--staff');
+            root.classList.remove('swac-desk-role--owner');
+            if (badge) {
+                badge.textContent = '📦 Staff (Stock Control)';
+                badge.className = 'swac-desk-badge swac-desk-badge--staff';
+            }
+        } else {
+            root.classList.add('swac-desk-role--owner');
+            root.classList.remove('swac-desk-role--staff');
+            if (badge) {
+                badge.textContent = isWpAdmin ? '👑 Admin (Owner)' : '👑 Owner (Full Access)';
+                badge.className = 'swac-desk-badge';
+            }
+        }
+    }
+
     // ── 1. Authentication & Initialization ────────────────────────────────────
     function initAuth() {
         if (isWpAdmin || masterToken) {
             document.getElementById('swac-desk-login-box')?.classList.add('swac-desk-hidden');
             document.getElementById('swac-desk-app')?.classList.remove('swac-desk-hidden');
+            applyRoleUI();
             loadProducts();
-            loadRetailers();
-            loadSettings();
+            if (userRole === 'owner') {
+                loadRetailers();
+                loadSettings();
+            }
         }
 
         const authForm = document.getElementById('swac-desk-auth-form');
@@ -79,13 +103,20 @@
                     .then(data => {
                         if (data && data.success && data.token) {
                             masterToken = data.token;
+                            userRole = data.role || 'owner';
                             sessionStorage.setItem('swac_master_token', masterToken);
-                            document.getElementById('swac-desk-login-box').classList.add('swac-desk-hidden');
-                            document.getElementById('swac-desk-app').classList.remove('swac-desk-hidden');
+                            localStorage.setItem('swac_b2b_master_token', masterToken);
+                            localStorage.setItem('swac_desk_role', userRole);
+
+                            document.getElementById('swac-desk-login-box')?.classList.add('swac-desk-hidden');
+                            document.getElementById('swac-desk-app')?.classList.remove('swac-desk-hidden');
+                            applyRoleUI();
                             loadProducts();
-                            loadRetailers();
-                            loadSettings();
-                            showToast('Distributor Desk unlocked.');
+                            if (userRole === 'owner') {
+                                loadRetailers();
+                                loadSettings();
+                            }
+                            showToast(userRole === 'owner' ? 'Owner Desk unlocked.' : 'Warehouse Staff Desk unlocked.');
                         } else {
                             if (errBox) {
                                 errBox.textContent = data.message || 'Incorrect PIN.';
@@ -111,7 +142,11 @@
                     }).catch(() => {});
                 }
                 masterToken = '';
+                userRole = isWpAdmin ? 'owner' : '';
                 sessionStorage.removeItem('swac_master_token');
+                localStorage.removeItem('swac_b2b_master_token');
+                localStorage.removeItem('swac_desk_role');
+                root.classList.remove('swac-desk-role--staff', 'swac-desk-role--owner');
                 document.getElementById('swac-desk-app')?.classList.add('swac-desk-hidden');
                 document.getElementById('swac-desk-login-box')?.classList.remove('swac-desk-hidden');
                 const pinInput = document.getElementById('swac-desk-pin-input');
@@ -182,6 +217,9 @@
             return;
         }
 
+        const isStaff = userRole === 'staff';
+        const disabledAttr = isStaff ? ' disabled readonly tabindex="-1"' : '';
+
         tbody.innerHTML = products.map(item => `
             <tr data-id="${item.id}" class="swac-fast-row">
                 <td class="swac-col-product">
@@ -211,7 +249,7 @@
                            data-field="ptr" 
                            data-last-saved="${item.ptr || ''}" 
                            value="${item.ptr || ''}" 
-                           placeholder="0.00"
+                           placeholder="0.00"${disabledAttr}
                            title="Base Wholesale Rate (PTR)">
                 </td>
                 <td class="swac-col-mrp">
@@ -223,7 +261,7 @@
                            data-field="mrp" 
                            data-last-saved="${item.mrp || ''}" 
                            value="${item.mrp || ''}" 
-                           placeholder="0.00"
+                           placeholder="0.00"${disabledAttr}
                            title="Retail MRP">
                 </td>
                 <td class="swac-col-scheme">
@@ -233,7 +271,7 @@
                            data-field="scheme_shorthand" 
                            data-last-saved="${esc(item.scheme_shorthand || '')}" 
                            value="${esc(item.scheme_shorthand || '')}" 
-                           placeholder="e.g. 10+1"
+                           placeholder="e.g. 10+1"${disabledAttr}
                            title="Scheme (e.g. 10+1, 10:2%, 2% CD)">
                 </td>
                 <td class="swac-col-moq">
@@ -245,7 +283,7 @@
                            data-field="moq" 
                            data-last-saved="${item.moq || '1'}" 
                            value="${item.moq || '1'}" 
-                           placeholder="1"
+                           placeholder="1"${disabledAttr}
                            title="Minimum Order Quantity">
                 </td>
                 <td class="swac-col-status" style="text-align:right;">
@@ -762,6 +800,7 @@
                     const shipChargeEl = document.getElementById('swac-set-ship-charge');
                     const disclaimerEl = document.getElementById('swac-set-disclaimer');
                     const pinEl = document.getElementById('swac-set-master-pin');
+                    const staffPinEl = document.getElementById('swac-set-staff-pin');
 
                     if (phoneEl) phoneEl.value = s.phone_number || '';
                     if (nameEl) nameEl.value = s.store_name || '';
@@ -770,6 +809,7 @@
                     if (shipChargeEl) shipChargeEl.value = s.shipping_charge || 0;
                     if (disclaimerEl) disclaimerEl.value = s.order_disclaimer || '';
                     if (pinEl) pinEl.value = '';
+                    if (staffPinEl) staffPinEl.value = '';
                 }
             })
             .catch(() => {});
@@ -794,7 +834,8 @@
                     free_shipping_at: parseFloat(document.getElementById('swac-set-free-ship')?.value) || 0,
                     shipping_charge: parseFloat(document.getElementById('swac-set-ship-charge')?.value) || 0,
                     order_disclaimer: document.getElementById('swac-set-disclaimer')?.value.trim() || '',
-                    master_pin: document.getElementById('swac-set-master-pin')?.value.trim() || ''
+                    master_pin: document.getElementById('swac-set-master-pin')?.value.trim() || '',
+                    staff_pin: document.getElementById('swac-set-staff-pin')?.value.trim() || ''
                 };
 
                 fetch(restUrl + 'swac/v1/desk/settings', {
@@ -811,7 +852,9 @@
                         if (data && data.success) {
                             showToast(data.message || 'Store settings saved.');
                             const pinEl = document.getElementById('swac-set-master-pin');
+                            const staffPinEl = document.getElementById('swac-set-staff-pin');
                             if (pinEl) pinEl.value = '';
+                            if (staffPinEl) staffPinEl.value = '';
                         } else {
                             showToast('Error: ' + (data.message || ''));
                         }

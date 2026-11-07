@@ -9,6 +9,19 @@ All release dates strictly follow the Indian standard date format: **`DD-MM-YYYY
 
 ---
 
+## [1.7.7] — 07-11-2026
+
+### Added
+- **Dual-Role Distributor Desk Access Control (Owner vs Staff)**:
+  - Introduced shared Staff PIN (`swac_b2b_staff_pin`) for warehouse personnel, configurable in Store Settings or WP-Admin.
+  - Role-based UI and REST authorization boundaries:
+    - **Owner Role (`owner`)**: Full access to rates (PTR), MRP, schemes, MOQ, Add Product, Retailer Accounts, Store Settings, and CSV synchronization.
+    - **Staff Role (`staff`)**: Strict stock-only control (`[ 🟢 IN STOCK ]` / `[ 🔴 OUT OF STOCK ]`) and catalog search. All rate, MRP, Scheme, and MOQ inputs are rendered read-only/disabled with tab stops removed. Restricted tabs and CSV action buttons are completely hidden.
+  - Server-side REST route defense in depth: `/desk/fast-row-update` strictly blocks non-stock field modifications with HTTP 403 Forbidden for staff requests. All administrative and management endpoints require `swac_desk_is_owner_authorized`.
+  - Multi-session token map (`swac_b2b_desk_tokens`) supporting concurrent mobile staff and owner logins with sliding 30-day token expiration and automatic expired session cleanup.
+
+---
+
 ## [1.7.6] — 06-11-2026
 
 ### Fixed & Enhanced

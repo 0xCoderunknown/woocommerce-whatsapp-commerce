@@ -146,9 +146,9 @@ if (!defined('ABSPATH')) {
             <!-- Master Desk PIN Card -->
             <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:6px; margin-top:20px;">
                 <h4 style="margin:0 0 8px 0; font-size:13px;">
-                    🔐 <?php esc_html_e('Distributor Desk Master PIN', 'stateless-wa-commerce'); ?></h4>
+                    👑 <?php esc_html_e('Distributor Master PIN (Owner)', 'stateless-wa-commerce'); ?></h4>
                 <p class="description" style="margin-bottom:12px; font-size:12px;">
-                    <?php esc_html_e('Used to unlock the frontend distributor portal from mobile phones without WordPress login.', 'stateless-wa-commerce'); ?>
+                    <?php esc_html_e('Unlocks full owner controls (rates, products, retailers, settings) from mobile.', 'stateless-wa-commerce'); ?>
                 </p>
                 <form method="post">
                     <?php wp_nonce_field('swac_retailer_admin_nonce'); ?>
@@ -161,6 +161,27 @@ if (!defined('ABSPATH')) {
                     </p>
                     <button type="submit" class="button"
                             style="width:100%;"><?php esc_html_e('Update Master PIN', 'stateless-wa-commerce'); ?></button>
+                </form>
+            </div>
+
+            <!-- Staff Warehouse PIN Card -->
+            <div style="background:#f0fdf4; border:1px solid #bbf7d0; padding:16px; border-radius:6px; margin-top:16px;">
+                <h4 style="margin:0 0 8px 0; font-size:13px; color:#166534;">
+                    📦 <?php esc_html_e('Warehouse Staff PIN (Stock Only)', 'stateless-wa-commerce'); ?></h4>
+                <p class="description" style="margin-bottom:12px; font-size:12px; color:#15803d;">
+                    <?php esc_html_e('Shared with warehouse staff. Staff can strictly toggle stock In/Out without editing rates or settings.', 'stateless-wa-commerce'); ?>
+                </p>
+                <form method="post">
+                    <?php wp_nonce_field('swac_retailer_admin_nonce'); ?>
+                    <input type="hidden" name="swac_retailer_action" value="update_staff_pin">
+                    <p style="margin-bottom:10px;">
+                        <input type="text" name="staff_pin"
+                               value="<?php echo esc_attr($staff_pin); ?>"
+                               placeholder="e.g. 5678" class="regular-text" maxlength="8"
+                               style="font-size:15px; letter-spacing:2px; width:100%; text-align:center;">
+                    </p>
+                    <button type="submit" class="button button-secondary"
+                            style="width:100%;"><?php esc_html_e('Update Staff PIN', 'stateless-wa-commerce'); ?></button>
                 </form>
             </div>
         </div>

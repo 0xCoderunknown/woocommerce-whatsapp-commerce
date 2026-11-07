@@ -26,6 +26,7 @@ function swac_rest_desk_get_settings(WP_REST_Request $request): WP_REST_Response
             'free_shipping_at' => (float)($cfg['free_shipping_at'] ?? 0),
             'shipping_charge' => (float)($cfg['shipping_charge'] ?? 0),
             'order_disclaimer' => (string)($cfg['order_disclaimer'] ?? ''),
+            'has_staff_pin' => !empty(get_option('swac_b2b_staff_pin', '')),
         ],
     ], 200);
 }
@@ -71,6 +72,20 @@ function swac_rest_desk_save_settings(WP_REST_Request $request): WP_REST_Respons
             return new WP_REST_Response([
                 'success' => false,
                 'message' => __('Master PIN must be at least 4 digits.', 'stateless-wa-commerce'),
+            ], 400);
+        }
+    }
+
+    if (isset($params['staff_pin'])) {
+        $st_pin = sanitize_text_field((string)$params['staff_pin']);
+        if ($st_pin === '') {
+            delete_option('swac_b2b_staff_pin');
+        } elseif (strlen($st_pin) >= 4) {
+            update_option('swac_b2b_staff_pin', $st_pin, false);
+        } else {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Staff PIN must be at least 4 digits.', 'stateless-wa-commerce'),
             ], 400);
         }
     }

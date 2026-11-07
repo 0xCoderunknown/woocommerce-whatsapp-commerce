@@ -271,11 +271,23 @@ function swac_render_retailers_admin_page()
             } else {
                 $error = __('Master PIN must be at least 4 digits.', 'stateless-wa-commerce');
             }
+        } elseif ($action === 'update_staff_pin') {
+            $staff_pin = sanitize_text_field($_POST['staff_pin'] ?? '');
+            if ($staff_pin === '') {
+                delete_option('swac_b2b_staff_pin');
+                $message = __('Staff PIN removed.', 'stateless-wa-commerce');
+            } elseif (strlen($staff_pin) >= 4) {
+                update_option('swac_b2b_staff_pin', $staff_pin, false);
+                $message = __('Staff PIN updated successfully.', 'stateless-wa-commerce');
+            } else {
+                $error = __('Staff PIN must be at least 4 digits.', 'stateless-wa-commerce');
+            }
         }
     }
 
     $retailers = swac_get_approved_retailers();
     $master_pin = (string)get_option('swac_b2b_master_pin', '');
+    $staff_pin = (string)get_option('swac_b2b_staff_pin', '');
 
     include __DIR__ . '/templates/retailers-admin-page.php';
 }

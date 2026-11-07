@@ -277,14 +277,17 @@ Empowers stockists and distributors with counter-speed rate management, wholesal
 
 - **Aliases**: `[swac_frontend_admin]`
 - **Purpose**: Embeds a zero-admin, mobile-friendly Frontend Distributor Desk on any Breakdance or theme page (e.g. `/distributor/`). Enables wholesalers, sales reps, and dispatch clerks to:
-    1. **Counter-Speed Quick-Update Grid**: Tab through Rate (PTR), Retail MRP, MOQ, and Scheme inputs with auto-save on blur, plus 1-tap Stock Pill toggling (`[ 🟢 IN STOCK ]` / `[ 🔴 OUT OF STOCK ]`) executing in `<100ms` via `/desk/fast-row-update`.
-    2. **Shorthand Scheme Notation**: Input single promotional strings (`"10+1"`, `"12+1 FREE"`, `"10:2%"`, `"2% CD"`) automatically parsed into structured wholesale schema.
-    3. **Fast Product Entry**: Add new simple products via a single-screen mobile form with direct phone camera / gallery photo upload.
-    4. **Retailer Account Management**: View, approve, edit, and delete wholesale retailer accounts and assign 4-digit PINs.
-    5. **Store & Delivery Settings**: Manage WhatsApp business number, store name, city focus, free shipping cutoff, flat delivery charge, order disclaimer, and Master PIN directly from mobile with zero `wp-admin` access.
-    6. **1-Click CSV Synchronization**: UTF-8 BOM CSV catalog export (Excel-compatible) and bulk rate/stock CSV import.
-    7. **Session Security & Quick Lock**: Protected by Master PIN with IP rate-limiting, 30-day sliding token lifespan, and a 1-tap `🔒 Lock` button in the header.
-- **Access**: Authorized automatically for logged-in WordPress administrators, or secured via Master PIN prompt for phone access without WordPress login.
+    1. **Dual-Role Access Control (Owner vs Staff)**:
+        - **Owner**: Authenticated via Master PIN or logged-in WordPress Administrator. Full control over rates (PTR), Retail MRP, MOQ, carton packs, promotional schemes, fast product photo creation, retailer directories, store settings, and CSV synchronization.
+        - **Staff**: Authenticated via shared Staff PIN (`swac_b2b_staff_pin`). Strictly limited to toggling stock pills (`[ 🟢 IN STOCK ]` / `[ 🔴 OUT OF STOCK ]`) and catalog search. All pricing, scheme, MOQ inputs, and administrative tabs are disabled and hidden.
+    2. **Counter-Speed Quick-Update Grid**: Tab through Rate (PTR), Retail MRP, MOQ, and Scheme inputs with auto-save on blur, plus 1-tap Stock Pill toggling executing in `<100ms` via `/desk/fast-row-update`.
+    3. **Shorthand Scheme Notation**: Input single promotional strings (`"10+1"`, `"12+1 FREE"`, `"10:2%"`, `"2% CD"`) automatically parsed into structured wholesale schema.
+    4. **Fast Product Entry**: Add new simple products via a single-screen mobile form with direct phone camera / gallery photo upload (Owner only).
+    5. **Retailer Account Management**: View, approve, edit, and delete wholesale retailer accounts and assign 4-digit PINs (Owner only).
+    6. **Store & Delivery Settings**: Manage WhatsApp business number, store name, city focus, free shipping cutoff, flat delivery charge, order disclaimer, Master PIN, and Staff PIN directly from mobile with zero `wp-admin` access (Owner only).
+    7. **1-Click CSV Synchronization**: UTF-8 BOM CSV catalog export (Excel-compatible) and bulk rate/stock CSV import (Owner only).
+    8. **Multi-Session Security & Quick Lock**: Protected by Master/Staff PIN with IP rate-limiting, 30-day sliding token lifespan across multiple mobile warehouse devices, and a 1-tap `🔒 Lock` button in the header.
+- **Access**: Authorized automatically for logged-in WordPress administrators, or secured via Master PIN / Staff PIN prompt for phone access without WordPress login.
 - **Example**:
   ```text
   [swac_distributor_portal]

@@ -48,69 +48,69 @@ add_action('rest_api_init', function () {
         'permission_callback' => 'swac_desk_is_authorized',
     ]);
 
-    // 3. Quick Update Rate & Scheme
+    // 3. Quick Update Rate & Scheme (Owner Only)
     register_rest_route('swac/v1', '/desk/quick-update', [
         'methods' => 'POST',
         'callback' => 'swac_rest_desk_quick_update',
-        'permission_callback' => 'swac_desk_is_authorized',
+        'permission_callback' => 'swac_desk_is_owner_authorized',
     ]);
 
-    // 3b. High-Speed In-Place Row Update (<100ms counter grid)
+    // 3b. High-Speed In-Place Row Update (<100ms counter grid - Owner & Staff)
     register_rest_route('swac/v1', '/desk/fast-row-update', [
         'methods' => 'POST',
         'callback' => 'swac_rest_desk_fast_row_update',
         'permission_callback' => 'swac_desk_is_authorized',
     ]);
 
-    // 4. Create New Product
+    // 4. Create New Product (Owner Only)
     register_rest_route('swac/v1', '/desk/create-product', [
         'methods' => 'POST',
         'callback' => 'swac_rest_desk_create_product',
-        'permission_callback' => 'swac_desk_is_authorized',
+        'permission_callback' => 'swac_desk_is_owner_authorized',
     ]);
 
-    // 5. Retailer Management Endpoints
+    // 5. Retailer Management Endpoints (Owner Only)
     register_rest_route('swac/v1', '/desk/retailers', [
         'methods' => 'GET',
         'callback' => 'swac_rest_desk_get_retailers',
-        'permission_callback' => 'swac_desk_is_authorized',
+        'permission_callback' => 'swac_desk_is_owner_authorized',
     ]);
 
     register_rest_route('swac/v1', '/desk/save-retailer', [
         'methods' => 'POST',
         'callback' => 'swac_rest_desk_save_retailer',
-        'permission_callback' => 'swac_desk_is_authorized',
+        'permission_callback' => 'swac_desk_is_owner_authorized',
     ]);
 
     register_rest_route('swac/v1', '/desk/delete-retailer', [
         'methods' => 'POST',
         'callback' => 'swac_rest_desk_delete_retailer',
-        'permission_callback' => 'swac_desk_is_authorized',
+        'permission_callback' => 'swac_desk_is_owner_authorized',
     ]);
 
-    // 6. CSV Export & Import Endpoints
+    // 6. CSV Export & Import Endpoints (Owner Only)
     register_rest_route('swac/v1', '/desk/export-csv', [
         'methods' => 'GET',
         'callback' => 'swac_rest_desk_export_csv',
-        'permission_callback' => 'swac_desk_is_authorized',
+        'permission_callback' => 'swac_desk_is_owner_authorized',
     ]);
 
     register_rest_route('swac/v1', '/desk/import-csv', [
         'methods' => 'POST',
         'callback' => 'swac_rest_desk_import_csv',
-        'permission_callback' => 'swac_desk_is_authorized',
+        'permission_callback' => 'swac_desk_is_owner_authorized',
     ]);
 
-    // 7. Store Essentials Settings Endpoints
+    // 7. Store Essentials Settings Endpoints (Owner Only)
     register_rest_route('swac/v1', '/desk/settings', [
         'methods' => 'GET',
         'callback' => 'swac_rest_desk_get_settings',
-        'permission_callback' => 'swac_desk_is_authorized',
+        'permission_callback' => 'swac_desk_is_owner_authorized',
     ]);
 
     register_rest_route('swac/v1', '/desk/settings', [
         'methods' => 'POST',
         'callback' => 'swac_rest_desk_save_settings',
-        'permission_callback' => 'swac_desk_is_authorized',
+        'permission_callback' => 'swac_desk_is_owner_authorized',
     ]);
 });

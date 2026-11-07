@@ -55,7 +55,9 @@
                 if (retailer && retailer.store_name) {
                     pillName.textContent = `🏪 ${retailer.store_name}`;
                 } else if (masterToken || isAdmin) {
-                    pillName.textContent = '👑 Distributor Admin';
+                    let deskRole = '';
+                    try { deskRole = localStorage.getItem('swac_desk_role') || ''; } catch (e) {}
+                    pillName.textContent = deskRole === 'staff' ? '📦 Staff (Stock Control)' : '👑 Distributor Admin';
                 } else {
                     pillName.textContent = '🏪 Retailer';
                 }
@@ -191,6 +193,7 @@
                 try {
                     localStorage.removeItem(RETAILER_STORAGE_KEY);
                     localStorage.removeItem('swac_b2b_master_token');
+                    localStorage.removeItem('swac_desk_role');
                 } catch (err) {}
                 syncRetailerUI();
                 showToast('Signed out. Wholesale portal locked.');

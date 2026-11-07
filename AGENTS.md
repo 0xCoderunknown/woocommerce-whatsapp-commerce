@@ -155,12 +155,15 @@ The wholesale engine (`modules/wholesale/`) enables B2B trade between stockists 
 - `swac_customer_details`: Customer delivery object `{ name, address, landmark, area, pincode }`.
 - `swac_b2b_retailer`: Authenticated retailer session `{ phone, store_name, owner_name, area, token }`.
 - `swac_b2b_master_token`: Master token authorizing Distributor Desk mobile access.
+- `swac_desk_role`: Active role for distributor desk (`owner` | `staff`).
 
 ### 7.2. WordPress `wp_options` Keys
 
 - `swac_b2b_approved_retailers`: Keyed array of registered retailers `[ phone => { phone, pin, store_name, owner_name, area, status, created_at } ]`.
-- `swac_b2b_master_pin`: Plain master passcode for Distributor Desk mobile unlock.
-- `swac_b2b_master_hash`: SHA-256 hash or array `[ hash, expires ]` of currently active master session token.
+- `swac_b2b_master_pin`: Plain master passcode for Distributor Desk owner access.
+- `swac_b2b_staff_pin`: Plain staff passcode for Distributor Desk stock-only access.
+- `swac_b2b_desk_tokens`: Keyed array of active sessions `[ token_hash => { role, expires, created_at } ]`.
+- `swac_b2b_master_hash`: SHA-256 hash or array `[ hash, expires, role ]` of currently active master session token.
 - `swac_cron_cleaned`: One-time flag indicating obsolete WooCommerce background sessions cron was unregistered.
 - `swac_store_phone`: Overridden WhatsApp business phone number (string).
 - `swac_store_name`: Overridden store display name (string).
@@ -188,19 +191,19 @@ The wholesale engine (`modules/wholesale/`) enables B2B trade between stockists 
 | Endpoint | Method | Permission | Purpose |
 |:---|:---|:---|:---|
 | `/wp-json/swac/v1/retailer-login` | `POST` | Public (Rate-Limited) | Authenticates retailer via Phone + 4-digit PIN. |
-| `/wp-json/swac/v1/desk/auth` | `POST` | Public (Rate-Limited) | Validates Master PIN and issues Distributor Desk token. |
-| `/wp-json/swac/v1/desk/logout` | `POST` | Authorized | Invalidates master session token immediately. |
-| `/wp-json/swac/v1/desk/products` | `GET` | Authorized | Returns catalog items with PTR and schemes for rate sheet. |
-| `/wp-json/swac/v1/desk/quick-update` | `POST` | Authorized | Inline updates MRP, PTR, Carton, Scheme, and Stock. |
-| `/wp-json/swac/v1/desk/fast-row-update` | `POST` | Authorized | High-speed (<100ms) counter-grid update for PTR, MRP, scheme shorthand, MOQ, and stock. |
-| `/wp-json/swac/v1/desk/settings` | `GET` | Authorized | Retrieves store contact, delivery charges, and order disclaimer. |
-| `/wp-json/swac/v1/desk/settings` | `POST` | Authorized | Saves store contact, delivery charges, disclaimer, and optional Master PIN. |
-| `/wp-json/swac/v1/desk/create-product` | `POST` | Authorized | Creates new simple product with phone camera photo upload. |
-| `/wp-json/swac/v1/desk/retailers` | `GET` | Authorized | Fetches approved retailer directory. |
-| `/wp-json/swac/v1/desk/save-retailer` | `POST` | Authorized | Creates or edits approved retailer account and PIN. |
-| `/wp-json/swac/v1/desk/delete-retailer` | `POST` | Authorized | Deletes retailer from approved directory. |
-| `/wp-json/swac/v1/desk/export-csv` | `GET` | Authorized | Streams complete catalog rates as CSV with UTF-8 BOM. |
-| `/wp-json/swac/v1/desk/import-csv` | `POST` | Authorized | Bulk updates catalog rates and stock from uploaded CSV. |
+| `/wp-json/swac/v1/desk/auth` | `POST` | Public (Rate-Limited) | Validates Master PIN (Owner) or Staff PIN and issues 30-day token with role. |
+| `/wp-json/swac/v1/desk/logout` | `POST` | Authorized | Invalidates session token immediately. |
+| `/wp-json/swac/v1/desk/products` | `GET` | Authorized (Owner & Staff) | Returns catalog items for rate sheet. |
+| `/wp-json/swac/v1/desk/fast-row-update` | `POST` | Authorized (Role-Filtered) | High-speed (<100ms) update. Staff restricted to stock toggles only; Owner can update rates, schemes, MOQ. |
+| `/wp-json/swac/v1/desk/quick-update` | `POST` | Owner Authorized | Full product save for rates and schemes. |
+| `/wp-json/swac/v1/desk/create-product` | `POST` | Owner Authorized | Creates new simple product with phone camera photo upload. |
+| `/wp-json/swac/v1/desk/retailers` | `GET` | Owner Authorized | Fetches approved retailer directory. |
+| `/wp-json/swac/v1/desk/save-retailer` | `POST` | Owner Authorized | Creates or edits approved retailer account and PIN. |
+| `/wp-json/swac/v1/desk/delete-retailer` | `POST` | Owner Authorized | Deletes retailer from approved directory. |
+| `/wp-json/swac/v1/desk/export-csv` | `GET` | Owner Authorized | Streams complete catalog rates as CSV with UTF-8 BOM. |
+| `/wp-json/swac/v1/desk/import-csv` | `POST` | Owner Authorized | Bulk updates catalog rates and stock from uploaded CSV. |
+| `/wp-json/swac/v1/desk/settings` | `GET` | Owner Authorized | Retrieves store contact, delivery charges, and order disclaimer. |
+| `/wp-json/swac/v1/desk/settings` | `POST` | Owner Authorized | Saves store contact, delivery charges, disclaimer, Master PIN, and Staff PIN. |
 
 ---
 

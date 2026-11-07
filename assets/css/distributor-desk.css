@@ -67,6 +67,26 @@
     border: 1px solid #a7f3d0;
 }
 
+.swac-desk-badge--staff {
+    background: #eff6ff !important;
+    color: #1d4ed8 !important;
+    border-color: #bfdbfe !important;
+}
+
+/* Role-Based Permissions (Staff vs Owner) */
+.swac-desk-role--staff .swac-desk-owner-only {
+    display: none !important;
+}
+
+.swac-desk-role--staff .swac-fast-input {
+    background: #f8fafc !important;
+    color: #94a3b8 !important;
+    border-color: #e2e8f0 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+    user-select: none !important;
+}
+
 /* Tabs */
 .swac-desk-tabs {
     width: 100%;

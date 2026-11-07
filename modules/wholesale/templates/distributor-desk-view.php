@@ -40,7 +40,7 @@ if (!defined('ABSPATH')) {
             <div class="swac-desk-header-left">
                 <h1 class="swac-desk-brand-title">
                     📦 <?php esc_html_e('Distributor Desk', 'stateless-wa-commerce'); ?></h1>
-                <span class="swac-desk-badge"><?php esc_html_e('Counter Speed', 'stateless-wa-commerce'); ?></span>
+                <span id="swac-desk-role-badge" class="swac-desk-badge"><?php esc_html_e('Counter Speed', 'stateless-wa-commerce'); ?></span>
             </div>
             <div class="swac-desk-header-right">
                 <a href="<?php echo esc_url(wc_get_page_permalink('shop') ?: home_url('/')); ?>"
@@ -60,13 +60,13 @@ if (!defined('ABSPATH')) {
                     role="tab">
                 ⚡ <?php esc_html_e('Quick Rate Sheet', 'stateless-wa-commerce'); ?>
             </button>
-            <button type="button" class="swac-desk-tab-btn" data-tab="tab-add" role="tab">
+            <button type="button" class="swac-desk-tab-btn swac-desk-owner-only" data-tab="tab-add" role="tab">
                 ➕ <?php esc_html_e('Add Product', 'stateless-wa-commerce'); ?>
             </button>
-            <button type="button" class="swac-desk-tab-btn" data-tab="tab-retailers" role="tab">
+            <button type="button" class="swac-desk-tab-btn swac-desk-owner-only" data-tab="tab-retailers" role="tab">
                 🏪 <?php esc_html_e('Approved Retailers', 'stateless-wa-commerce'); ?>
             </button>
-            <button type="button" class="swac-desk-tab-btn" data-tab="tab-settings" role="tab">
+            <button type="button" class="swac-desk-tab-btn swac-desk-owner-only" data-tab="tab-settings" role="tab">
                 ⚙️ <?php esc_html_e('Store Settings', 'stateless-wa-commerce'); ?>
             </button>
         </nav>
@@ -83,11 +83,11 @@ if (!defined('ABSPATH')) {
                     🔄 <?php esc_html_e('Refresh', 'stateless-wa-commerce'); ?>
                 </button>
                 <input type="file" id="swac-rates-import-file" accept=".csv" style="display:none;">
-                <button type="button" id="swac-rates-import-btn" class="swac-desk-btn swac-desk-btn--secondary"
+                <button type="button" id="swac-rates-import-btn" class="swac-desk-btn swac-desk-btn--secondary swac-desk-owner-only"
                         title="<?php esc_attr_e('Bulk update rates & stock from CSV file', 'stateless-wa-commerce'); ?>">
                     📤 <?php esc_html_e('Import CSV', 'stateless-wa-commerce'); ?>
                 </button>
-                <button type="button" id="swac-rates-export-btn" class="swac-desk-btn swac-desk-btn--secondary"
+                <button type="button" id="swac-rates-export-btn" class="swac-desk-btn swac-desk-btn--secondary swac-desk-owner-only"
                         title="<?php esc_attr_e('Download current rates as spreadsheet CSV', 'stateless-wa-commerce'); ?>">
                     📥 <?php esc_html_e('Export CSV', 'stateless-wa-commerce'); ?>
                 </button>
@@ -355,11 +355,20 @@ if (!defined('ABSPATH')) {
                         </div>
 
                         <div class="swac-desk-field" style="margin-top:14px; padding-top:14px; border-top:1px dashed #cbd5e1;">
-                            <label><strong><?php esc_html_e('Change Master PIN (Optional)', 'stateless-wa-commerce'); ?></strong></label>
+                            <label><strong><?php esc_html_e('Change Master PIN (Owner Full Access)', 'stateless-wa-commerce'); ?></strong></label>
                             <input type="password" id="swac-set-master-pin" name="master_pin" maxlength="12" class="swac-desk-input"
                                    placeholder="•••• (Leave blank to keep unchanged)">
                             <small style="color:#64748b; font-size:0.75rem; display:block; margin-top:4px;">
-                                <?php esc_html_e('Passcode used to unlock this Distributor Desk. Minimum 4 digits.', 'stateless-wa-commerce'); ?>
+                                <?php esc_html_e('Passcode for full owner controls (rates, products, retailers, settings). Minimum 4 digits.', 'stateless-wa-commerce'); ?>
+                            </small>
+                        </div>
+
+                        <div class="swac-desk-field" style="margin-top:14px;">
+                            <label><strong><?php esc_html_e('Staff PIN (Warehouse Stock-Only Access)', 'stateless-wa-commerce'); ?></strong></label>
+                            <input type="password" id="swac-set-staff-pin" name="staff_pin" maxlength="12" class="swac-desk-input"
+                                   placeholder="•••• (Leave blank to keep unchanged)">
+                            <small style="color:#64748b; font-size:0.75rem; display:block; margin-top:4px;">
+                                <?php esc_html_e('Passcode shared with warehouse staff. Staff can strictly toggle In Stock / Out of Stock without seeing or editing rates or settings.', 'stateless-wa-commerce'); ?>
                             </small>
                         </div>
 

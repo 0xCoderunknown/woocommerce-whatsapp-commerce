@@ -183,4 +183,36 @@ describe('Wholesale Schemes & B2B Cart Calculations', () => {
         assert.equal(clampMoq(6), 6);
         assert.equal(clampMoq('12'), 12);
     });
+
+    test('should enforce role-based permissions between owner and staff roles', () => {
+        function validateUpdatePermissions(role, payload) {
+            if (role === 'staff') {
+                const restricted = ['ptr', 'mrp', 'scheme', 'scheme_shorthand', 'moq', 'carton', 'carton_pack'];
+                const hasRestricted = restricted.some(k => Object.prototype.hasOwnProperty.call(payload, k));
+                if (hasRestricted) {
+                    return { allowed: false, error: 'Staff accounts are authorized for stock toggles only.' };
+                }
+                if (!Object.prototype.hasOwnProperty.call(payload, 'in_stock')) {
+                    return { allowed: false, error: 'No stock update parameter provided.' };
+                }
+            }
+            return { allowed: true };
+        }
+
+        // Staff allowed to toggle stock
+        assert.deepEqual(validateUpdatePermissions('staff', { id: 101, in_stock: true }), { allowed: true });
+        assert.deepEqual(validateUpdatePermissions('staff', { id: 101, in_stock: false }), { allowed: true });
+
+        // Staff blocked from editing PTR, MRP, scheme, MOQ
+        assert.equal(validateUpdatePermissions('staff', { id: 101, ptr: 25.50 }).allowed, false);
+        assert.equal(validateUpdatePermissions('staff', { id: 101, mrp: 30.00 }).allowed, false);
+        assert.equal(validateUpdatePermissions('staff', { id: 101, scheme: '10+1' }).allowed, false);
+        assert.equal(validateUpdatePermissions('staff', { id: 101, moq: 12 }).allowed, false);
+        assert.equal(validateUpdatePermissions('staff', { id: 101, in_stock: true, ptr: 25.50 }).allowed, false);
+
+        // Owner allowed all fields
+        assert.deepEqual(validateUpdatePermissions('owner', { id: 101, in_stock: true }), { allowed: true });
+        assert.deepEqual(validateUpdatePermissions('owner', { id: 101, ptr: 25.50 }), { allowed: true });
+        assert.deepEqual(validateUpdatePermissions('owner', { id: 101, mrp: 30.00, ptr: 25.50, scheme: '10+1' }), { allowed: true });
+    });
 });
