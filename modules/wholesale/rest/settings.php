@@ -17,6 +17,10 @@ if (!defined('ABSPATH')) {
 function swac_rest_desk_get_settings(WP_REST_Request $request): WP_REST_Response
 {
     $cfg = function_exists('swac_get_config') ? swac_get_config(true) : [];
+    $master_pin = (string)get_option('swac_b2b_master_pin', '');
+    $staff_pin = (string)get_option('swac_b2b_staff_pin', '');
+    $salesman_pin = (string)get_option('swac_b2b_salesman_pin', '3344');
+
     return new WP_REST_Response([
         'success' => true,
         'settings' => [
@@ -26,7 +30,11 @@ function swac_rest_desk_get_settings(WP_REST_Request $request): WP_REST_Response
             'free_shipping_at' => (float)($cfg['free_shipping_at'] ?? 0),
             'shipping_charge' => (float)($cfg['shipping_charge'] ?? 0),
             'order_disclaimer' => (string)($cfg['order_disclaimer'] ?? ''),
-            'has_staff_pin' => !empty(get_option('swac_b2b_staff_pin', '')),
+            'master_pin' => $master_pin,
+            'staff_pin' => $staff_pin,
+            'salesman_pin' => $salesman_pin,
+            'has_staff_pin' => !empty($staff_pin),
+            'has_salesman_pin' => !empty($salesman_pin),
         ],
     ], 200);
 }

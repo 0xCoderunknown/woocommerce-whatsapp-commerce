@@ -9,6 +9,20 @@ All release dates strictly follow the Indian standard date format: **`DD-MM-YYYY
 
 ---
 
+## [1.7.9] — 09-11-2026
+
+### Added & Enhanced
+- **Salesman Retailer Directory Read Authorization**:
+  - Broadened `GET /desk/retailers` permission callback in `desk-rest.php` with `swac_desk_can_read_retailers()` to allow `salesman` sessions to fetch approved shops for route filtering and instant shop switching.
+  - Strips private retailer PINs in `swac_rest_desk_get_retailers()` when accessed by Salesman sessions, ensuring credential isolation.
+- **Scheme Shorthand Parser Alignment**:
+  - Enhanced `swac_parse_scheme_shorthand()` to recognize flat percentage patterns (`5%`, `5% Off`, `5% Scheme`, `3.5%`) as `cash_discount` alongside `X% CD`.
+  - Added word normalization (`plus`/`and` -> `+`) for free goods notation.
+- **Store Settings PIN Retrieval & Sync**:
+  - Exposed `master_pin`, `staff_pin`, `salesman_pin`, and `has_salesman_pin` in `GET /desk/settings` for verified Owner sessions.
+
+---
+
 ## [1.7.8] — 08-11-2026
 
 ### Added & Enhanced

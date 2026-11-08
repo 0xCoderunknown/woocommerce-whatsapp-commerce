@@ -33,8 +33,11 @@ function swac_parse_scheme_shorthand(string $shorthand): array
         ];
     }
 
-    // Pattern 1: Free goods: X+Y or X+Y FREE
-    if (preg_match('/^\s*(\d+)\s*\+\s*(\d+)(?:\s+FREE)?\s*$/i', $clean, $matches)) {
+    // Normalize words "plus" or "and" into "+"
+    $normalized = preg_replace('/\b(?:plus|and)\b/i', '+', $clean);
+
+    // Pattern 1: Free goods: X+Y (with optional free/goods/bonus descriptor)
+    if (preg_match('/^\s*(\d+)\s*\+\s*(\d+)/i', $normalized, $matches)) {
         return [
             'scheme_type' => 'free_goods',
             'scheme_buy' => (int)$matches[1],
@@ -50,15 +53,15 @@ function swac_parse_scheme_shorthand(string $shorthand): array
         ];
     }
 
-    // Pattern 3: Cash discount: X% CD
-    if (preg_match('/^\s*(\d+(?:\.\d+)?)\s*%\s*CD\s*$/i', $clean, $matches)) {
+    // Pattern 3: Cash discount / Flat Percentage: X% or X% CD / OFF / SCHEME
+    if (preg_match('/^\s*(\d+(?:\.\d+)?)\s*%/i', $clean, $matches)) {
         return [
             'scheme_type' => 'cash_discount',
             'scheme_cd' => (float)$matches[1],
         ];
     }
 
-    // Pattern 4: Custom tag
+    // Pattern 4: Custom tag / Informational Note
     return [
         'scheme_type' => 'custom',
         'scheme_custom' => sanitize_text_field($clean),

@@ -13,10 +13,22 @@ if (!defined('ABSPATH')) {
 
 /**
  * Returns approved retailers for desk management.
+ * Strips secret PINs when accessed by Salesman role for route booking.
  */
-function swac_rest_desk_get_retailers(): WP_REST_Response
+function swac_rest_desk_get_retailers(WP_REST_Request $request): WP_REST_Response
 {
     $retailers = function_exists('swac_get_approved_retailers') ? swac_get_approved_retailers() : [];
+    $role = function_exists('swac_desk_get_auth_role') ? swac_desk_get_auth_role($request) : 'owner';
+
+    if ($role === 'salesman') {
+        $sanitized = [];
+        foreach ($retailers as $r) {
+            unset($r['pin']);
+            $sanitized[] = $r;
+        }
+        return new WP_REST_Response(['success' => true, 'retailers' => $sanitized], 200);
+    }
+
     return new WP_REST_Response(['success' => true, 'retailers' => array_values($retailers)], 200);
 }
 

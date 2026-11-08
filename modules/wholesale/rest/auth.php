@@ -128,6 +128,18 @@ function swac_desk_is_owner_authorized(?WP_REST_Request $request = null): bool
 }
 
 /**
+ * Verifies if current request has retailer directory read access (Owner or Salesman).
+ *
+ * @param WP_REST_Request|null $request Optional REST request.
+ * @return bool
+ */
+function swac_desk_can_read_retailers(?WP_REST_Request $request = null): bool
+{
+    $role = swac_desk_get_auth_role($request);
+    return $role === 'owner' || $role === 'salesman';
+}
+
+/**
  * Handles passcode verification for distributor mobile login (Owner or Staff).
  */
 function swac_rest_desk_auth(WP_REST_Request $request): WP_REST_Response

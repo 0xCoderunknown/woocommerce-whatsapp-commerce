@@ -78,11 +78,11 @@ add_action('rest_api_init', function () {
         'permission_callback' => 'swac_desk_is_owner_authorized',
     ]);
 
-    // 5. Retailer Management Endpoints (Owner Only)
+    // 5. Retailer Management Endpoints (Owner & Salesman Read, Owner Write)
     register_rest_route('swac/v1', '/desk/retailers', [
         'methods' => 'GET',
         'callback' => 'swac_rest_desk_get_retailers',
-        'permission_callback' => 'swac_desk_is_owner_authorized',
+        'permission_callback' => 'swac_desk_can_read_retailers',
     ]);
 
     register_rest_route('swac/v1', '/desk/save-retailer', [
