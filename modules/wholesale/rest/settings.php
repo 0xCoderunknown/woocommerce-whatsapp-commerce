@@ -90,6 +90,20 @@ function swac_rest_desk_save_settings(WP_REST_Request $request): WP_REST_Respons
         }
     }
 
+    if (isset($params['salesman_pin'])) {
+        $sm_pin = sanitize_text_field((string)$params['salesman_pin']);
+        if ($sm_pin === '') {
+            delete_option('swac_b2b_salesman_pin');
+        } elseif (strlen($sm_pin) >= 4) {
+            update_option('swac_b2b_salesman_pin', $sm_pin, false);
+        } else {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Salesman PIN must be at least 4 digits.', 'stateless-wa-commerce'),
+            ], 400);
+        }
+    }
+
     if (function_exists('swac_get_config')) {
         swac_get_config(true);
     }

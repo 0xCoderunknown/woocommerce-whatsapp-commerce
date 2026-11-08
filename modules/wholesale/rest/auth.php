@@ -12,10 +12,39 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Resolves the authenticated role for current request ('owner' | 'staff' | null).
+ * Validates a retailer HMAC token against approved active retailers.
+ *
+ * @param string $token HMAC token.
+ * @return bool True if valid active retailer, false otherwise.
+ */
+function swac_is_valid_retailer_token(string $token): bool
+{
+    if (empty($token)) {
+        return false;
+    }
+    $retailers = function_exists('swac_get_approved_retailers') ? swac_get_approved_retailers() : [];
+    if (empty($retailers)) {
+        return false;
+    }
+    $salt = function_exists('wp_salt') ? wp_salt('auth') : (defined('AUTH_KEY') ? AUTH_KEY : 'swac-b2b-token-salt');
+    foreach ($retailers as $r_phone => $r_data) {
+        if (($r_data['status'] ?? 'active') !== 'active') {
+            continue;
+        }
+        $clean_10 = substr((string)$r_phone, -10);
+        $expected = hash_hmac('sha256', $clean_10 . '|' . (string)($r_data['pin'] ?? ''), $salt);
+        if (hash_equals($expected, $token)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Resolves the authenticated role for current request ('owner' | 'staff' | 'salesman' | 'retailer' | null).
  *
  * @param WP_REST_Request|null $request Optional REST request.
- * @return string|null 'owner', 'staff', or null if unauthenticated.
+ * @return string|null 'owner', 'staff', 'salesman', 'retailer', or null if unauthenticated.
  */
 function swac_desk_get_auth_role(?WP_REST_Request $request = null): ?string
 {
@@ -26,10 +55,15 @@ function swac_desk_get_auth_role(?WP_REST_Request $request = null): ?string
 
     // 2. Token-based authorization for mobile access
     $token = '';
+    $retailer_token = '';
     if ($request instanceof WP_REST_Request) {
         $token = (string)$request->get_header('X-SWAC-Master-Token');
         if (empty($token)) {
             $token = (string)($request->get_param('master_token') ?? '');
+        }
+        $retailer_token = (string)$request->get_header('X-SWAC-Retailer-Token');
+        if (empty($retailer_token)) {
+            $retailer_token = (string)($request->get_param('retailer_token') ?? '');
         }
     }
 
@@ -57,6 +91,15 @@ function swac_desk_get_auth_role(?WP_REST_Request $request = null): ?string
         } elseif (is_string($stored) && !empty($stored) && hash_equals($stored, $token_hash)) {
             return 'owner';
         }
+
+        // If the token in X-SWAC-Master-Token happens to be a valid retailer token
+        if (swac_is_valid_retailer_token($token)) {
+            return 'retailer';
+        }
+    }
+
+    if (!empty($retailer_token) && swac_is_valid_retailer_token($retailer_token)) {
+        return 'retailer';
     }
 
     return null;
@@ -109,8 +152,9 @@ function swac_rest_desk_auth(WP_REST_Request $request): WP_REST_Response
 
     $master_pin = (string)get_option('swac_b2b_master_pin', '');
     $staff_pin = (string)get_option('swac_b2b_staff_pin', '');
+    $salesman_pin = (string)get_option('swac_b2b_salesman_pin', '3344');
 
-    if (empty($master_pin) && empty($staff_pin)) {
+    if (empty($master_pin) && empty($staff_pin) && empty($salesman_pin)) {
         return new WP_REST_Response([
             'success' => false,
             'message' => __('Distributor Desk PIN is not configured. Please set the Master or Staff PIN in wp-admin.', 'stateless-wa-commerce'),
@@ -122,6 +166,8 @@ function swac_rest_desk_auth(WP_REST_Request $request): WP_REST_Response
         $role = 'owner';
     } elseif (!empty($staff_pin) && hash_equals($staff_pin, $pin)) {
         $role = 'staff';
+    } elseif (!empty($salesman_pin) && hash_equals($salesman_pin, $pin)) {
+        $role = 'salesman';
     }
 
     if (!$role) {
@@ -175,7 +221,9 @@ function swac_rest_desk_auth(WP_REST_Request $request): WP_REST_Response
         'role' => $role,
         'message' => $role === 'owner'
             ? __('Owner Access Granted.', 'stateless-wa-commerce')
-            : __('Staff Access Granted (Stock Control).', 'stateless-wa-commerce'),
+            : ($role === 'salesman'
+                ? __('Salesman Access Granted (Route Booking).', 'stateless-wa-commerce')
+                : __('Staff Access Granted (Stock Control).', 'stateless-wa-commerce')),
     ], 200);
 }
 

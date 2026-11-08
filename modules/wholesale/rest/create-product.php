@@ -36,7 +36,14 @@ function swac_rest_desk_create_product(WP_REST_Request $request): WP_REST_Respon
     $product->set_status('publish');
     $product->set_regular_price($mrp);
     $product->set_price($ptr > 0 ? $ptr : $mrp);
-    $product->set_stock_status('instock');
+
+    $in_stock_param = $request->get_param('in_stock');
+    if ($in_stock_param !== null) {
+        $in_stock = filter_var($in_stock_param, FILTER_VALIDATE_BOOLEAN);
+        $product->set_stock_status($in_stock ? 'instock' : 'outofstock');
+    } else {
+        $product->set_stock_status('instock');
+    }
     $product_id = $product->save();
 
     if (!$product_id) {
@@ -46,14 +53,33 @@ function swac_rest_desk_create_product(WP_REST_Request $request): WP_REST_Respon
         ], 500);
     }
 
-    // 2. Set Wholesale Meta
+    // 2. Set Wholesale Meta (PTR, Carton, MOQ, Scheme)
     if ($ptr > 0) {
         update_post_meta($product_id, '_swac_b2b_ptr', (string)$ptr);
     }
     if ($carton > 0) {
         update_post_meta($product_id, '_swac_b2b_carton_pack', $carton);
     }
-    if ($scheme_type !== 'none') {
+    $moq = max(1, absint($request->get_param('moq') ?: 1));
+    update_post_meta($product_id, '_swac_b2b_moq', (string)$moq);
+
+    // Parse scheme shorthand if provided (e.g. "10+1", "5% CD", "10:2%")
+    $shorthand = sanitize_text_field((string)$request->get_param('scheme_shorthand'));
+    if (!empty($shorthand) && function_exists('swac_parse_scheme_shorthand')) {
+        $parsed = swac_parse_scheme_shorthand($shorthand);
+        $scheme_type = $parsed['scheme_type'];
+        update_post_meta($product_id, '_swac_b2b_scheme_type', $scheme_type);
+        if ($scheme_type === 'free_goods') {
+            update_post_meta($product_id, '_swac_b2b_scheme_buy', (string)$parsed['scheme_buy']);
+            update_post_meta($product_id, '_swac_b2b_scheme_free', (string)$parsed['scheme_free']);
+        } elseif ($scheme_type === 'tier_discount') {
+            update_post_meta($product_id, '_swac_b2b_scheme_tiers', $parsed['scheme_tiers']);
+        } elseif ($scheme_type === 'cash_discount') {
+            update_post_meta($product_id, '_swac_b2b_scheme_cd', (string)$parsed['scheme_cd']);
+        } elseif ($scheme_type === 'custom') {
+            update_post_meta($product_id, '_swac_b2b_scheme_custom', $parsed['scheme_custom']);
+        }
+    } elseif ($scheme_type !== 'none') {
         update_post_meta($product_id, '_swac_b2b_scheme_type', $scheme_type);
         if ($scheme_type === 'free_goods') {
             update_post_meta($product_id, '_swac_b2b_scheme_buy', absint($request->get_param('scheme_buy') ?: 12));

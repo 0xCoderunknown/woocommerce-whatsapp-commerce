@@ -185,15 +185,21 @@ function swac_rest_desk_fast_row_update(WP_REST_Request $request): WP_REST_Respo
         $params[$field_name] = $params['value'];
     }
 
-    // Role-based authorization: staff can ONLY toggle stock
+    // Role-based authorization: staff/salesman can ONLY toggle stock; retailers cannot edit
     $role = function_exists('swac_desk_get_auth_role') ? swac_desk_get_auth_role($request) : 'owner';
-    if ($role === 'staff') {
+    if ($role === 'retailer') {
+        return new WP_REST_Response([
+            'success' => false,
+            'message' => __('Retailer accounts are read-only and cannot modify wholesale catalog.', 'stateless-wa-commerce'),
+        ], 403);
+    }
+    if ($role === 'staff' || $role === 'salesman') {
         $restricted_keys = ['ptr', 'mrp', 'scheme', 'scheme_shorthand', 'moq', 'carton', 'carton_pack'];
         foreach ($restricted_keys as $key) {
             if (array_key_exists($key, $params)) {
                 return new WP_REST_Response([
                     'success' => false,
-                    'message' => __('Staff accounts are authorized for stock toggles only. Price and scheme updates require Owner PIN.', 'stateless-wa-commerce'),
+                    'message' => __('Staff and salesman accounts are authorized for stock toggles only. Price and scheme updates require Owner PIN.', 'stateless-wa-commerce'),
                 ], 403);
             }
         }

@@ -25,6 +25,15 @@ require_once __DIR__ . '/rest/csv.php';
 require_once __DIR__ . '/rest/settings.php';
 
 /**
+ * Whitelist custom auth headers for Flutter Web cross-origin preflight requests (OPTIONS).
+ */
+add_filter('rest_allowed_cors_headers', function (array $headers): array {
+    $headers[] = 'X-SWAC-Master-Token';
+    $headers[] = 'X-SWAC-Retailer-Token';
+    return array_unique($headers);
+});
+
+/**
  * Registers REST API endpoints for Frontend Distributor Desk.
  */
 add_action('rest_api_init', function () {

@@ -9,6 +9,23 @@ All release dates strictly follow the Indian standard date format: **`DD-MM-YYYY
 
 ---
 
+## [1.7.8] — 08-11-2026
+
+### Added & Enhanced
+- **Flutter Web Cross-Origin CORS Whitelist**:
+  - Filtered `rest_allowed_cors_headers` in `desk-rest.php` to whitelist `X-SWAC-Master-Token` and `X-SWAC-Retailer-Token`, resolving cross-origin browser preflight (`OPTIONS`) blocks on Flutter Web single-page apps.
+- **Retailer Catalog Read Authorization**:
+  - Broadened `swac_desk_is_authorized` in `auth.php` with `swac_is_valid_retailer_token()` to authenticate verified Retailer HMAC tokens on `/desk/products`, eliminating 403 authorization locks for retailer apps.
+- **Salesman PIN & Role Support**:
+  - Added `swac_b2b_salesman_pin` (default `'3344'`) to `/desk/auth`, issuing session tokens stamped with `'role' => 'salesman'` for field order bookers.
+  - Added `salesman_pin` persistence to Store Settings REST API and options.
+- **Product Creation MOQ & Scheme Shorthand Parity**:
+  - Updated `create-product.php` to parse and persist `moq` and `scheme_shorthand` (e.g. `'10+1'`, `'5% CD'`) via `swac_parse_scheme_shorthand()`, preventing wholesale parameter loss during remote creation.
+- **Strict Retailer Mutation Guardrail**:
+  - In `fast-row-update`, strictly blocked retailer tokens from mutating prices or stock status with an HTTP 403 Forbidden response.
+
+---
+
 ## [1.7.7] — 07-11-2026
 
 ### Added
