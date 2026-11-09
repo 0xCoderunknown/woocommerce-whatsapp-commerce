@@ -91,5 +91,31 @@ add_action('wp_footer', function () {
             </div>
         </div>
     </div>
+
+    <!-- Active Retailer Floating Pill -->
+    <div id="swac-retailer-pill" class="swac-retailer-status-pill swac-b2b-modal-hidden">
+        <span class="swac-pill-store" id="swac-pill-store-name">🏪 <?php esc_html_e('Retailer', 'stateless-wa-commerce'); ?></span>
+        <button type="button" id="swac-pill-logout" class="swac-pill-logout-btn" title="<?php esc_attr_e('Lock wholesale rates & sign out', 'stateless-wa-commerce'); ?>">
+            <?php esc_html_e('Sign Out', 'stateless-wa-commerce'); ?>
+        </button>
+    </div>
     <?php
+});
+
+/**
+ * Enqueues the standalone retailer authentication & price gating script.
+ */
+add_action('wp_enqueue_scripts', function () {
+    if (!is_admin() && swac_is_module_active('wholesale')) {
+        wp_enqueue_script(
+            'swac-retailer-auth',
+            SWAC_URL . 'assets/js/retailer-auth.js',
+            ['swac-cart-script'],
+            SWAC_VERSION,
+            [
+                'strategy' => 'defer',
+                'in_footer' => true,
+            ]
+        );
+    }
 });

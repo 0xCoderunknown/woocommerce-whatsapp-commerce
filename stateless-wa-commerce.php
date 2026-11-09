@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Stateless WhatsApp Commerce for WooCommerce
  * Description: Zero-session catalog lockdown and client-side WhatsApp commerce engine for WooCommerce. Serving dynamic catalogs from full-page static cache.
- * Version: 1.7.9
+ * Version: 1.8.0
  * Author: 0xCoderunknown
  * License: GPL-2.0-or-later
  * Text Domain: stateless-wa-commerce
@@ -63,7 +63,6 @@ require_once SWAC_PATH . 'core/cache-manager.php';
 
 // 📂 INTEGRATIONS
 require_once SWAC_PATH . 'integrations/ssl-security.php';
-require_once SWAC_PATH . 'integrations/sitemap-generator.php';
 
 // 📂 FRONTEND COMPONENTS
 require_once SWAC_PATH . 'frontend/archive/archive-loop.php';
@@ -71,8 +70,6 @@ require_once SWAC_PATH . 'frontend/components/whatsapp-button.php';
 require_once SWAC_PATH . 'frontend/components/cart-drawer.php';
 require_once SWAC_PATH . 'frontend/single/product-meta.php';
 require_once SWAC_PATH . 'frontend/single/notices.php';
-require_once SWAC_PATH . 'frontend/single/delivery-notice.php';
-require_once SWAC_PATH . 'frontend/single/single-whatsapp.php';
 require_once SWAC_PATH . 'frontend/enqueue.php';
 
 // 📂 BACKEND UTILITIES
@@ -138,11 +135,16 @@ if (swac_is_module_active('seo') && is_dir(SWAC_PATH . 'modules/seo')) {
         'modules/seo/homepage-schema.php',
         'modules/seo/product-seo.php',
         'modules/seo/taxonomy-seo.php',
+        'modules/seo/sitemap-generator.php',
     ];
     foreach ($seo_files as $file) {
         if (file_exists(SWAC_PATH . $file)) {
             require_once SWAC_PATH . $file;
         }
+    }
+} elseif (defined('SWAC_ENABLE_SITEMAP') && SWAC_ENABLE_SITEMAP) {
+    if (file_exists(SWAC_PATH . 'modules/seo/sitemap-generator.php')) {
+        require_once SWAC_PATH . 'modules/seo/sitemap-generator.php';
     }
 }
 

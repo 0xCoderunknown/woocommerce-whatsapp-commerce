@@ -59,10 +59,7 @@ if (!function_exists('swac_is_lockdown_enabled')) {
 if (swac_is_lockdown_enabled('cart_checkout_redirect')) {
     add_action('template_redirect', function () {
         // Exempt wp-admin, Customizer preview, and visual page builder editors
-        if (is_admin() || (function_exists('is_customize_preview') && is_customize_preview())) {
-            return;
-        }
-        if (isset($_GET['elementor-preview']) || isset($_GET['breakdance'])) {
+        if (is_admin() || (function_exists('swac_is_page_builder_preview') && swac_is_page_builder_preview())) {
             return;
         }
 

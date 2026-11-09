@@ -28,8 +28,11 @@ if (!function_exists('swac_get_delivery_zones')) {
      */
     function swac_get_delivery_zones(): array
     {
+        $cfg = function_exists('swac_get_config') ? swac_get_config() : [];
+        $is_gated = !empty($cfg['delivery_gated']) || (defined('SWAC_DELIVERY_GATED') && SWAC_DELIVERY_GATED);
+
         $defaults = [
-            'gated' => false, // Default: Open Mode. Set true to enforce registered postal codes.
+            'gated' => (bool)$is_gated, // Default: Open Mode unless SWAC_DELIVERY_GATED is true.
             'zones' => [
                 'standard' => [
                     'label' => __('Standard Delivery', 'stateless-wa-commerce'),

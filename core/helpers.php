@@ -166,3 +166,26 @@ if (!function_exists('swac_get_term_initial')) {
         return $char !== '' ? $char : '#';
     }
 }
+
+if (!function_exists('swac_is_page_builder_preview')) {
+    /**
+     * Determines if the current request is an active visual page builder editor or preview canvas.
+     * Supports Breakdance, Elementor, Bricks, Divi, Oxygen, Beaver Builder, and Customizer.
+     *
+     * @return bool
+     */
+    function swac_is_page_builder_preview(): bool
+    {
+        if (function_exists('is_customize_preview') && is_customize_preview()) {
+            return true;
+        }
+
+        // Elementor, Breakdance, Bricks, Divi, Oxygen, Beaver Builder query signatures
+        return !empty($_GET['elementor-preview'])
+            || !empty($_GET['breakdance'])
+            || !empty($_GET['bricks'])
+            || !empty($_GET['et_fb'])
+            || !empty($_GET['ct_builder'])
+            || !empty($_GET['fl_builder']);
+    }
+}

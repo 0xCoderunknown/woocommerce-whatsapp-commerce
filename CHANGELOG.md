@@ -9,6 +9,21 @@ All release dates strictly follow the Indian standard date format: **`DD-MM-YYYY
 
 ---
 
+## [1.8.0] — 09-11-2026
+
+### Refactored & Enhanced
+- **Architectural Cleanup & Module Restructuring**:
+  - Re-enqueued `assets/js/retailer-auth.js` and restored `#swac-retailer-pill` floating status pill markup for wholesale accounts.
+  - Extracted ~630 lines of B2B wholesale styling from `assets/css/frontend.css` into dedicated `assets/css/modules/wholesale.css`, enqueued conditionally.
+  - Relocated XML sitemap generator to `modules/seo/sitemap-generator.php` with `SWAC_ENABLE_SITEMAP` toggle, preventing conflicts with external SEO plugins.
+  - Guaranteed Distributor Desk assets enqueue on visual page builders (Breakdance, Elementor, Bricks) within `swac_distributor_portal_shortcode()`.
+  - Renamed `assets/js/frontend.js` to `assets/js/explore-search.js` for architectural clarity.
+  - Consolidated single product micro-files (`single-whatsapp.php` and `delivery-notice.php`) into `product-meta.php` and `notices.php`.
+  - Added configurable constants `SWAC_DELIVERY_CUTOFF_HOUR`, `SWAC_DELIVERY_GATED`, and `SWAC_TAX_BRAND`.
+  - Added unified `swac_is_page_builder_preview()` helper supporting Bricks, Divi, Oxygen, Breakdance, and Elementor.
+
+---
+
 ## [1.7.9] — 09-11-2026
 
 ### Added & Enhanced

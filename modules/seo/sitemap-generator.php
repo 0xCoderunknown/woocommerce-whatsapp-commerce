@@ -12,9 +12,29 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+if (!function_exists('swac_is_sitemap_enabled')) {
+    /**
+     * Check if the native XML sitemap generator should be active.
+     *
+     * @return bool
+     */
+    function swac_is_sitemap_enabled(): bool
+    {
+        if (function_exists('swac_is_private_catalog') && swac_is_private_catalog()) {
+            return false;
+        }
+        if (defined('SWAC_ENABLE_SITEMAP')) {
+            return (bool)SWAC_ENABLE_SITEMAP;
+        }
+        return function_exists('swac_is_module_active') && swac_is_module_active('seo');
+    }
+}
+
 // ── 1. Register Rewrite Rule & Query Var ──────────────────────────────────────
 add_action('init', function () {
-    add_rewrite_rule('^sitemap\.xml$', 'index.php?swac_sitemap=1', 'top');
+    if (swac_is_sitemap_enabled()) {
+        add_rewrite_rule('^sitemap\.xml$', 'index.php?swac_sitemap=1', 'top');
+    }
 });
 
 add_filter('query_vars', function ($vars) {

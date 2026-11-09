@@ -142,8 +142,8 @@ The wholesale engine (`modules/wholesale/`) enables B2B trade between stockists 
 | **Distributor Desk** | `modules/wholesale/frontend-desk.php`, `modules/wholesale/desk-rest.php`, `modules/wholesale/rest/`, `modules/wholesale/desk-template.php`, `modules/wholesale/templates/distributor-desk-view.php`, `assets/js/distributor-desk.js` | `[swac_distributor_portal]`, quick rate sheet, camera upload, CSV sync. |
 | **Retailer Auth (JS)** | `assets/js/retailer-auth.js` | Client-side 4-digit PIN verification modal, status pill, and class toggle. |
 | **Pharmacy Module** | `modules/pharmacy/` | Salt composition explorer, prescription flags (`isRx`), pack size badges. |
-| **Explore Module** | `modules/explore/` | Brand and category directory grids with live client-side search. |
-| **SEO Module** | `modules/seo/` | Static JSON-LD Product & WebSite schema, canonical tags, OpenGraph meta. |
+| **Explore Module** | `modules/explore/`, `assets/js/explore-search.js` | Brand and category directory grids with live client-side search. |
+| **SEO Module** | `modules/seo/` | Static JSON-LD Product & WebSite schema, canonical tags, OpenGraph meta, XML sitemap. |
 
 ---
 

@@ -27,8 +27,12 @@ add_action('wp_enqueue_scripts', function () {
         wp_register_style('swac-explore-style', SWAC_URL . 'assets/css/modules/explore.css', ['swac-frontend-style'], SWAC_VERSION, 'all');
     }
 
-    // 3. Explore Search JS (registered for on-demand enqueue by shortcodes)
-    wp_register_script('swac-frontend-script', SWAC_URL . 'assets/js/frontend.js', [], SWAC_VERSION, [
+    if (swac_is_module_active('wholesale') && file_exists(SWAC_PATH . 'assets/css/modules/wholesale.css')) {
+        wp_enqueue_style('swac-wholesale-style', SWAC_URL . 'assets/css/modules/wholesale.css', ['swac-frontend-style'], SWAC_VERSION, 'all');
+    }
+
+    // 3. Explore & Directory Live Search JS (registered for on-demand enqueue by shortcodes)
+    wp_register_script('swac-frontend-script', SWAC_URL . 'assets/js/explore-search.js', [], SWAC_VERSION, [
         'strategy' => 'defer',
         'in_footer' => true,
     ]);
@@ -115,6 +119,7 @@ add_action('wp_enqueue_scripts', function () {
             'max_qty_per_item' => (int)($cfg['max_qty_per_item'] ?? 10),
             'loyalty' => $cfg['loyalty'],
             'timezone_offset' => function_exists('wp_timezone') ? (float)((wp_timezone()->getOffset(new DateTime('now', new DateTimeZone('UTC')))) / 3600) : 0.0,
+            'cutoff_hour' => (int)($cfg['cutoff_hour'] ?? 12),
             'cutoff_messages' => [
                 'weekend' => __('Order now to get it by Monday', 'stateless-wa-commerce'),
                 'morning' => __('Order before 12 noon for same-day delivery', 'stateless-wa-commerce'),

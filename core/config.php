@@ -78,6 +78,31 @@ define('SWAC_SHIPPING_CHARGE', 0.0);
  */
 define('SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES', []);
 
+/**
+ * Hour of day for same-day delivery cutoff (24-hour format in store timezone).
+ *
+ * Orders placed before this hour qualify for same-day delivery notice.
+ * Default: 12 (12:00 PM noon).
+ */
+define('SWAC_DELIVERY_CUTOFF_HOUR', 12);
+
+/**
+ * Enforce gated delivery mode (requires matching registered postal code).
+ *
+ * When TRUE, only postal codes registered in delivery zones are accepted.
+ * When FALSE (default), any valid postal code format is accepted.
+ */
+define('SWAC_DELIVERY_GATED', false);
+
+/**
+ * Product brand taxonomy slug.
+ *
+ * Default: 'product_brand'. Used across loop cards, filters, and product editor.
+ */
+if (!defined('SWAC_TAX_BRAND')) {
+    define('SWAC_TAX_BRAND', 'product_brand');
+}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ORDER LIMITS
@@ -157,7 +182,7 @@ if (!defined('SWAC_URL')) {
     define('SWAC_URL', plugin_dir_url(dirname(__FILE__)));
 }
 if (!defined('SWAC_VERSION')) {
-    define('SWAC_VERSION', '1.7.9');
+    define('SWAC_VERSION', '1.8.0');
 }
 
 if (!function_exists('swac_get_config')) {
@@ -209,6 +234,9 @@ if (!function_exists('swac_get_config')) {
             'free_shipping_at' => $free_shipping_at,
             'shipping_charge' => $shipping_charge,
             'always_free_shipping_postal_codes' => (array)(defined('SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES') ? SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES : []),
+            'cutoff_hour' => defined('SWAC_DELIVERY_CUTOFF_HOUR') ? (int)SWAC_DELIVERY_CUTOFF_HOUR : 12,
+            'delivery_gated' => defined('SWAC_DELIVERY_GATED') ? (bool)SWAC_DELIVERY_GATED : false,
+            'brand_taxonomy' => defined('SWAC_TAX_BRAND') ? (string)SWAC_TAX_BRAND : 'product_brand',
             'currency_symbol' => $currency_symbol,
             'city_name' => $city_name,
             'max_cart_items' => (int)SWAC_MAX_CART_ITEMS,

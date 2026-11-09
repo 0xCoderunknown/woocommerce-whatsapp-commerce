@@ -222,6 +222,16 @@ define('SWAC_MODULE_EXPLORE', false);
 define('SWAC_MODULE_SEO', false);
 
 /**
+ * Native XML Sitemap Generator (/sitemap.xml).
+ *
+ * When TRUE (and SEO module is active or sitemap enabled):
+ *   - Serves streaming XML sitemap from /sitemap.xml
+ *
+ * Leave FALSE if you use Rank Math, Yoast SEO, or an external sitemap plugin.
+ */
+define('SWAC_ENABLE_SITEMAP', false);
+
+/**
  * Wholesale / B2B Schemes module  →  /modules/wholesale/
  *
  * Adds: Wholesale PTR pricing, MRP-to-PTR retailer margin badges,
