@@ -11,7 +11,7 @@
 
     var config = window.swacAdminTax || {};
 
-    $('.swac-taxonomy-select2, .wa-taxonomy-select2').each(function () {
+    $('.swac-taxonomy-select2').each(function () {
         var $select = $(this);
         var taxonomy = $select.data('taxonomy');
 

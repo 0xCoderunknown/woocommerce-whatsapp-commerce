@@ -84,23 +84,23 @@ if (!function_exists('swac_render_walled_garden_gate')) {
             <div class="swac-walled-gate-card">
                 <div class="swac-walled-gate-badge">
                     <span class="swac-walled-badge-icon" aria-hidden="true">🏢</span>
-                    <span><?php esc_html_e('Wholesale Trade Portal', 'stateless-wa-commerce'); ?></span>
+                    <span><?php esc_html_e('Wholesale Trade Portal', 'woocommerce-whatsapp-commerce'); ?></span>
                 </div>
 
                 <h2 class="swac-walled-gate-title"><?php echo esc_html($store_name); ?></h2>
 
                 <p class="swac-walled-gate-desc">
-                    <?php esc_html_e('Private B2B ordering portal for approved retailers and trade stockists. Enter your registered mobile and 4-digit PIN to access wholesale rates and carton ordering.', 'stateless-wa-commerce'); ?>
+                    <?php esc_html_e('Private B2B ordering portal for approved retailers and trade stockists. Enter your registered mobile and 4-digit PIN to access wholesale rates and carton ordering.', 'woocommerce-whatsapp-commerce'); ?>
                 </p>
 
                 <form id="swac-walled-gate-form" class="swac-walled-gate-form" novalidate>
                     <div class="swac-form-row">
-                        <label for="swac-gate-phone"><strong><?php esc_html_e('Registered Mobile Number', 'stateless-wa-commerce'); ?></strong></label>
+                        <label for="swac-gate-phone"><strong><?php esc_html_e('Registered Mobile Number', 'woocommerce-whatsapp-commerce'); ?></strong></label>
                         <input
                             type="tel"
                             id="swac-gate-phone"
                             class="swac-modal-input"
-                            placeholder="<?php esc_attr_e('10-digit mobile number', 'stateless-wa-commerce'); ?>"
+                            placeholder="<?php esc_attr_e('10-digit mobile number', 'woocommerce-whatsapp-commerce'); ?>"
                             maxlength="14"
                             required
                             autocomplete="tel"
@@ -109,7 +109,7 @@ if (!function_exists('swac_render_walled_garden_gate')) {
                     </div>
 
                     <div class="swac-form-row">
-                        <label for="swac-gate-pin"><strong><?php esc_html_e('4-Digit Login PIN', 'stateless-wa-commerce'); ?></strong></label>
+                        <label for="swac-gate-pin"><strong><?php esc_html_e('4-Digit Login PIN', 'woocommerce-whatsapp-commerce'); ?></strong></label>
                         <input
                             type="password"
                             id="swac-gate-pin"
@@ -125,17 +125,17 @@ if (!function_exists('swac_render_walled_garden_gate')) {
                     <div id="swac-gate-msg" class="swac-login-alert swac-b2b-modal-hidden" role="alert"></div>
 
                     <button type="submit" id="swac-gate-submit" class="swac-modal-submit-btn swac-walled-gate-btn">
-                        <span><?php esc_html_e('Unlock Wholesale Catalog', 'stateless-wa-commerce'); ?></span>
+                        <span><?php esc_html_e('Unlock Wholesale Catalog', 'woocommerce-whatsapp-commerce'); ?></span>
                         <span aria-hidden="true">→</span>
                     </button>
                 </form>
 
                 <?php if (!empty($whatsapp_reg_url)) : ?>
                     <div class="swac-walled-gate-footer">
-                        <div class="swac-footer-note"><?php esc_html_e('New Retail Store / Partner?', 'stateless-wa-commerce'); ?></div>
+                        <div class="swac-footer-note"><?php esc_html_e('New Retail Store / Partner?', 'woocommerce-whatsapp-commerce'); ?></div>
                         <a href="<?php echo esc_url($whatsapp_reg_url); ?>" class="swac-wa-register-link" target="_blank" rel="noopener noreferrer">
                             <span aria-hidden="true">💬</span>
-                            <span><?php esc_html_e('Apply for Retailer Account via WhatsApp', 'stateless-wa-commerce'); ?></span>
+                            <span><?php esc_html_e('Apply for Retailer Account via WhatsApp', 'woocommerce-whatsapp-commerce'); ?></span>
                         </a>
                     </div>
                 <?php endif; ?>

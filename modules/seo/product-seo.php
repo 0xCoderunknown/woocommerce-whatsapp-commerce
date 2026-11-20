@@ -49,9 +49,9 @@ if (!function_exists('swac_seo_build_description')) {
 
         $sentences = [];
         if (!empty($loc_suffix)) {
-            $sentences[] = sprintf(__('Buy %s online in %s.', 'stateless-wa-commerce'), $product_name, $loc_suffix);
+            $sentences[] = sprintf(__('Buy %s online in %s.', 'woocommerce-whatsapp-commerce'), $product_name, $loc_suffix);
         } else {
-            $sentences[] = sprintf(__('Buy %s online.', 'stateless-wa-commerce'), $product_name);
+            $sentences[] = sprintf(__('Buy %s online.', 'woocommerce-whatsapp-commerce'), $product_name);
         }
 
         $cat_term = swac_seo_get_deepest_term($product_id, 'product_cat');
@@ -60,9 +60,9 @@ if (!function_exists('swac_seo_build_description')) {
         }
 
         if (!empty($loc_suffix)) {
-            $sentences[] = sprintf(__('Fast delivery in %s.', 'stateless-wa-commerce'), $loc_suffix);
+            $sentences[] = sprintf(__('Fast delivery in %s.', 'woocommerce-whatsapp-commerce'), $loc_suffix);
         } else {
-            $sentences[] = __('Fast and reliable dispatch available.', 'stateless-wa-commerce');
+            $sentences[] = __('Fast and reliable dispatch available.', 'woocommerce-whatsapp-commerce');
         }
 
         $description = implode(' ', $sentences);

@@ -79,17 +79,17 @@ if (!function_exists('swac_generic_box_html')) {
         ?>
         <section class="swac-spotlight-alternate-lg">
             <div class="swac-spotlight-header-lg">
-                <span class="swac-spotlight-eyebrow"><?php esc_html_e('VERIFIED CLINICAL ALTERNATE', 'stateless-wa-commerce'); ?></span>
+                <span class="swac-spotlight-eyebrow"><?php esc_html_e('VERIFIED CLINICAL ALTERNATE', 'woocommerce-whatsapp-commerce'); ?></span>
                 <h3>
                     <?php
                     echo sprintf(
                     /* translators: %s: formatted savings amount */
-                        esc_html__('Save %s with a Verified Alternate', 'stateless-wa-commerce'),
+                        esc_html__('Save %s with a Verified Alternate', 'woocommerce-whatsapp-commerce'),
                         '<span class="swac-savings-amount">' . esc_html($savings_formatted) . '</span>'
                     );
                     ?>
                 </h3>
-                <p><?php esc_html_e('Same active ingredients. Same therapeutic effect. Quality tested.', 'stateless-wa-commerce'); ?></p>
+                <p><?php esc_html_e('Same active ingredients. Same therapeutic effect. Quality tested.', 'woocommerce-whatsapp-commerce'); ?></p>
             </div>
             <div class="swac-alternate-card-lg">
                 <div class="swac-alt-thumb-lg">
@@ -115,7 +115,7 @@ if (!function_exists('swac_generic_box_html')) {
                 </div>
                 <div class="swac-alt-action-lg">
                     <a href="<?php echo $alt_permalink; ?>" class="button swac-switch-btn">
-                        <?php esc_html_e('Switch & Save', 'stateless-wa-commerce'); ?>
+                        <?php esc_html_e('Switch & Save', 'woocommerce-whatsapp-commerce'); ?>
                     </a>
                 </div>
             </div>

@@ -67,11 +67,11 @@ if (!function_exists('swac_format_price_block_html')) {
 
             <?php if ($data['is_discounted']) : ?>
                 <span class="swac-price-mrp-wrap">
-                    <span class="swac-mrp-label"><?php esc_html_e('MRP', 'stateless-wa-commerce'); ?></span>
+                    <span class="swac-mrp-label"><?php esc_html_e('MRP', 'woocommerce-whatsapp-commerce'); ?></span>
                     <del class="swac-price-regular"><?php echo wc_price($data['regular_price']); ?></del>
                 </span>
                 <span class="swac-discount-badge">
-                    <?php echo sprintf(esc_html__('%d%% OFF', 'stateless-wa-commerce'), $data['discount_percentage']); ?>
+                    <?php echo sprintf(esc_html__('%d%% OFF', 'woocommerce-whatsapp-commerce'), $data['discount_percentage']); ?>
                 </span>
             <?php endif; ?>
         </div>

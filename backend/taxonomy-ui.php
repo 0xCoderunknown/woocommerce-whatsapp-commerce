@@ -62,15 +62,15 @@ if (!function_exists('swac_render_taxonomy_dropdown')) {
 
         wp_nonce_field('swac_save_taxonomy_select2', 'swac_taxonomy_nonce_' . $taxonomy);
         ?>
-        <div class="swac-taxonomy-select2-wrapper wa-taxonomy-select2-wrapper" style="margin-top: 5px;">
+        <div class="swac-taxonomy-select2-wrapper" style="margin-top: 5px;">
             <select
                     name="swac_tax_select2[<?php echo esc_attr($taxonomy); ?>]"
-                    class="swac-taxonomy-select2 wa-taxonomy-select2"
+                    class="swac-taxonomy-select2"
                     data-taxonomy="<?php echo esc_attr($taxonomy); ?>"
-                    data-placeholder="<?php echo esc_attr(sprintf(__('Select %s...', 'stateless-wa-commerce'), $tax_name)); ?>"
+                    data-placeholder="<?php echo esc_attr(sprintf(__('Select %s...', 'woocommerce-whatsapp-commerce'), $tax_name)); ?>"
                     style="width: 100%;"
             >
-                <option value=""><?php echo esc_html(sprintf(__('— No %s —', 'stateless-wa-commerce'), $tax_name)); ?></option>
+                <option value=""><?php echo esc_html(sprintf(__('— No %s —', 'woocommerce-whatsapp-commerce'), $tax_name)); ?></option>
                 <?php if ($selected_term) : ?>
                     <option value="<?php echo esc_attr($selected_term->term_id); ?>" selected>
                         <?php echo esc_html($selected_term->name); ?>

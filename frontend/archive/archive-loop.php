@@ -29,7 +29,7 @@ add_filter('woocommerce_loop_add_to_cart_link', function ($button_html, $product
         return sprintf(
             '<a href="%s" class="button swac-out-of-stock-btn">%s</a>',
             esc_url($product->get_permalink()),
-            esc_html__('Out of Stock', 'stateless-wa-commerce')
+            esc_html__('Out of Stock', 'woocommerce-whatsapp-commerce')
         );
     }
 
@@ -44,7 +44,7 @@ add_filter('woocommerce_loop_add_to_cart_link', function ($button_html, $product
         $sale_price = (float)$product->get_price();
     }
     $is_rx = (bool)apply_filters('swac_product_is_rx', false, $product);
-    $button_label = (string)apply_filters('swac_loop_button_text', __('Add to Order', 'stateless-wa-commerce'));
+    $button_label = (string)apply_filters('swac_loop_button_text', __('Add to Order', 'woocommerce-whatsapp-commerce'));
     $icon = function_exists('swac_icon_svg') ? swac_icon_svg() : '';
 
     return sprintf(
@@ -67,7 +67,7 @@ add_filter('woocommerce_loop_add_to_cart_link', function ($button_html, $product
         esc_attr($mrp),
         esc_attr($sale_price),
         $is_rx ? '1' : '0',
-        esc_attr(sprintf(__('Add %s to order', 'stateless-wa-commerce'), $name)),
+        esc_attr(sprintf(__('Add %s to order', 'woocommerce-whatsapp-commerce'), $name)),
         $icon,
         esc_html($button_label)
     );

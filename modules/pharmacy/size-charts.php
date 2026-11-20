@@ -27,19 +27,19 @@ if (!function_exists('swac_render_size_chart')) {
         $default_charts = [
             'adult-diaper' => [
                 'slugs' => ['adult-diaper-bed-pan', 'adult-diapers-underpads'],
-                'title' => __('📏 Adult Diaper Size Chart', 'stateless-wa-commerce'),
-                'header' => [__('Size', 'stateless-wa-commerce'), __('Waist Range', 'stateless-wa-commerce')],
+                'title' => __('📏 Adult Diaper Size Chart', 'woocommerce-whatsapp-commerce'),
+                'header' => [__('Size', 'woocommerce-whatsapp-commerce'), __('Waist Range', 'woocommerce-whatsapp-commerce')],
                 'rows' => [
                     ['<strong>M</strong> (Medium)', '28 – 44 inches'],
                     ['<strong>L</strong> (Large)', '38 – 54 inches'],
                     ['<strong>XL</strong> (Extra Large)', '48 – 68 inches'],
                 ],
-                'note' => __('*Sizes are approximate. Measure waist for the best fit.', 'stateless-wa-commerce'),
+                'note' => __('*Sizes are approximate. Measure waist for the best fit.', 'woocommerce-whatsapp-commerce'),
             ],
             'baby-diaper' => [
                 'slugs' => ['baby-diaper', 'diapers-pants'],
-                'title' => __('👶 Baby Diaper Size Chart', 'stateless-wa-commerce'),
-                'header' => [__('Size', 'stateless-wa-commerce'), __('Weight Range', 'stateless-wa-commerce')],
+                'title' => __('👶 Baby Diaper Size Chart', 'woocommerce-whatsapp-commerce'),
+                'header' => [__('Size', 'woocommerce-whatsapp-commerce'), __('Weight Range', 'woocommerce-whatsapp-commerce')],
                 'rows' => [
                     ['New Born (NB)', 'Up to 5 kg'],
                     ['Small (S)', '4 – 8 kg'],
@@ -47,7 +47,7 @@ if (!function_exists('swac_render_size_chart')) {
                     ['Large (L)', '9 – 14 kg'],
                     ['Extra Large (XL)', '12 – 17 kg'],
                 ],
-                'note' => __('*Weight ranges may vary slightly by brand fit.', 'stateless-wa-commerce'),
+                'note' => __('*Weight ranges may vary slightly by brand fit.', 'woocommerce-whatsapp-commerce'),
             ],
         ];
 

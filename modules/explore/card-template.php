@@ -60,7 +60,7 @@ if (!function_exists('swac_render_explore_card')) {
                             <?php
                             echo sprintf(
                             /* translators: %d: product count */
-                                esc_html(_n('%d product', '%d products', $term->count, 'stateless-wa-commerce')),
+                                esc_html(_n('%d product', '%d products', $term->count, 'woocommerce-whatsapp-commerce')),
                                 $term->count
                             );
                             ?>

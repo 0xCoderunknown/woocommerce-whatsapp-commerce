@@ -31,26 +31,26 @@ add_action('wp_footer', function () {
             <div class="swac-modal-card-header">
                 <div class="swac-modal-title">
                     <span class="swac-modal-icon" aria-hidden="true">🔐</span>
-                    <h3><?php esc_html_e('Retailer Wholesale Login', 'stateless-wa-commerce'); ?></h3>
+                    <h3><?php esc_html_e('Retailer Wholesale Login', 'woocommerce-whatsapp-commerce'); ?></h3>
                 </div>
                 <button type="button" class="swac-modal-close-btn" id="swac-modal-close"
-                        aria-label="<?php esc_attr_e('Close modal', 'stateless-wa-commerce'); ?>">✕
+                        aria-label="<?php esc_attr_e('Close modal', 'woocommerce-whatsapp-commerce'); ?>">✕
                 </button>
             </div>
 
             <div class="swac-modal-card-body">
                 <p class="swac-modal-subtitle">
-                    <?php esc_html_e('Wholesale PTR rates, schemes, and margins are exclusive to approved retailers. Enter your registered mobile and 4-digit PIN.', 'stateless-wa-commerce'); ?>
+                    <?php esc_html_e('Wholesale PTR rates, schemes, and margins are exclusive to approved retailers. Enter your registered mobile and 4-digit PIN.', 'woocommerce-whatsapp-commerce'); ?>
                 </p>
 
                 <form id="swac-retailer-login-form" novalidate>
                     <div class="swac-form-row">
-                        <label for="swac-input-phone"><?php esc_html_e('Mobile Number', 'stateless-wa-commerce'); ?></label>
+                        <label for="swac-input-phone"><?php esc_html_e('Mobile Number', 'woocommerce-whatsapp-commerce'); ?></label>
                         <input
                                 type="tel"
                                 id="swac-input-phone"
                                 class="swac-modal-input"
-                                placeholder="<?php esc_attr_e('10-digit mobile number', 'stateless-wa-commerce'); ?>"
+                                placeholder="<?php esc_attr_e('10-digit mobile number', 'woocommerce-whatsapp-commerce'); ?>"
                                 maxlength="14"
                                 required
                                 autocomplete="tel"
@@ -58,7 +58,7 @@ add_action('wp_footer', function () {
                     </div>
 
                     <div class="swac-form-row">
-                        <label for="swac-input-pin"><?php esc_html_e('4-Digit PIN', 'stateless-wa-commerce'); ?></label>
+                        <label for="swac-input-pin"><?php esc_html_e('4-Digit PIN', 'woocommerce-whatsapp-commerce'); ?></label>
                         <input
                                 type="password"
                                 id="swac-input-pin"
@@ -74,17 +74,17 @@ add_action('wp_footer', function () {
                     <div id="swac-login-msg" class="swac-login-alert swac-b2b-modal-hidden" role="alert"></div>
 
                     <button type="submit" id="swac-login-submit" class="swac-modal-submit-btn">
-                        <?php esc_html_e('Unlock Wholesale Rates', 'stateless-wa-commerce'); ?>
+                        <?php esc_html_e('Unlock Wholesale Rates', 'woocommerce-whatsapp-commerce'); ?>
                     </button>
                 </form>
 
                 <?php if (!empty($whatsapp_reg_url)) : ?>
                     <div class="swac-modal-card-footer">
-                        <span class="swac-footer-note"><?php esc_html_e('Not an approved retailer yet?', 'stateless-wa-commerce'); ?></span>
+                        <span class="swac-footer-note"><?php esc_html_e('Not an approved retailer yet?', 'woocommerce-whatsapp-commerce'); ?></span>
                         <a href="<?php echo esc_url($whatsapp_reg_url); ?>" class="swac-wa-register-link"
                            target="_blank" rel="noopener noreferrer">
                             <span aria-hidden="true">💬</span>
-                            <?php esc_html_e('Apply for Retailer Account via WhatsApp', 'stateless-wa-commerce'); ?>
+                            <?php esc_html_e('Apply for Retailer Account via WhatsApp', 'woocommerce-whatsapp-commerce'); ?>
                         </a>
                     </div>
                 <?php endif; ?>
@@ -94,9 +94,9 @@ add_action('wp_footer', function () {
 
     <!-- Active Retailer Floating Pill -->
     <div id="swac-retailer-pill" class="swac-retailer-status-pill swac-b2b-modal-hidden">
-        <span class="swac-pill-store" id="swac-pill-store-name">🏪 <?php esc_html_e('Retailer', 'stateless-wa-commerce'); ?></span>
-        <button type="button" id="swac-pill-logout" class="swac-pill-logout-btn" title="<?php esc_attr_e('Lock wholesale rates & sign out', 'stateless-wa-commerce'); ?>">
-            <?php esc_html_e('Sign Out', 'stateless-wa-commerce'); ?>
+        <span class="swac-pill-store" id="swac-pill-store-name">🏪 <?php esc_html_e('Retailer', 'woocommerce-whatsapp-commerce'); ?></span>
+        <button type="button" id="swac-pill-logout" class="swac-pill-logout-btn" title="<?php esc_attr_e('Lock wholesale rates & sign out', 'woocommerce-whatsapp-commerce'); ?>">
+            <?php esc_html_e('Sign Out', 'woocommerce-whatsapp-commerce'); ?>
         </button>
     </div>
     <?php

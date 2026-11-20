@@ -33,22 +33,22 @@ if (!function_exists('swac_button_shortcode')) {
         if (empty($base_url)) {
             if (current_user_can('manage_woocommerce')) {
                 return '<span class="swac-btn-unconfigured" style="display:inline-block;padding:8px 12px;background:#fffbeb;border:1px dashed #f59e0b;color:#b45309;font-size:12px;border-radius:6px;">'
-                    . esc_html__('⚠️ [swac_button]: No WhatsApp phone number configured.', 'stateless-wa-commerce')
+                    . esc_html__('⚠️ [swac_button]: No WhatsApp phone number configured.', 'woocommerce-whatsapp-commerce')
                     . '</span>';
             }
             return '';
         }
 
-        $default_msg = sprintf(__('Hello %s.', 'stateless-wa-commerce'), get_bloginfo('name') ?: 'Store');
+        $default_msg = sprintf(__('Hello %s.', 'woocommerce-whatsapp-commerce'), get_bloginfo('name') ?: 'Store');
 
         $parsed_atts = shortcode_atts([
-            'text' => __('Order on WhatsApp', 'stateless-wa-commerce'),
+            'text' => __('Order on WhatsApp', 'woocommerce-whatsapp-commerce'),
             'message' => $default_msg,
             'fullwidth' => 'no',
             'icon' => 'yes',
         ], is_array($atts) ? $atts : [], 'swac_button');
 
-        $text = !empty($parsed_atts['text']) ? esc_html($parsed_atts['text']) : __('Contact Us', 'stateless-wa-commerce');
+        $text = !empty($parsed_atts['text']) ? esc_html($parsed_atts['text']) : __('Contact Us', 'woocommerce-whatsapp-commerce');
         if (!empty($content)) {
             $text = esc_html(trim((string)$content));
         }

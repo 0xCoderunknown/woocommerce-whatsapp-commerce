@@ -52,7 +52,7 @@ function swac_save_approved_retailer(array $data): bool
 
     $store_name = sanitize_text_field((string)($data['store_name'] ?? ''));
     if ($store_name === '') {
-        $store_name = sprintf(__('Retailer %s', 'stateless-wa-commerce'), substr($phone, -4));
+        $store_name = sprintf(__('Retailer %s', 'woocommerce-whatsapp-commerce'), substr($phone, -4));
     }
 
     $owner_name = sanitize_text_field((string)($data['owner_name'] ?? ''));
@@ -104,7 +104,7 @@ if (!function_exists('swac_b2b_get_registration_whatsapp_url')) {
 
         $message = sprintf(
             /* translators: %s: store name */
-            __("Hello %s, I want to register our retail store for wholesale ordering. Here are our shop details:\n\n• Shop / Store Name:\n• Owner / Contact Person:\n• Delivery Route / Area:\n• Mobile Number:\n\nPlease approve our account and issue our 4-digit PIN.", 'stateless-wa-commerce'),
+            __("Hello %s, I want to register our retail store for wholesale ordering. Here are our shop details:\n\n• Shop / Store Name:\n• Owner / Contact Person:\n• Delivery Route / Area:\n• Mobile Number:\n\nPlease approve our account and issue our 4-digit PIN.", 'woocommerce-whatsapp-commerce'),
             $store_name
         );
 
@@ -140,7 +140,7 @@ function swac_rest_retailer_login(WP_REST_Request $request): WP_REST_Response
     if ($attempts >= 10) {
         return new WP_REST_Response([
             'success' => false,
-            'message' => __('Too many failed login attempts. Please wait 15 minutes before trying again.', 'stateless-wa-commerce'),
+            'message' => __('Too many failed login attempts. Please wait 15 minutes before trying again.', 'woocommerce-whatsapp-commerce'),
         ], 429);
     }
 
@@ -156,7 +156,7 @@ function swac_rest_retailer_login(WP_REST_Request $request): WP_REST_Response
     if (strlen($phone) < 10 || $raw_pin === '') {
         return new WP_REST_Response([
             'success' => false,
-            'message' => __('Please enter a valid 10-digit mobile number and PIN.', 'stateless-wa-commerce'),
+            'message' => __('Please enter a valid 10-digit mobile number and PIN.', 'woocommerce-whatsapp-commerce'),
         ], 400);
     }
 
@@ -175,14 +175,14 @@ function swac_rest_retailer_login(WP_REST_Request $request): WP_REST_Response
     if (!$matched_retailer) {
         return new WP_REST_Response([
             'success' => false,
-            'message' => __('Retailer number not registered. Please tap "Register via WhatsApp" to request approval.', 'stateless-wa-commerce'),
+            'message' => __('Retailer number not registered. Please tap "Register via WhatsApp" to request approval.', 'woocommerce-whatsapp-commerce'),
         ], 403);
     }
 
     if (($matched_retailer['status'] ?? 'active') !== 'active') {
         return new WP_REST_Response([
             'success' => false,
-            'message' => __('Your wholesale account is currently suspended. Please contact distributor.', 'stateless-wa-commerce'),
+            'message' => __('Your wholesale account is currently suspended. Please contact distributor.', 'woocommerce-whatsapp-commerce'),
         ], 403);
     }
 
@@ -191,7 +191,7 @@ function swac_rest_retailer_login(WP_REST_Request $request): WP_REST_Response
         set_transient($rate_key, $attempts, 15 * MINUTE_IN_SECONDS);
         return new WP_REST_Response([
             'success' => false,
-            'message' => __('Incorrect 4-digit PIN. Please re-enter or request PIN from distributor.', 'stateless-wa-commerce'),
+            'message' => __('Incorrect 4-digit PIN. Please re-enter or request PIN from distributor.', 'woocommerce-whatsapp-commerce'),
         ], 403);
     }
 
@@ -219,8 +219,8 @@ function swac_rest_retailer_login(WP_REST_Request $request): WP_REST_Response
 add_action('admin_menu', function () {
     add_submenu_page(
         'edit.php?post_type=product',
-        __('Approved Retailers', 'stateless-wa-commerce'),
-        __('Approved Retailers', 'stateless-wa-commerce'),
+        __('Approved Retailers', 'woocommerce-whatsapp-commerce'),
+        __('Approved Retailers', 'woocommerce-whatsapp-commerce'),
         'manage_woocommerce',
         'swac-retailers',
         'swac_render_retailers_admin_page'
@@ -233,7 +233,7 @@ add_action('admin_menu', function () {
 function swac_render_retailers_admin_page()
 {
     if (!current_user_can('manage_woocommerce')) {
-        wp_die(esc_html__('Access Denied: Insufficient privileges.', 'stateless-wa-commerce'));
+        wp_die(esc_html__('Access Denied: Insufficient privileges.', 'woocommerce-whatsapp-commerce'));
     }
 
     $message = '';
@@ -254,33 +254,33 @@ function swac_render_retailers_admin_page()
             ]);
 
             if ($saved) {
-                $message = __('Retailer details successfully saved.', 'stateless-wa-commerce');
+                $message = __('Retailer details successfully saved.', 'woocommerce-whatsapp-commerce');
             } else {
-                $error = __('Failed to save retailer. Please check mobile number.', 'stateless-wa-commerce');
+                $error = __('Failed to save retailer. Please check mobile number.', 'woocommerce-whatsapp-commerce');
             }
         } elseif ($action === 'delete') {
             $phone = sanitize_text_field($_POST['phone'] ?? '');
             if (swac_delete_approved_retailer($phone)) {
-                $message = __('Retailer successfully removed from directory.', 'stateless-wa-commerce');
+                $message = __('Retailer successfully removed from directory.', 'woocommerce-whatsapp-commerce');
             }
         } elseif ($action === 'update_master_pin') {
             $master_pin = sanitize_text_field($_POST['master_pin'] ?? '');
             if (strlen($master_pin) >= 4) {
                 update_option('swac_b2b_master_pin', $master_pin, false);
-                $message = __('Master Desk PIN updated successfully.', 'stateless-wa-commerce');
+                $message = __('Master Desk PIN updated successfully.', 'woocommerce-whatsapp-commerce');
             } else {
-                $error = __('Master PIN must be at least 4 digits.', 'stateless-wa-commerce');
+                $error = __('Master PIN must be at least 4 digits.', 'woocommerce-whatsapp-commerce');
             }
         } elseif ($action === 'update_staff_pin') {
             $staff_pin = sanitize_text_field($_POST['staff_pin'] ?? '');
             if ($staff_pin === '') {
                 delete_option('swac_b2b_staff_pin');
-                $message = __('Staff PIN removed.', 'stateless-wa-commerce');
+                $message = __('Staff PIN removed.', 'woocommerce-whatsapp-commerce');
             } elseif (strlen($staff_pin) >= 4) {
                 update_option('swac_b2b_staff_pin', $staff_pin, false);
-                $message = __('Staff PIN updated successfully.', 'stateless-wa-commerce');
+                $message = __('Staff PIN updated successfully.', 'woocommerce-whatsapp-commerce');
             } else {
-                $error = __('Staff PIN must be at least 4 digits.', 'stateless-wa-commerce');
+                $error = __('Staff PIN must be at least 4 digits.', 'woocommerce-whatsapp-commerce');
             }
         }
     }

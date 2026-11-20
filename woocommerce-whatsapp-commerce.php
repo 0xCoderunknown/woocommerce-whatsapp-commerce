@@ -2,10 +2,10 @@
 /**
  * Plugin Name: Stateless WhatsApp Commerce for WooCommerce
  * Description: Zero-session catalog lockdown and client-side WhatsApp commerce engine for WooCommerce. Serving dynamic catalogs from full-page static cache.
- * Version: 1.8.0
+ * Version: 1.0.0
  * Author: 0xCoderunknown
  * License: GPL-2.0-or-later
- * Text Domain: stateless-wa-commerce
+ * Text Domain: woocommerce-whatsapp-commerce
  * Domain Path: /languages
  * Requires at least: 6.2
  * Requires PHP: 8.2
@@ -48,7 +48,7 @@ require_once plugin_dir_path(__FILE__) . 'features.php';
  * 🌐 LOAD PLUGIN TEXTDOMAIN
  */
 add_action('init', function () {
-    load_plugin_textdomain('stateless-wa-commerce', false, dirname(plugin_basename(__FILE__)) . '/languages');
+    load_plugin_textdomain('woocommerce-whatsapp-commerce', false, dirname(plugin_basename(__FILE__)) . '/languages');
 });
 
 // (Admin notices → backend/admin-tools.php)

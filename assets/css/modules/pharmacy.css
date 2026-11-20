@@ -16,12 +16,11 @@ body:not(.home):not(.front-page) ul.products li.product.is-generic {
     box-shadow: 0 4px 14px rgba(224, 148, 44, 0.12) !important;
 }
 
-:is(.woocommerce ul.products li.product, ul.products li.product, .pd-card) {
+:is(.woocommerce ul.products li.product, ul.products li.product, .swac-card) {
     position: relative;
 }
 
-.swac-generic-badge,
-.wa-generic-badge {
+.swac-generic-badge {
     position: absolute;
     top: 8px;
     left: 8px;
@@ -40,7 +39,7 @@ body:not(.home):not(.front-page) ul.products li.product.is-generic {
     display: inline-block;
 }
 
-body:is(.home, .front-page) :is(.swac-generic-badge, .wa-generic-badge) {
+body:is(.home, .front-page) .swac-generic-badge {
     display: none !important;
 }
 
@@ -55,16 +54,16 @@ body:is(.home, .front-page) :is(.swac-generic-badge, .wa-generic-badge) {
 }
 
 /* =========================================
-   2. COMPOSITION TAG (.wa-composition-tag, .pd-salt-tag)
+   2. COMPOSITION TAG ([swac_composition_tag])
    ========================================= */
-.wa-composition-tag,
-.pd-salt-tag,
-a.pd-salt-tag,
-a.pd-salt-tag:link,
-a.pd-salt-tag:visited,
-a.pd-salt-tag:hover,
-a.pd-salt-tag:focus,
-.pd-salt-tag * {
+.swac-composition-tag,
+.swac-salt-tag,
+a.swac-salt-tag,
+a.swac-salt-tag:link,
+a.swac-salt-tag:visited,
+a.swac-salt-tag:hover,
+a.swac-salt-tag:focus,
+.swac-salt-tag * {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -81,9 +80,9 @@ a.pd-salt-tag:focus,
 }
 
 /* =========================================
-   3. RX REGULATORY BADGE ([wa_rx_badge])
+   3. RX REGULATORY BADGE ([swac_rx_badge])
    ========================================= */
-.wa-rx-badge {
+.swac-rx-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -102,14 +101,33 @@ a.pd-salt-tag:focus,
     user-select: none;
 }
 
-.wa-rx-meta {
+.swac-otc-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1;
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: #15803d;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    vertical-align: middle;
+    margin-right: 6px;
+    user-select: none;
+}
+
+.swac-rx-meta {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     vertical-align: middle;
 }
 
-.wa-rx-brand {
+.swac-rx-brand {
     font-size: 14px;
     font-weight: 600;
     color: #667670;
@@ -361,8 +379,7 @@ a.pd-salt-tag:focus,
 /* =========================================
    5. SIZE CHART ACCORDION ([swac_size_chart])
    ========================================= */
-.swac-size-chart-accordion,
-.wa-size-chart-accordion {
+.swac-size-chart-accordion {
     border: 1px solid #ebebeb;
     border-radius: 8px;
     background: #ffffff;
@@ -373,8 +390,7 @@ a.pd-salt-tag:focus,
     order: 5;
 }
 
-.swac-size-chart-accordion[open],
-.wa-size-chart-accordion[open] {
+.swac-size-chart-accordion[open] {
     border-color: #2E7A8C;
 }
 
@@ -404,13 +420,11 @@ a.pd-salt-tag:focus,
     transition: transform 0.2s ease;
 }
 
-.swac-size-chart-accordion[open] .swac-size-chart-summary::after,
-.wa-size-chart-accordion[open] .swac-size-chart-summary::after {
+.swac-size-chart-accordion[open] .swac-size-chart-summary::after {
     transform: rotate(180deg);
 }
 
-.swac-size-chart-accordion[open] .swac-size-chart-summary,
-.wa-size-chart-accordion[open] .swac-size-chart-summary {
+.swac-size-chart-accordion[open] .swac-size-chart-summary {
     background: #f0f7f9;
     color: #2E7A8C;
     border-bottom: 1px solid #ebebeb;

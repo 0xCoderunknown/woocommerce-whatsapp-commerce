@@ -32,22 +32,22 @@ if (!defined('SWAC_TAX_GENERIC')) {
 add_action('init', function () {
     $taxonomies = [
         SWAC_TAX_SALT => [
-            'singular' => __('Composition', 'stateless-wa-commerce'),
-            'plural' => __('Compositions', 'stateless-wa-commerce'),
+            'singular' => __('Composition', 'woocommerce-whatsapp-commerce'),
+            'plural' => __('Compositions', 'woocommerce-whatsapp-commerce'),
             'slug' => 'composition',
             'public' => true,
             'hierarchical' => false,
         ],
         SWAC_TAX_PACK_SIZE => [
-            'singular' => __('Pack Size', 'stateless-wa-commerce'),
-            'plural' => __('Pack Sizes', 'stateless-wa-commerce'),
+            'singular' => __('Pack Size', 'woocommerce-whatsapp-commerce'),
+            'plural' => __('Pack Sizes', 'woocommerce-whatsapp-commerce'),
             'slug' => 'pack-size',
             'public' => true,
             'hierarchical' => false,
         ],
         SWAC_TAX_GENERIC => [
-            'singular' => __('Generic Flag', 'stateless-wa-commerce'),
-            'plural' => __('Generic Flags', 'stateless-wa-commerce'),
+            'singular' => __('Generic Flag', 'woocommerce-whatsapp-commerce'),
+            'plural' => __('Generic Flags', 'woocommerce-whatsapp-commerce'),
             'slug' => 'generic',
             'public' => true,
             'hierarchical' => true,
@@ -65,12 +65,12 @@ add_action('init', function () {
         $labels = [
             'name' => $config['plural'],
             'singular_name' => $config['singular'],
-            'search_items' => sprintf(__('Search %s', 'stateless-wa-commerce'), $config['plural']),
-            'all_items' => sprintf(__('All %s', 'stateless-wa-commerce'), $config['plural']),
-            'edit_item' => sprintf(__('Edit %s', 'stateless-wa-commerce'), $config['singular']),
-            'update_item' => sprintf(__('Update %s', 'stateless-wa-commerce'), $config['singular']),
-            'add_new_item' => sprintf(__('Add New %s', 'stateless-wa-commerce'), $config['singular']),
-            'new_item_name' => sprintf(__('New %s Name', 'stateless-wa-commerce'), $config['singular']),
+            'search_items' => sprintf(__('Search %s', 'woocommerce-whatsapp-commerce'), $config['plural']),
+            'all_items' => sprintf(__('All %s', 'woocommerce-whatsapp-commerce'), $config['plural']),
+            'edit_item' => sprintf(__('Edit %s', 'woocommerce-whatsapp-commerce'), $config['singular']),
+            'update_item' => sprintf(__('Update %s', 'woocommerce-whatsapp-commerce'), $config['singular']),
+            'add_new_item' => sprintf(__('Add New %s', 'woocommerce-whatsapp-commerce'), $config['singular']),
+            'new_item_name' => sprintf(__('New %s Name', 'woocommerce-whatsapp-commerce'), $config['singular']),
             'menu_name' => $config['plural'],
         ];
 

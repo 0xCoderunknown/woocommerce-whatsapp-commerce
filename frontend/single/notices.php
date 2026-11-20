@@ -37,9 +37,9 @@ add_action('woocommerce_after_add_to_cart_button', function () {
 
     if (!empty(array_intersect($non_returnable_cats, $product_cats))) {
         echo '<div class="swac-sp-notice swac-notice-nr"><span>🚫</span><span><strong>'
-            . esc_html__('Notice:', 'stateless-wa-commerce')
+            . esc_html__('Notice:', 'woocommerce-whatsapp-commerce')
             . '</strong> '
-            . esc_html__('This item is non-returnable.', 'stateless-wa-commerce')
+            . esc_html__('This item is non-returnable.', 'woocommerce-whatsapp-commerce')
             . '</span></div>';
     }
 }, 99);
@@ -68,7 +68,7 @@ if (!function_exists('swac_render_single_product_stock_status')) {
 
         return sprintf(
             '<div class="swac-single-stock-notice-wrapper"><div class="swac-sp-notice swac-notice-oos"><div class="swac-notice-content"><strong>%s</strong></div></div></div>',
-            esc_html__('Out of stock', 'stateless-wa-commerce')
+            esc_html__('Out of stock', 'woocommerce-whatsapp-commerce')
         );
     }
 }

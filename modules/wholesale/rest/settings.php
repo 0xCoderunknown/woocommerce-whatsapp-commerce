@@ -79,7 +79,7 @@ function swac_rest_desk_save_settings(WP_REST_Request $request): WP_REST_Respons
         } else {
             return new WP_REST_Response([
                 'success' => false,
-                'message' => __('Master PIN must be at least 4 digits.', 'stateless-wa-commerce'),
+                'message' => __('Master PIN must be at least 4 digits.', 'woocommerce-whatsapp-commerce'),
             ], 400);
         }
     }
@@ -93,7 +93,7 @@ function swac_rest_desk_save_settings(WP_REST_Request $request): WP_REST_Respons
         } else {
             return new WP_REST_Response([
                 'success' => false,
-                'message' => __('Staff PIN must be at least 4 digits.', 'stateless-wa-commerce'),
+                'message' => __('Staff PIN must be at least 4 digits.', 'woocommerce-whatsapp-commerce'),
             ], 400);
         }
     }
@@ -107,7 +107,7 @@ function swac_rest_desk_save_settings(WP_REST_Request $request): WP_REST_Respons
         } else {
             return new WP_REST_Response([
                 'success' => false,
-                'message' => __('Salesman PIN must be at least 4 digits.', 'stateless-wa-commerce'),
+                'message' => __('Salesman PIN must be at least 4 digits.', 'woocommerce-whatsapp-commerce'),
             ], 400);
         }
     }
@@ -118,7 +118,7 @@ function swac_rest_desk_save_settings(WP_REST_Request $request): WP_REST_Respons
 
     return new WP_REST_Response([
         'success' => true,
-        'message' => __('Store settings saved successfully.', 'stateless-wa-commerce'),
+        'message' => __('Store settings saved successfully.', 'woocommerce-whatsapp-commerce'),
     ], 200);
 }
 

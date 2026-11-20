@@ -6,7 +6,7 @@
  * Supports Open Mode (accepts any postal code) and Gated Mode (validates against registered tiers).
  *
  * Consumed by:
- *  - PHP: stateless-wa-commerce.php (localizes to window.swacZones via wp_localize_script)
+ *  - PHP: frontend/enqueue.php (localizes to window.swacZones via wp_localize_script)
  *  - JS:  assets/js/wa_cart.js (client-side postal gating & real-time address validation)
  *
  * @package StatelessWaCommerce
@@ -35,17 +35,17 @@ if (!function_exists('swac_get_delivery_zones')) {
             'gated' => (bool)$is_gated, // Default: Open Mode unless SWAC_DELIVERY_GATED is true.
             'zones' => [
                 'standard' => [
-                    'label' => __('Standard Delivery', 'stateless-wa-commerce'),
-                    'badge_text' => __('✓ Delivery Available', 'stateless-wa-commerce'),
+                    'label' => __('Standard Delivery', 'woocommerce-whatsapp-commerce'),
+                    'badge_text' => __('✓ Delivery Available', 'woocommerce-whatsapp-commerce'),
                     'status_class' => 'swac-pin-success',
                     'allow_order' => true,
                     'pincodes' => [], // Associative array of ['postal_code' => 'Area Name']
                 ],
             ],
             'messages' => [
-                'available' => __('✓ Delivery is available to your location', 'stateless-wa-commerce'),
-                'unsupported' => __('⚠️ We do not deliver to this location yet.', 'stateless-wa-commerce'),
-                'invalid' => __('Please enter a valid postal code.', 'stateless-wa-commerce'),
+                'available' => __('✓ Delivery is available to your location', 'woocommerce-whatsapp-commerce'),
+                'unsupported' => __('⚠️ We do not deliver to this location yet.', 'woocommerce-whatsapp-commerce'),
+                'invalid' => __('Please enter a valid postal code.', 'woocommerce-whatsapp-commerce'),
             ],
         ];
 

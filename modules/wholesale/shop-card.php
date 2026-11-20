@@ -48,9 +48,9 @@ if (!function_exists('swac_b2b_format_price_block_html')) {
             <!-- Unauthenticated Locked View -->
             <div class="swac-b2b-locked-view">
                 <button type="button" class="swac-b2b-gate-trigger"
-                        aria-label="<?php esc_attr_e('Login to view wholesale rate', 'stateless-wa-commerce'); ?>">
+                        aria-label="<?php esc_attr_e('Login to view wholesale rate', 'woocommerce-whatsapp-commerce'); ?>">
                     <span class="swac-lock-icon" aria-hidden="true">🔒</span>
-                    <span><?php esc_html_e('Retailer PIN to View Rate', 'stateless-wa-commerce'); ?></span>
+                    <span><?php esc_html_e('Retailer PIN to View Rate', 'woocommerce-whatsapp-commerce'); ?></span>
                 </button>
             </div>
 
@@ -58,12 +58,12 @@ if (!function_exists('swac_b2b_format_price_block_html')) {
             <div class="swac-b2b-unlocked-view">
                 <div class="swac-b2b-rate-row">
                     <span class="swac-b2b-ptr">
-                        <span class="swac-b2b-ptr-label"><?php esc_html_e('Rate:', 'stateless-wa-commerce'); ?></span>
+                        <span class="swac-b2b-ptr-label"><?php esc_html_e('Rate:', 'woocommerce-whatsapp-commerce'); ?></span>
                         <span class="swac-b2b-ptr-val"><?php echo wc_price($b2b['ptr']); ?></span>
                     </span>
                     <?php if ($b2b['mrp'] > $b2b['ptr'] && $b2b['mrp'] > 0) : ?>
                         <span class="swac-b2b-mrp">
-                            <?php esc_html_e('MRP:', 'stateless-wa-commerce'); ?>
+                            <?php esc_html_e('MRP:', 'woocommerce-whatsapp-commerce'); ?>
                             <s class="swac-b2b-mrp-strike"><?php echo wc_price($b2b['mrp']); ?></s>
                         </span>
                     <?php endif; ?>
@@ -75,7 +75,7 @@ if (!function_exists('swac_b2b_format_price_block_html')) {
                             <?php
                             printf(
                             /* translators: 1: currency symbol, 2: margin amount, 3: margin percent */
-                                esc_html__('Margin: %1$s%2$s (%3$s%%)', 'stateless-wa-commerce'),
+                                esc_html__('Margin: %1$s%2$s (%3$s%%)', 'woocommerce-whatsapp-commerce'),
                                 esc_html($currency),
                                 esc_html(number_format($b2b['margin_amount'], 2)),
                                 esc_html($b2b['margin_percent'])
@@ -132,7 +132,7 @@ add_filter('woocommerce_loop_add_to_cart_link', function ($button_html, $product
         return sprintf(
             '<a href="%s" class="button swac-out-of-stock-btn">%s</a>',
             esc_url($product->get_permalink()),
-            esc_html__('Out of Stock', 'stateless-wa-commerce')
+            esc_html__('Out of Stock', 'woocommerce-whatsapp-commerce')
         );
     }
 
@@ -147,7 +147,7 @@ add_filter('woocommerce_loop_add_to_cart_link', function ($button_html, $product
     $mrp = (float)($b2b['is_b2b'] ? $b2b['mrp'] : $product->get_regular_price());
     $sale_price = (float)($b2b['is_b2b'] ? $b2b['ptr'] : $product->get_price());
     $is_rx = (bool)apply_filters('swac_product_is_rx', false, $product);
-    $button_label = (string)apply_filters('swac_loop_button_text', __('Add to Order', 'stateless-wa-commerce'));
+    $button_label = (string)apply_filters('swac_loop_button_text', __('Add to Order', 'woocommerce-whatsapp-commerce'));
     $icon = function_exists('swac_icon_svg') ? swac_icon_svg() : '';
 
     ob_start();
@@ -157,7 +157,7 @@ add_filter('woocommerce_loop_add_to_cart_link', function ($button_html, $product
         <div class="swac-b2b-locked-action">
             <button type="button" class="button swac-b2b-gate-trigger swac-b2b-locked-order-btn">
                 <span class="swac-lock-icon" aria-hidden="true">🔒</span>
-                <span><?php esc_html_e('Retailer Login to Order', 'stateless-wa-commerce'); ?></span>
+                <span><?php esc_html_e('Retailer Login to Order', 'woocommerce-whatsapp-commerce'); ?></span>
             </button>
         </div>
 
@@ -165,12 +165,12 @@ add_filter('woocommerce_loop_add_to_cart_link', function ($button_html, $product
         <div class="swac-b2b-unlocked-action">
             <?php if (!empty($b2b['carton_pack']) && $b2b['carton_pack'] > 0) : ?>
                 <div class="swac-b2b-carton-guide"
-                     title="<?php esc_attr_e('Packing conversion reference', 'stateless-wa-commerce'); ?>">
+                     title="<?php esc_attr_e('Packing conversion reference', 'woocommerce-whatsapp-commerce'); ?>">
                     <span class="swac-b2b-carton-icon" aria-hidden="true">📦</span>
                     <?php
                     printf(
                     /* translators: %d: pieces per carton */
-                        esc_html__('1 Carton = %d pcs', 'stateless-wa-commerce'),
+                        esc_html__('1 Carton = %d pcs', 'woocommerce-whatsapp-commerce'),
                         (int)$b2b['carton_pack']
                     );
                     ?>
@@ -180,7 +180,7 @@ add_filter('woocommerce_loop_add_to_cart_link', function ($button_html, $product
             <div class="swac-b2b-loop-action">
                 <div class="swac-qty-selector">
                     <button type="button" class="swac-qty-btn swac-qty-minus"
-                            aria-label="<?php esc_attr_e('Decrease quantity', 'stateless-wa-commerce'); ?>">−
+                            aria-label="<?php esc_attr_e('Decrease quantity', 'woocommerce-whatsapp-commerce'); ?>">−
                     </button>
                     <input
                             type="number"
@@ -189,10 +189,10 @@ add_filter('woocommerce_loop_add_to_cart_link', function ($button_html, $product
                             min="1"
                             max="9999"
                             data-carton-pack="<?php echo esc_attr($b2b['carton_pack']); ?>"
-                            aria-label="<?php esc_attr_e('Order quantity', 'stateless-wa-commerce'); ?>"
+                            aria-label="<?php esc_attr_e('Order quantity', 'woocommerce-whatsapp-commerce'); ?>"
                     >
                     <button type="button" class="swac-qty-btn swac-qty-plus"
-                            aria-label="<?php esc_attr_e('Increase quantity', 'stateless-wa-commerce'); ?>">+
+                            aria-label="<?php esc_attr_e('Increase quantity', 'woocommerce-whatsapp-commerce'); ?>">+
                     </button>
                 </div>
 
@@ -207,7 +207,7 @@ add_filter('woocommerce_loop_add_to_cart_link', function ($button_html, $product
                    data-carton-pack="<?php echo esc_attr($b2b['carton_pack']); ?>"
                    data-scheme-badge="<?php echo esc_attr($b2b['scheme_badge']); ?>"
                    data-is-rx="<?php echo $is_rx ? '1' : '0'; ?>"
-                   aria-label="<?php echo esc_attr(sprintf(__('Add %s to wholesale order', 'stateless-wa-commerce'), $name)); ?>"
+                   aria-label="<?php echo esc_attr(sprintf(__('Add %s to wholesale order', 'woocommerce-whatsapp-commerce'), $name)); ?>"
                 >
                     <?php echo $icon; ?>
                     <span><?php echo esc_html($button_label); ?></span>

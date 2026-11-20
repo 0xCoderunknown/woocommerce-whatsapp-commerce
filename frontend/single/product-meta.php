@@ -120,7 +120,7 @@ if (!function_exists('swac_action_row_shortcode')) {
         if (!$product->is_in_stock()) {
             return sprintf(
                 '<div class="swac-action-row"><button type="button" class="button swac-out-of-stock-btn" disabled>%s</button></div>',
-                esc_html__('Out of Stock', 'stateless-wa-commerce')
+                esc_html__('Out of Stock', 'woocommerce-whatsapp-commerce')
             );
         }
 
@@ -143,7 +143,7 @@ if (!function_exists('swac_action_row_shortcode')) {
             <div class="swac-b2b-locked-action">
                 <button type="button" class="button swac-b2b-gate-trigger swac-b2b-locked-order-btn">
                     <span class="swac-lock-icon" aria-hidden="true">🔒</span>
-                    <span><?php esc_html_e('Retailer Login to Order', 'stateless-wa-commerce'); ?></span>
+                    <span><?php esc_html_e('Retailer Login to Order', 'woocommerce-whatsapp-commerce'); ?></span>
                 </button>
             </div>
 
@@ -151,12 +151,12 @@ if (!function_exists('swac_action_row_shortcode')) {
             <div class="swac-b2b-unlocked-action">
                 <?php if (!empty($b2b['carton_pack']) && $b2b['carton_pack'] > 0) : ?>
                     <div class="swac-b2b-carton-guide" style="margin-bottom:8px;"
-                         title="<?php esc_attr_e('Packing conversion reference', 'stateless-wa-commerce'); ?>">
+                         title="<?php esc_attr_e('Packing conversion reference', 'woocommerce-whatsapp-commerce'); ?>">
                         <span class="swac-b2b-carton-icon" aria-hidden="true">📦</span>
                         <?php
                         printf(
                         /* translators: %d: pieces per carton */
-                            esc_html__('1 Carton = %d pcs', 'stateless-wa-commerce'),
+                            esc_html__('1 Carton = %d pcs', 'woocommerce-whatsapp-commerce'),
                             (int)$b2b['carton_pack']
                         );
                         ?>
@@ -166,7 +166,7 @@ if (!function_exists('swac_action_row_shortcode')) {
                 <div class="swac-action-row swac-b2b-loop-action">
                     <div class="swac-qty-selector">
                         <button type="button" class="swac-qty-btn swac-qty-minus"
-                                aria-label="<?php esc_attr_e('Decrease quantity', 'stateless-wa-commerce'); ?>">−
+                                aria-label="<?php esc_attr_e('Decrease quantity', 'woocommerce-whatsapp-commerce'); ?>">−
                         </button>
                         <input
                                 type="number"
@@ -175,10 +175,10 @@ if (!function_exists('swac_action_row_shortcode')) {
                                 min="1"
                                 max="9999"
                                 data-carton-pack="<?php echo esc_attr($b2b['carton_pack']); ?>"
-                                aria-label="<?php esc_attr_e('Product quantity', 'stateless-wa-commerce'); ?>"
+                                aria-label="<?php esc_attr_e('Product quantity', 'woocommerce-whatsapp-commerce'); ?>"
                         >
                         <button type="button" class="swac-qty-btn swac-qty-plus"
-                                aria-label="<?php esc_attr_e('Increase quantity', 'stateless-wa-commerce'); ?>">+
+                                aria-label="<?php esc_attr_e('Increase quantity', 'woocommerce-whatsapp-commerce'); ?>">+
                         </button>
                     </div>
                     <button
@@ -195,7 +195,7 @@ if (!function_exists('swac_action_row_shortcode')) {
                             data-is-rx="<?php echo $is_rx ? '1' : '0'; ?>"
                     >
                         <?php echo $icon; ?>
-                        <span><?php esc_html_e('Add to Order', 'stateless-wa-commerce'); ?></span>
+                        <span><?php esc_html_e('Add to Order', 'woocommerce-whatsapp-commerce'); ?></span>
                     </button>
                 </div>
             </div>
@@ -204,12 +204,12 @@ if (!function_exists('swac_action_row_shortcode')) {
         <div class="swac-action-row">
             <div class="swac-qty-selector">
                 <button type="button" class="swac-qty-btn swac-qty-minus"
-                        aria-label="<?php esc_attr_e('Decrease quantity', 'stateless-wa-commerce'); ?>">−
+                        aria-label="<?php esc_attr_e('Decrease quantity', 'woocommerce-whatsapp-commerce'); ?>">−
                 </button>
                 <input type="number" class="swac-qty-input" value="1" min="1" max="99"
-                       aria-label="<?php esc_attr_e('Product quantity', 'stateless-wa-commerce'); ?>">
+                       aria-label="<?php esc_attr_e('Product quantity', 'woocommerce-whatsapp-commerce'); ?>">
                 <button type="button" class="swac-qty-btn swac-qty-plus"
-                        aria-label="<?php esc_attr_e('Increase quantity', 'stateless-wa-commerce'); ?>">+
+                        aria-label="<?php esc_attr_e('Increase quantity', 'woocommerce-whatsapp-commerce'); ?>">+
                 </button>
             </div>
             <button
@@ -224,7 +224,7 @@ if (!function_exists('swac_action_row_shortcode')) {
                     data-is-rx="<?php echo $is_rx ? '1' : '0'; ?>"
             >
                 <?php echo $icon; ?>
-                <span><?php esc_html_e('Add to Order', 'stateless-wa-commerce'); ?></span>
+                <span><?php esc_html_e('Add to Order', 'woocommerce-whatsapp-commerce'); ?></span>
             </button>
         </div>
     <?php endif; ?>
@@ -238,7 +238,7 @@ add_shortcode('swac_action_row', 'swac_action_row_shortcode');
  * Ensures standard WooCommerce templates display "Add to Order" rather than "Add to cart".
  */
 add_filter('woocommerce_product_single_add_to_cart_text', function ($text, $product = null) {
-    return (string)apply_filters('swac_single_button_text', __('Add to Order', 'stateless-wa-commerce'), $product);
+    return (string)apply_filters('swac_single_button_text', __('Add to Order', 'woocommerce-whatsapp-commerce'), $product);
 }, 10, 2);
 
 /**

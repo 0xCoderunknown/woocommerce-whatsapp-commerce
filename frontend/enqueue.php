@@ -121,9 +121,9 @@ add_action('wp_enqueue_scripts', function () {
             'timezone_offset' => function_exists('wp_timezone') ? (float)((wp_timezone()->getOffset(new DateTime('now', new DateTimeZone('UTC')))) / 3600) : 0.0,
             'cutoff_hour' => (int)($cfg['cutoff_hour'] ?? 12),
             'cutoff_messages' => [
-                'weekend' => __('Order now to get it by Monday', 'stateless-wa-commerce'),
-                'morning' => __('Order before 12 noon for same-day delivery', 'stateless-wa-commerce'),
-                'afternoon' => __('Order now to receive it by tomorrow', 'stateless-wa-commerce'),
+                'weekend' => __('Order now to get it by Monday', 'woocommerce-whatsapp-commerce'),
+                'morning' => __('Order before 12 noon for same-day delivery', 'woocommerce-whatsapp-commerce'),
+                'afternoon' => __('Order now to receive it by tomorrow', 'woocommerce-whatsapp-commerce'),
             ],
         ];
 

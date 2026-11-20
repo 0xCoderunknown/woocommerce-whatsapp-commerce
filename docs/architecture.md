@@ -21,7 +21,7 @@ Standard WooCommerce is engineered around stateful server sessions:
 
 ## 2. The Zero-Session Lockdown Solution
 
-`stateless-wa-commerce` completely eliminates server-side session management:
+`woocommerce-whatsapp-commerce` completely eliminates server-side session management:
 
 ### 2.1. Session Stubbing (`SWAC_Null_Session_Handler`)
 
@@ -191,10 +191,11 @@ Warehouse dispatch clerks can read carton and scheme totals instantly without ma
 To eliminate the friction of navigating WordPress admin screens on mobile phones, `modules/wholesale/` exposes the
 `[swac_distributor_portal]` shortcode:
 
-1. **Master PIN Authentication & Rate Limiting**: Phone access is authenticated via a 4-to-8 digit master
-   passcode (`swac_b2b_master_pin`). Fail-closed design ensures missing configuration denies access. Protected by IP-based
-   rate limiting (5 attempts / 15 min lock). Successful entry issues a token with a 30-day sliding expiry and 1-tap `🔒 Lock`
-   invalidation.
+1. **3-Tier Role Authentication & Rate Limiting**: Phone access is authenticated via role-specific passcodes:
+   - 👑 **Owner Role** (`swac_b2b_master_pin`): Full administrative authority over rates, MOQ, schemes, approved retailers, store settings, CSV sync, and product creation.
+   - 📦 **Staff Role** (`swac_b2b_staff_pin`): Warehouse stock toggle authority (`[ 🟢 IN STOCK ]` / `[ 🔴 OUT OF STOCK ]`). Rates and schemes are read-only; administrative features are hidden.
+   - 💼 **Salesman Role** (`swac_b2b_salesman_pin`): Field rep order booking authority. Can browse catalog rates and view approved retailer route directory (with private retailer PINs stripped); editing and admin tools are hidden.
+   Protected by fail-closed missing PIN guards and IP-based rate limiting (5 attempts / 15 min lock). Successful entry issues a session token tracked in `swac_b2b_desk_tokens` with a 30-day sliding expiry and 1-tap `🔒 Lock` invalidation. Cross-Origin Resource Sharing (CORS) is supported for standalone Flutter Web clients via `rest_allowed_cors_headers` (`X-SWAC-Master-Token`, `X-SWAC-Retailer-Token`).
 2. **Counter-Speed Quick-Update Grid (`/desk/fast-row-update`)**: An in-place tabular spreadsheet editor enabling sub-100ms
    updates for Rate (PTR), Retail MRP, MOQ, and shorthand schemes (`10+1`, `10:2%`, `2% CD`), plus 1-tap stock pill toggling
    (`instock`/`outofstock`) bypassing heavy `WC_Product::save()` lifecycle hooks.

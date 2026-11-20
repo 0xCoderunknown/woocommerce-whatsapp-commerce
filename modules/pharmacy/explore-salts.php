@@ -56,7 +56,7 @@ function swac_explore_salts_shortcode($atts)
     }
 
     if (empty($terms) || is_wp_error($terms)) {
-        return '<p class="swac-no-results">' . esc_html__('No compositions found. Please check if compositions have associated products, or set hide_empty="false".', 'stateless-wa-commerce') . '</p>';
+        return '<p class="swac-no-results">' . esc_html__('No compositions found. Please check if compositions have associated products, or set hide_empty="false".', 'woocommerce-whatsapp-commerce') . '</p>';
     }
 
     $columns = max(1, min(6, intval($atts['columns'])));
@@ -81,15 +81,15 @@ function swac_explore_salts_shortcode($atts)
                            id="swac-salt-search"
                            class="swac-cat-search-input swac-live-search"
                            data-target="#swac-salt-list"
-                           placeholder="<?php esc_attr_e('Search active compositions...', 'stateless-wa-commerce'); ?>"
-                           aria-label="<?php esc_attr_e('Filter compositions', 'stateless-wa-commerce'); ?>"
+                           placeholder="<?php esc_attr_e('Search active compositions...', 'woocommerce-whatsapp-commerce'); ?>"
+                           aria-label="<?php esc_attr_e('Filter compositions', 'woocommerce-whatsapp-commerce'); ?>"
                            autocomplete="off">
                     <span class="swac-search-icon">🔍</span>
                 </div>
             </div>
         </div>
         <p id="swac-salts-no-results" class="swac-empty-state" style="display: none;">
-            <?php esc_html_e('No compositions found matching your search.', 'stateless-wa-commerce'); ?>
+            <?php esc_html_e('No compositions found matching your search.', 'woocommerce-whatsapp-commerce'); ?>
         </p>
     </div>
 

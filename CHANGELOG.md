@@ -9,289 +9,80 @@ All release dates strictly follow the Indian standard date format: **`DD-MM-YYYY
 
 ---
 
-## [1.8.0] — 09-11-2026
-
-### Refactored & Enhanced
-- **Architectural Cleanup & Module Restructuring**:
-  - Re-enqueued `assets/js/retailer-auth.js` and restored `#swac-retailer-pill` floating status pill markup for wholesale accounts.
-  - Extracted ~630 lines of B2B wholesale styling from `assets/css/frontend.css` into dedicated `assets/css/modules/wholesale.css`, enqueued conditionally.
-  - Relocated XML sitemap generator to `modules/seo/sitemap-generator.php` with `SWAC_ENABLE_SITEMAP` toggle, preventing conflicts with external SEO plugins.
-  - Guaranteed Distributor Desk assets enqueue on visual page builders (Breakdance, Elementor, Bricks) within `swac_distributor_portal_shortcode()`.
-  - Renamed `assets/js/frontend.js` to `assets/js/explore-search.js` for architectural clarity.
-  - Consolidated single product micro-files (`single-whatsapp.php` and `delivery-notice.php`) into `product-meta.php` and `notices.php`.
-  - Added configurable constants `SWAC_DELIVERY_CUTOFF_HOUR`, `SWAC_DELIVERY_GATED`, and `SWAC_TAX_BRAND`.
-  - Added unified `swac_is_page_builder_preview()` helper supporting Bricks, Divi, Oxygen, Breakdance, and Elementor.
-
----
-
-## [1.7.9] — 09-11-2026
-
-### Added & Enhanced
-- **Salesman Retailer Directory Read Authorization**:
-  - Broadened `GET /desk/retailers` permission callback in `desk-rest.php` with `swac_desk_can_read_retailers()` to allow `salesman` sessions to fetch approved shops for route filtering and instant shop switching.
-  - Strips private retailer PINs in `swac_rest_desk_get_retailers()` when accessed by Salesman sessions, ensuring credential isolation.
-- **Scheme Shorthand Parser Alignment**:
-  - Enhanced `swac_parse_scheme_shorthand()` to recognize flat percentage patterns (`5%`, `5% Off`, `5% Scheme`, `3.5%`) as `cash_discount` alongside `X% CD`.
-  - Added word normalization (`plus`/`and` -> `+`) for free goods notation.
-- **Store Settings PIN Retrieval & Sync**:
-  - Exposed `master_pin`, `staff_pin`, `salesman_pin`, and `has_salesman_pin` in `GET /desk/settings` for verified Owner sessions.
-
----
-
-## [1.7.8] — 08-11-2026
-
-### Added & Enhanced
-- **Flutter Web Cross-Origin CORS Whitelist**:
-  - Filtered `rest_allowed_cors_headers` in `desk-rest.php` to whitelist `X-SWAC-Master-Token` and `X-SWAC-Retailer-Token`, resolving cross-origin browser preflight (`OPTIONS`) blocks on Flutter Web single-page apps.
-- **Retailer Catalog Read Authorization**:
-  - Broadened `swac_desk_is_authorized` in `auth.php` with `swac_is_valid_retailer_token()` to authenticate verified Retailer HMAC tokens on `/desk/products`, eliminating 403 authorization locks for retailer apps.
-- **Salesman PIN & Role Support**:
-  - Added `swac_b2b_salesman_pin` (default `'3344'`) to `/desk/auth`, issuing session tokens stamped with `'role' => 'salesman'` for field order bookers.
-  - Added `salesman_pin` persistence to Store Settings REST API and options.
-- **Product Creation MOQ & Scheme Shorthand Parity**:
-  - Updated `create-product.php` to parse and persist `moq` and `scheme_shorthand` (e.g. `'10+1'`, `'5% CD'`) via `swac_parse_scheme_shorthand()`, preventing wholesale parameter loss during remote creation.
-- **Strict Retailer Mutation Guardrail**:
-  - In `fast-row-update`, strictly blocked retailer tokens from mutating prices or stock status with an HTTP 403 Forbidden response.
-
----
-
-## [1.7.7] — 07-11-2026
+## [1.0.0] — 21-11-2026
 
 ### Added
-- **Dual-Role Distributor Desk Access Control (Owner vs Staff)**:
-  - Introduced shared Staff PIN (`swac_b2b_staff_pin`) for warehouse personnel, configurable in Store Settings or WP-Admin.
-  - Role-based UI and REST authorization boundaries:
-    - **Owner Role (`owner`)**: Full access to rates (PTR), MRP, schemes, MOQ, Add Product, Retailer Accounts, Store Settings, and CSV synchronization.
-    - **Staff Role (`staff`)**: Strict stock-only control (`[ 🟢 IN STOCK ]` / `[ 🔴 OUT OF STOCK ]`) and catalog search. All rate, MRP, Scheme, and MOQ inputs are rendered read-only/disabled with tab stops removed. Restricted tabs and CSV action buttons are completely hidden.
-  - Server-side REST route defense in depth: `/desk/fast-row-update` strictly blocks non-stock field modifications with HTTP 403 Forbidden for staff requests. All administrative and management endpoints require `swac_desk_is_owner_authorized`.
-  - Multi-session token map (`swac_b2b_desk_tokens`) supporting concurrent mobile staff and owner logins with sliding 30-day token expiration and automatic expired session cleanup.
-
----
-
-## [1.7.6] — 06-11-2026
-
-### Fixed & Enhanced
-- **Breakdance "Theme Disabled" Canvas Fixed Width**:
-  - Replaced relative `width: 100%` with explicit `width: 1200px !important; max-width: 100% !important; flex: 1 1 1200px;` on `.swac-desk-container`.
-  - Ensures the Distributor Desk enforces its authoritative 1200px desktop boundary even on completely blank Breakdance pages without containers, sections, or theme wrappers.
-
----
-
-## [1.7.5] — 06-11-2026
-
-### Fixed & Enhanced
-- **Distributor Desk Layout Stability & Width Jitter Fix**:
-  - Enforced `width: 100% !important; max-width: 1200px; align-self: stretch; flex: 1 1 100%;` on `.swac-desk-container` to lock the workspace width in all page builders and theme container layouts.
-  - Locked header (`.swac-desk-header`), tabs bar (`.swac-desk-tabs`), and all tab contents to uniform 100% width so switching tabs or searching never shrinks or shifts the top layout.
-  - Added `table-layout: fixed` and `min-width: 820px` to the rates table (`.swac-fast-grid`) so column boundaries and search empty states remain rock-solid without horizontal jitter.
-
----
-
-## [1.7.4] — 06-11-2026
-
-### Fixed & Enhanced
-- **Walled Garden Store Owner & Admin Bypass**:
-  - Automatically exempted logged-in WordPress Administrators and Store Managers (`current_user_can('manage_woocommerce')`) from the frontend Walled Garden gate screen, allowing direct access to the `/shop/` catalog and unlocked rate views.
-  - Added support for Distributor Master Tokens (`swac_b2b_master_token`) in client-side auth state (`retailer-auth.js` and `<head>` script) so distributors who unlock the mobile Distributor Desk are recognized on the storefront with a `👑 Distributor Admin` status pill without needing a dummy retailer account.
-  - Supported clearing `swac_b2b_master_token` on status pill logout.
-
----
-
-## [1.7.3] — 05-11-2026
-
-### Removed & Migrated (Legacy Compatibility Purge)
-- **Purged Legacy `g1_*` & `cdr_*` Shims**: Completely purged old backward-compatibility aliases and shims across all subsystems in favor of the canonical `swac_*` architecture:
-  - Purged `g1_get_delivery_cutoff_message()` in `core/delivery-cutoff.php`.
-  - Purged `[cdr_whatsapp_button]` and `cdr_whatsapp_button_shortcode()` in `frontend/components/whatsapp-button.php`.
-  - Purged `[g1_delivery_notice]` in `frontend/single/delivery-notice.php`.
-  - Purged `[cdr_generic_box]`, `[g1_generic_box]`, and `cdr_generic_box_html()` in `modules/pharmacy/generic-upsell.php`.
-  - Purged `[g1_composition_tag]` in `modules/pharmacy/product-meta.php`.
-  - Cleaned legacy CSS classes `.cdr-alt-salt` and `.cdr-totals-loyalty .cdr-loyalty-gift-icon`.
-- **Documentation Alignment**: Updated `AGENTS.md` and `docs/shortcodes.md` to reflect the clean unified `swac_*` namespace without obsolete legacy aliases.
-
----
-
-## [1.7.2] — 05-11-2026
-
-### Performance & Modernization
-- **Autoload Optimization (WordPress 6.6+)**: Explicitly passed `autoload = false` to `swac_b2b_approved_retailers`, `swac_b2b_master_hash`, `swac_b2b_master_pin`, and `swac_cron_cleaned` to keep `wp_load_alloptions` lean and prevent B2B directories from bloating static catalog page loads.
-- **Modern Script Loading (WordPress 6.3+)**: Updated `swac-desk-script` enqueueing in `modules/wholesale/frontend-desk.php` to use `['strategy' => 'defer', 'in_footer' => true]`.
-- **PHP 8.2 Baseline & Modern Primitives**:
-  - Declared `Requires PHP: 8.2` in primary plugin header.
-  - Replaced legacy `strpos` substring searches with native `str_contains` in URL builders and admin handlers.
-  - Replaced legacy `substr` checks with native `str_ends_with` across SSL local domain detectors and pharmacy pack metrics.
-
----
-
-## [1.7.1] — 05-11-2026
-
-### Added
-- **Store Contact & Delivery Settings**: Added frontend Store Settings tab to Distributor Desk for direct mobile management of WhatsApp business phone, store title, delivery fees, and order footer disclaimer.
-
-### Security & Hardening
-- **Distributor Master PIN Hardening**: Removed predictable fallback to merchant phone number or default passcode; Distributor Desk fails closed if unconfigured in settings.
-- **Brute-Force Rate Limiting**: Added IP-based attempt throttling on Master Desk and Retailer login endpoints to block automated PIN guessing.
-- **Session Expiry & Quick Lock**: Added 30-day sliding token lifespan for warehouse staff and a one-tap Lock action in the Distributor Desk header.
-
-### Performance & Architectural Refactoring
-- **Lightweight Legacy Desk Actions**: Replaced full WooCommerce lifecycle hooks (`$product->save()`) in legacy rate sheet updates with direct meta and stock updates.
-- **Wholesale REST Controller Modularization**: Restructured wholesale REST controllers into clean, domain-specific modules (`modules/wholesale/rest/`) for enhanced maintainability.
-- **Counter Grid Script Fix**: Cleaned up duplicate debounce handler in live search input.
-
----
-
-## [1.7.0] — 05-11-2026
-
-### Added
-- **Distributor Counter-Speed In-Place Quick-Update Grid**:
-  - Live in-place tabular editor in `[swac_distributor_portal]` with tab-through inputs for Rate (PTR), Retail MRP, Promotional Scheme, and MOQ.
-  - 1-Tap Stock Pill button for instantaneous toggling between `[ 🟢 IN STOCK ]` and `[ 🔴 OUT OF STOCK ]` with optimistic UI response.
-  - Auto-save on blur and field commit with subtle inline sync feedback (`Saving...` → `Saved ✓`).
-  - High-speed `POST /wp-json/swac/v1/desk/fast-row-update` REST endpoint executing targeted updates without full `WC_Product::save()` lifecycle overhead.
-  - Server-side shorthand scheme notation parser converting `"10+1"`, `"12+1 FREE"`, `"10:2%"`, `"2% CD"` directly into structured promotional scheme data.
-  - Introduced Minimum Order Quantity (`_swac_b2b_moq`) post-meta across REST controllers and WooCommerce wholesale admin panels.
-
-### Fixed
-- **Loop Price Infinite Recursion**: Removed recursive `$product->get_price_html()` call inside `swac_calculate_price_data()` and added re-entrancy protection to `woocommerce_get_price_html` filter in `frontend/archive/archive-loop.php` to prevent memory exhaustion during product list rendering.
-- **Localhost SSL Redirect Guard**: Prevented canonical HTTPS 301 redirection and CSP `upgrade-insecure-requests` headers on local development environments (`localhost`, `127.0.0.1`, `.test`, `.local`) and corrected subdirectory URL path resolution in `integrations/ssl-security.php`.
-
----
-
-## [1.6.0] — 04-11-2026
-
-### Added
-- **Shikhar-Style Walled Garden Mode** (`SWAC_CATALOG_MODE = 'walled_garden'`):
-  - Completely hides the product catalog, pricing, search, and cart drawer behind a B2B Wholesale PIN login gate.
-  - Zero layout flash (FOUC) for authenticated retailers via an inline `<head>` script.
-  - Public visitors and guests see the distributor portal login card only, preventing rate exposure.
-- **Search Engine Stealth Shield** (`SWAC_PRIVATE_CATALOG = true`):
-  - Disallows search engine crawling and indexing for private wholesale sites via `X-Robots-Tag: noindex, nofollow`, `<meta name="robots">`, and dynamic `robots.txt` disallow rules.
-  - Automatically returns HTTP 404 on `/sitemap.xml` to prevent inventory discovery by competitors.
-- **WhatsApp 1-Tap Direct-Invite Auto-Login**:
-  - Wholesalers can distribute direct login links (`?b2b_login=PHONE&pin=PIN`) via WhatsApp that instantly authenticate retailers on click without manual credential entry.
-- **B2B Route-Based Dispatch**:
-  - Replaces consumer address forms with verified store name, mobile number, delivery route / area (e.g. Central Wholesale Route, Transport Bilty), and optional dispatch remarks.
-- **Modular Zero-Dependency Frontend Engine**:
-  - Decomposed the client engine into high-performance, standalone modules for delivery cutoffs (`delivery-engine.js`), pricing & totals math (`cart-math.js`), order serialization (`order-serializer.js`), and drawer presentation (`drawer-ui.js`).
-
----
-
-## [1.5.1] — 04-11-2026
-
-### Security & Hardening
-- **Timing-Safe PIN Verification**: Secured retailer 4-digit PINs and distributor Master PIN authentication using `hash_equals()` to eliminate timing leak vulnerabilities.
-- **Dynamic Auth Salting**: Hardened B2B authentication token generation using dynamic WordPress core `wp_salt('auth')`.
-- **CSV Import Validation**: Enforced strict `.csv` / `.txt` file validation for bulk rate sheet imports on the Distributor Desk.
-- **Admin & Cache Isolation**: Guarded WooCommerce price filters from altering admin product tables and prevented redundant cache purges during post revisions.
-
----
-
-## [1.5.0] — 03-11-2026
-
-### Added
+- **Stateless Zero-Session Commerce Core**:
+  - Replaced `WC_Session` with `SWAC_Null_Session_Handler`, making database session writes and `wp_woocommerce_sessions` completely inert.
+  - Suppressed WooCommerce guest tracking cookies (`woocommerce_set_cart_cookies`) and AJAX cart fragments polling (`?wc-ajax=get_refreshed_fragments`), enabling 100% full-page static caching (LiteSpeed Cache, Nginx `fastcgi_cache`, Cloudflare, Edge CDNs).
+  - Implemented 302 guest lockdown redirect routing `/cart/`, `/checkout/`, and `/my-account/` safely back to `home_url('/')` while preserving visual page builder previews (Breakdance, Elementor, Bricks, Divi, Oxygen).
+  - Built 0-dependency client-side LocalStorage cart state machine (`swac_cart`, `swac_customer_details`) with real-time DOM price reconciliation on drawer open.
+  - Implemented slide-out cart drawer UI and floating WhatsApp order trigger bubble with item counters and interactive quantity steppers.
+  - Added WhatsApp deep-link order serializer (`order-serializer.js`) formatting line items, savings, address routing, and footer disclaimers.
+  - Configurable cart ceilings (`SWAC_MAX_CART_ITEMS`, `SWAC_MAX_QTY_PER_ITEM`) to prevent WhatsApp deep-link URL truncation (~2000 chars).
+  - Optional loyalty incentive rewards system (`SWAC_LOYALTY_ENABLED`) triggered above configurable cart subtotal thresholds.
+- **Delivery & Serviceability Engine**:
+  - Timezone-aware delivery dispatch engine (`core/delivery-cutoff.php`, `assets/js/delivery-engine.js`) evaluating morning same-day, afternoon next-day, and weekend cutoffs in Kolkata IST (`wp_timezone()`).
+  - Configurable cutoff hour (`SWAC_DELIVERY_CUTOFF_HOUR`) and custom cutoff message filter (`swac_delivery_cutoff_message`).
+  - Multi-tier postal code zoning with Open mode and Gated mode (`SWAC_DELIVERY_GATED`).
+  - Always-free postal codes configuration (`SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES` and `swac_always_free_shipping_postal_codes` filter) waiving shipping fees regardless of subtotal.
+  - Flat shipping fees and configurable free delivery subtotal threshold (`SWAC_FREE_SHIPPING_AT`, `SWAC_SHIPPING_CHARGE`).
 - **Wholesale & Schemes B2B Module**:
-  - **Wholesale PTR & Schemes Pricing**: Added wholesale price-to-retailer (PTR) fields, carton pack sizes, and flexible promotional scheme rules (buy X get Y free, volume discount slabs, cash discounts, custom badges).
-  - **Dynamic Margin Calculation**: Automatically computes retailer margin amount and percentage relative to MRP on catalog cards and single product views.
-  - **Carton Packing Guide**: Displays master carton packing references (`1 Carton = X pcs`) to streamline bulk order sizing.
-  - **Zero-Cost Retailer PIN Login Gate**: Built-in phone number + 4-digit PIN authentication with zero third-party SMS gateway fees.
-  - **Frontend Distributor Desk (`[swac_distributor_portal]`)**: Mobile-first portal with instant rate search, fast product creation with direct camera photo upload, and retailer PIN directory.
-  - **1-Click Spreadsheet CSV Rate Sync**: Bulk export and import to update hundreds of product rates and stock states instantly.
-  - **WhatsApp Wholesale Order Compilation**: Order messages automatically itemize whole cartons, loose units, applied promotional schemes, and verified retailer store routing.
-
----
-
-## [1.4.1] — 01-11-2026
-
-### Fixed
-- **Action Row & Loop Button Reliability**: Ensured `[swac_action_row]` quantity steppers and "Add to Order" action buttons bind reliably across all catalog and single product templates.
-- **Unified Action Button Labels**: Synchronized single product action buttons to display "Add to Order", matching archive loop cards.
-- **Builder Template Context Resolution**: Hardened pharmaceutical composition tags and product metadata shortcodes to resolve product context accurately inside visual page builder templates.
-
----
-
-## [1.4.0] — 10-10-2026
-
-### Added
-- **Multi-Tier Always-Free Postal Code Support**:
-  - Added `SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES` configuration constant and `swac_always_free_shipping_postal_codes` filter.
-  - Automatically waives delivery fees for designated postal codes regardless of cart subtotal, with instant UI badge feedback.
-- **Background Cron Optimization**:
-  - Unschedules obsolete WooCommerce session cleanup cron jobs to eliminate background PHP wakeups.
-- **0-Dependency Automated Testing Suite**:
-  - Integrated native Node.js test runner covering cart math, shipping rules, delivery cutoffs, delimiter safety, and wholesale schemes.
-  - Added PHP static verification runner enforcing text domains, HPOS compatibility, and zero-session invariants.
-- **AI Maintenance Operating Manual (`AGENTS.md`)**:
-  - Established architectural guidelines, invariants, state registry, and maintenance mental models.
-
----
-
-## [1.3.2] — 05-10-2026
-
-### Fixed
-- **WooCommerce Admin Route Intercept**: Redirects `page=wc-admin` access denials smoothly to the classic product editor (`post-new.php?post_type=product`) instead of throwing 403 errors.
-- **Eliminated Dual-Cart Split Brain**: Removed admin-session exemptions from frontend redirects, ensuring logged-in administrators and guests share the identical zero-session client cart.
-- **Visual Builder Preview Compatibility**: Explicitly exempted visual page builder editors and previews (Breakdance, Elementor, Bricks) from lockdown redirects.
-
----
-
-## [1.3.1] — 05-10-2026
-
-### Fixed
-- **Sitemap Activation Lifecycle**: Standardized activation and deactivation hooks for the streaming XML sitemap generator.
-- **Native Select2 Asset Standardization**: Replaced external CDN assets with WooCommerce core registered select2 handles.
-- **Defensive Shortcode Guards**: Hardened shortcode callbacks and session engine handlers against duplicate function declarations.
-
----
-
-## [1.3.0] — 05-10-2026
-
-### Added
-- **Developer Feature Flag Control Panel (`features.php`)**:
-  - Introduced fine-grained toggles for optional WordPress cleanups, lockdown feature groups, and modular subsystems.
-- **Simplified Store Settings (`core/config.php`)**:
-  - Elevated essential merchant settings to human-readable PHP constants.
-- **Decoupled Pharmaceutical Features**: Decoupled prescription notices from standard catalog stores into the dedicated pharmacy module.
-
----
-
-## [1.2.2] — 03-10-2026
+  - Price-to-Retailer (PTR) metadata, retail MRP comparison, and live margin calculations (amount and percentage).
+  - Master shipping carton guide (`1 Carton = X pcs`) and Minimum Order Quantity (MOQ) enforcement.
+  - Structured promotional scheme rules: Free goods (Buy X get Y Free), volume discount slabs, cash discount percentages (CD), and custom scheme badges.
+  - Counter-speed shorthand scheme parser converting expressions like `"10+1"`, `"12+1 FREE"`, `"10:2%"`, and `"2% CD"` into structured scheme metadata.
+  - Zero-cost phone number + 4-digit PIN authentication (`/wp-json/swac/v1/retailer-login`) with brute-force rate limiting and timing-safe `hash_equals()` verification.
+  - WhatsApp 1-tap direct-invite auto-login links (`?b2b_login=PHONE&pin=PIN`) for friction-free retailer onboarding.
+  - Shikhar-style Walled Garden mode (`SWAC_CATALOG_MODE = 'walled_garden'`) hiding catalog, prices, and search behind wholesale authentication with zero layout flash (FOUC) and automatic administrator bypass.
+  - Search engine stealth shield (`SWAC_PRIVATE_CATALOG = true`) emitting `X-Robots-Tag: noindex, nofollow`, disallowing crawling in `robots.txt`, and returning 404 on `/sitemap.xml`.
+  - Route-based wholesale dispatch replacing consumer address forms with registered store name, mobile number, delivery route / transport bilty, and remarks.
+- **Distributor Desk (`[swac_distributor_portal]`)**:
+  - Mobile-first, counter-speed distributor portal with fixed 1200px desktop boundary and rock-solid tabular rate grid (`.swac-fast-grid`).
+  - 3-tier role-based access control with sliding 30-day multi-device session tokens (`swac_b2b_desk_tokens`):
+    - **Owner Role (`owner`)**: Full authority over rates (PTR), MRP, schemes, MOQ, product creation, retailer directory, store settings, and CSV synchronization.
+    - **Staff Role (`staff`)**: Dedicated warehouse stock authority with 1-tap toggling (`[ 🟢 IN STOCK ]` / `[ 🔴 OUT OF STOCK ]`) via high-speed `<100ms` endpoint (`/desk/fast-row-update`); rates and administrative tools are strictly read-only or hidden.
+    - **Salesman Role (`salesman`)**: Field order booking authority with read-only catalog access and approved retailer directory route viewing (with private retailer PINs stripped).
+  - High-speed product creation with direct smartphone camera photo capture and upload.
+  - Bulk spreadsheet CSV export and import with UTF-8 BOM (`\xEF\xBB\xBF`) for Microsoft Excel compatibility.
+  - Mobile frontend Store Settings management for WhatsApp phone number, store title, delivery fees, order disclaimers, and access PINs.
+  - Cross-Origin Resource Sharing (CORS) whitelist (`X-SWAC-Master-Token`, `X-SWAC-Retailer-Token`) supporting standalone Flutter Web applications.
+- **Pharmacy & Health Module**:
+  - Salt / active ingredient composition explorer shortcode (`[swac_explore_salts]`).
+  - Prescription medicine indicators (`isRx`) and checkout compliance warnings.
+  - Pack metrics badges (tablets, capsules, syrups, suspensions, strip counts).
+  - Generic medicine alternative upsell box (`[swac_generic_box]`).
+- **Explore & Navigation Module**:
+  - Brand and category exploration directory grids (`[swac_explore_brands]`, `[swac_categories_grid]`) with instant client-side search filtering (`explore-search.js`).
+- **SEO & Search Performance Module**:
+  - High-performance, low-memory streaming XML sitemap generator (`/sitemap.xml`) bypassing post query limits.
+  - Static JSON-LD Product & WebSite schema, canonical link generation, and OpenGraph social metadata.
+  - Toggle `SWAC_ENABLE_SITEMAP` to prevent conflicts with external SEO suites.
+- **Backend Utilities & Developer Tooling**:
+  - Missing product image audit report shortcode (`[swac_missing_images_finder]`).
+  - Select2 taxonomy UI integration using native WooCommerce core handles.
+  - Developer feature flag control panel (`features.php`) for fine-grained toggling of cleanups, lockdown groups, and modules.
+  - 0-dependency automated testing suite powered by native Node.js test runner (32 unit tests) and PHP static invariant linter (53 PHP files).
 
 ### Changed
-- Added calendar date stamping to delivery cutoffs and WhatsApp estimates.
-- Added `icon="yes|no"` toggle to `[swac_button]`.
-- Added backward-compatibility aliases for legacy shortcodes and shims.
+- Standardized baseline requirement to **PHP 8.2+** and **WooCommerce 8.0+** (tested up to 11.1).
+- Declared full compatibility with WooCommerce High-Performance Order Storage (HPOS / `custom_order_tables`) and Cart/Checkout Blocks (`cart_checkout_blocks`).
+- Standardized text domain and function namespacing across the entire codebase to `woocommerce-whatsapp-commerce` and `swac_*`.
+- Decoupled client frontend engine into high-performance, zero-dependency ES modules: `delivery-engine.js`, `cart-math.js`, `order-serializer.js`, `drawer-ui.js`, and `wa_cart.js`.
+- Extracted B2B wholesale styles into dedicated modular stylesheet (`assets/css/modules/wholesale.css`), enqueued conditionally to minimize frontend payload.
+- Modernized script loading with WordPress 6.3+ `defer` strategy in footer.
+- Optimized options loading with explicit `autoload = false` on heavy directories and tokens to prevent `wp_load_alloptions` cache bloat.
+- Replaced classic WooCommerce lifecycle hooks (`$product->save()`) in distributor desk fast updates with direct metadata and stock mutation for counter-speed response times.
+- Hardened distributor master PIN and retailer authentication with timing-safe `hash_equals()` comparison, IP brute-force rate limiting, and dynamic `wp_salt('auth')` derivation.
+- Hardened canonical HTTPS redirection and CSP headers to safely bypass local development environments (`localhost`, `127.0.0.1`, `.test`, `.local`).
+- Hardened single product shortcodes (`[swac_price_block]`, `[swac_action_row]`, `[swac_button]`, `[swac_delivery_notice]`) for robust rendering across visual page builders (Breakdance, Elementor, Bricks).
 
----
-
-## [1.2.1] — 30-09-2026
-
-### Changed
-- Added canonical WhatsApp URL builder handling query parameters safely.
-- Streamlined WhatsApp delivery details and totals formatting.
-
----
-
-## [1.2.0] — 29-09-2026
-
-### Changed
-- Declared High-Performance Order Storage (HPOS) and Cart/Checkout Blocks compatibility.
-- Standardized text domain and function namespacing to `stateless-wa-commerce`.
-
----
-
-## [1.1.0] — 26-09-2024
-
-### Added
-- Configurable cart ceilings (`max_cart_items`, `max_qty_per_item`) to protect WhatsApp deep-link URL lengths.
-- Floating toast notifications for cart quota limits.
-
----
-
-## [1.0.0] — 26-09-2024
-
-### Added
-- Initial release of the Stateless Zero-Session WhatsApp Commerce engine for WooCommerce.
-- Suppression of guest sessions, cart fragments, and tracking cookies for full-page static caching.
-- Client-side LocalStorage cart drawer with real-time DOM price reconciliation and order serializer.
-- Multi-tier delivery serviceability registry and timezone-aware dispatch cutoff engine.
-- Low-memory streaming XML sitemap generator (`/sitemap.xml`) and SSL/reverse-proxy enforcer.
+### Removed
+- **WooCommerce Guest Sessions & Cookies**: Completely eliminated `WC_Session` writes, `wp_woocommerce_sessions` database queries, and guest tracking cookies.
+- **Background Cron Wakeups**: Unregistered obsolete WooCommerce session garbage collection cron jobs.
+- **Cart Fragments Polling**: Blocked native WooCommerce cart fragments script (`wc-cart-fragments`) and AJAX polling (`?wc-ajax=get_refreshed_fragments`).
+- **Legacy Compatibility Shims & Prefixes**:
+  - Purged all legacy `g1_*` and `cdr_*` shortcode aliases (`[g1_delivery_notice]`, `[cdr_whatsapp_button]`, `[cdr_generic_box]`, `[g1_generic_box]`, `[g1_composition_tag]`).
+  - Purged legacy functions (`g1_get_delivery_cutoff_message()`, `cdr_whatsapp_button_shortcode()`, `cdr_generic_box_html()`).
+  - Purged single-token fallback `swac_b2b_master_hash` in favor of multi-device session tokens map (`swac_b2b_desk_tokens`).
+  - Purged obsolete CSS classes (`.cdr-alt-salt`, `.cdr-totals-loyalty .cdr-loyalty-gift-icon`).

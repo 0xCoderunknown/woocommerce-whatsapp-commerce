@@ -46,18 +46,18 @@ if (!function_exists('swac_get_delivery_cutoff_message')) {
             $monday_date = function_exists('wp_date')
                 ? wp_date('j M', $target_ts, $tz)
                 : (new DateTimeImmutable('@' . $target_ts))->setTimezone($tz)->format('j M');
-            $default_message = sprintf(__('Order now to get it by Monday (%s)', 'stateless-wa-commerce'), $monday_date);
+            $default_message = sprintf(__('Order now to get it by Monday (%s)', 'woocommerce-whatsapp-commerce'), $monday_date);
         } // 2. Morning Cutoff Window: Monday through Saturday, before cutoff hour
         elseif ($hour < $cutoff_hour) {
-            $cutoff_display = ($cutoff_hour === 12) ? __('12 noon', 'stateless-wa-commerce') : sprintf(__('%d:00', 'stateless-wa-commerce'), $cutoff_hour);
-            $default_message = sprintf(__('Order before %s for same-day delivery', 'stateless-wa-commerce'), $cutoff_display);
+            $cutoff_display = ($cutoff_hour === 12) ? __('12 noon', 'woocommerce-whatsapp-commerce') : sprintf(__('%d:00', 'woocommerce-whatsapp-commerce'), $cutoff_hour);
+            $default_message = sprintf(__('Order before %s for same-day delivery', 'woocommerce-whatsapp-commerce'), $cutoff_display);
         } // 3. Weekday Afternoon/Evening Window: Monday through Friday, after cutoff hour
         else {
             $target_ts = $timestamp + 86400;
             $tomorrow_date = function_exists('wp_date')
                 ? wp_date('j M', $target_ts, $tz)
                 : (new DateTimeImmutable('@' . $target_ts))->setTimezone($tz)->format('j M');
-            $default_message = sprintf(__('Order now to receive it by tomorrow (%s)', 'stateless-wa-commerce'), $tomorrow_date);
+            $default_message = sprintf(__('Order now to receive it by tomorrow (%s)', 'woocommerce-whatsapp-commerce'), $tomorrow_date);
         }
 
         /**

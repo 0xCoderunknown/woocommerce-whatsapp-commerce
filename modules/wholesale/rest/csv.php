@@ -85,7 +85,7 @@ function swac_rest_desk_import_csv(WP_REST_Request $request): WP_REST_Response
     if (empty($files['file']) || empty($files['file']['tmp_name'])) {
         return new WP_REST_Response([
             'success' => false,
-            'message' => __('No CSV file uploaded.', 'stateless-wa-commerce'),
+            'message' => __('No CSV file uploaded.', 'woocommerce-whatsapp-commerce'),
         ], 400);
     }
 
@@ -94,7 +94,7 @@ function swac_rest_desk_import_csv(WP_REST_Request $request): WP_REST_Response
     if ($ext !== 'csv' && $ext !== 'txt') {
         return new WP_REST_Response([
             'success' => false,
-            'message' => __('Invalid file format. Please upload a valid CSV file.', 'stateless-wa-commerce'),
+            'message' => __('Invalid file format. Please upload a valid CSV file.', 'woocommerce-whatsapp-commerce'),
         ], 400);
     }
 
@@ -103,7 +103,7 @@ function swac_rest_desk_import_csv(WP_REST_Request $request): WP_REST_Response
     if ($handle === false) {
         return new WP_REST_Response([
             'success' => false,
-            'message' => __('Could not open CSV file.', 'stateless-wa-commerce'),
+            'message' => __('Could not open CSV file.', 'woocommerce-whatsapp-commerce'),
         ], 500);
     }
 
@@ -118,7 +118,7 @@ function swac_rest_desk_import_csv(WP_REST_Request $request): WP_REST_Response
         fclose($handle);
         return new WP_REST_Response([
             'success' => false,
-            'message' => __('CSV file is empty.', 'stateless-wa-commerce'),
+            'message' => __('CSV file is empty.', 'woocommerce-whatsapp-commerce'),
         ], 400);
     }
 
@@ -204,7 +204,7 @@ function swac_rest_desk_import_csv(WP_REST_Request $request): WP_REST_Response
         'count' => $updated_count,
         'message' => sprintf(
         /* translators: %d: number of updated products */
-            __('Successfully updated %d products from CSV.', 'stateless-wa-commerce'),
+            __('Successfully updated %d products from CSV.', 'woocommerce-whatsapp-commerce'),
             $updated_count
         ),
     ], 200);

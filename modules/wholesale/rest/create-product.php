@@ -26,7 +26,7 @@ function swac_rest_desk_create_product(WP_REST_Request $request): WP_REST_Respon
     if (empty($name) || $mrp <= 0) {
         return new WP_REST_Response([
             'success' => false,
-            'message' => __('Product name and MRP are required.', 'stateless-wa-commerce'),
+            'message' => __('Product name and MRP are required.', 'woocommerce-whatsapp-commerce'),
         ], 400);
     }
 
@@ -49,7 +49,7 @@ function swac_rest_desk_create_product(WP_REST_Request $request): WP_REST_Respon
     if (!$product_id) {
         return new WP_REST_Response([
             'success' => false,
-            'message' => __('Failed to create product.', 'stateless-wa-commerce'),
+            'message' => __('Failed to create product.', 'woocommerce-whatsapp-commerce'),
         ], 500);
     }
 
@@ -122,7 +122,7 @@ function swac_rest_desk_create_product(WP_REST_Request $request): WP_REST_Respon
         'permalink' => $product->get_permalink(),
         'message' => sprintf(
         /* translators: %s: product title */
-            __('%s successfully added to wholesale catalog!', 'stateless-wa-commerce'),
+            __('%s successfully added to wholesale catalog!', 'woocommerce-whatsapp-commerce'),
             $name
         ),
     ], 201);

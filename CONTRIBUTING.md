@@ -45,7 +45,7 @@ Any code submitted to this repository **must strictly honor** these non-negotiab
     - Always declare return types where possible.
     - Guard against `null` inputs to string functions (`trim()`, `str_contains()`, `preg_match()`).
 6. **4-Way Version Synchronization & Indian Date Format**:
-    - Version bumps require updating `stateless-wa-commerce.php`, `core/config.php`, `package.json`, and `CHANGELOG.md` simultaneously.
+    - Version bumps require updating `woocommerce-whatsapp-commerce.php`, `core/config.php`, `package.json`, and `CHANGELOG.md` simultaneously.
     - Release dates in `CHANGELOG.md` must strictly follow Indian standard date format: `DD-MM-YYYY`.
 
 ---

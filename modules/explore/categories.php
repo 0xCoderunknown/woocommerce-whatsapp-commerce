@@ -34,12 +34,12 @@ function swac_categories_grid_shortcode($atts)
     ], $atts, 'swac_categories_grid');
 
     if (empty($atts['parent_slug'])) {
-        return '<p class="swac-no-results">' . esc_html__('Please specify a parent_slug attribute (e.g. [swac_categories_grid parent_slug="your-category"]).', 'stateless-wa-commerce') . '</p>';
+        return '<p class="swac-no-results">' . esc_html__('Please specify a parent_slug attribute (e.g. [swac_categories_grid parent_slug="your-category"]).', 'woocommerce-whatsapp-commerce') . '</p>';
     }
 
     $parent_term = get_term_by('slug', $atts['parent_slug'], 'product_cat');
     if (!$parent_term || is_wp_error($parent_term)) {
-        return '<p class="swac-no-results">' . sprintf(esc_html__('Category not found for slug "%s".', 'stateless-wa-commerce'), esc_html($atts['parent_slug'])) . '</p>';
+        return '<p class="swac-no-results">' . sprintf(esc_html__('Category not found for slug "%s".', 'woocommerce-whatsapp-commerce'), esc_html($atts['parent_slug'])) . '</p>';
     }
 
     $cache_ver = (int)get_option('swac_explore_cache_version', 1);
@@ -61,7 +61,7 @@ function swac_categories_grid_shortcode($atts)
     }
 
     if (empty($terms) || is_wp_error($terms)) {
-        return '<p class="swac-no-results">' . esc_html__('No categories found. Please check if categories have associated products, or set hide_empty="false".', 'stateless-wa-commerce') . '</p>';
+        return '<p class="swac-no-results">' . esc_html__('No categories found. Please check if categories have associated products, or set hide_empty="false".', 'woocommerce-whatsapp-commerce') . '</p>';
     }
 
     $parent_ids = wp_list_pluck($terms, 'parent');
@@ -74,7 +74,7 @@ function swac_categories_grid_shortcode($atts)
     $terms = $leaf_terms;
 
     if (empty($terms)) {
-        return '<p class="swac-no-results">' . esc_html__('No subcategories found. Please check if categories have associated products, or set hide_empty="false".', 'stateless-wa-commerce') . '</p>';
+        return '<p class="swac-no-results">' . esc_html__('No subcategories found. Please check if categories have associated products, or set hide_empty="false".', 'woocommerce-whatsapp-commerce') . '</p>';
     }
 
     ob_start();
@@ -101,7 +101,7 @@ function swac_directory_search_shortcode($atts)
     wp_enqueue_script('swac-frontend-script');
 
     $atts = shortcode_atts([
-        'placeholder' => __('Search directory...', 'stateless-wa-commerce'),
+        'placeholder' => __('Search directory...', 'woocommerce-whatsapp-commerce'),
     ], $atts, 'swac_directory_search');
 
     ob_start();
@@ -113,14 +113,14 @@ function swac_directory_search_shortcode($atts)
                     <input type="text"
                            class="swac-cat-search-input swac-live-search"
                            placeholder="<?php echo esc_attr($atts['placeholder']); ?>"
-                           aria-label="<?php esc_attr_e('Filter directory', 'stateless-wa-commerce'); ?>"
+                           aria-label="<?php esc_attr_e('Filter directory', 'woocommerce-whatsapp-commerce'); ?>"
                            autocomplete="off">
                     <span class="swac-search-icon">🔍</span>
                 </div>
             </div>
         </div>
         <p class="swac-empty-state" style="display: none;">
-            <?php esc_html_e('No results matching your search.', 'stateless-wa-commerce'); ?>
+            <?php esc_html_e('No results matching your search.', 'woocommerce-whatsapp-commerce'); ?>
         </p>
     </div>
     <?php

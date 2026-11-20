@@ -9,7 +9,7 @@ const path = require('path');
 const {spawnSync} = require('child_process');
 
 const ROOT_DIR = path.resolve(__dirname, '../..');
-const TEXT_DOMAIN = 'stateless-wa-commerce';
+const TEXT_DOMAIN = 'woocommerce-whatsapp-commerce';
 
 function getAllPhpFiles(dir, fileList = []) {
     const entries = fs.readdirSync(dir, {withFileTypes: true});
@@ -38,10 +38,10 @@ function runPhpVerification() {
     const pkgJson = JSON.parse(fs.readFileSync(path.join(ROOT_DIR, 'package.json'), 'utf8'));
     const targetVersion = pkgJson.version;
 
-    const mainPluginContent = fs.readFileSync(path.join(ROOT_DIR, 'stateless-wa-commerce.php'), 'utf8');
+    const mainPluginContent = fs.readFileSync(path.join(ROOT_DIR, 'woocommerce-whatsapp-commerce.php'), 'utf8');
     const versionHeaderMatch = mainPluginContent.match(/\*\s*Version:\s*([0-9\.]+)/);
     if (!versionHeaderMatch || versionHeaderMatch[1] !== targetVersion) {
-        errors.push(`Version mismatch in stateless-wa-commerce.php: expected ${targetVersion}, found ${versionHeaderMatch ? versionHeaderMatch[1] : 'none'}`);
+        errors.push(`Version mismatch in woocommerce-whatsapp-commerce.php: expected ${targetVersion}, found ${versionHeaderMatch ? versionHeaderMatch[1] : 'none'}`);
     }
 
     const configContent = fs.readFileSync(path.join(ROOT_DIR, 'core/config.php'), 'utf8');
@@ -96,6 +96,11 @@ function runPhpVerification() {
         // Check for $_SESSION invariant
         if (sessionSuperglobalRegex.test(content)) {
             errors.push(`[${relativePath}] Forbidden $_SESSION superglobal detected`);
+        }
+
+        // Check for purged legacy master hash option invariant (except in uninstaller)
+        if (content.includes('swac_b2b_master_hash') && !relativePath.includes('uninstall.php')) {
+            errors.push(`[${relativePath}] Forbidden legacy option 'swac_b2b_master_hash' detected`);
         }
 
         // Check text domains (2-arg)

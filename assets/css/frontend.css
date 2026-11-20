@@ -1,7 +1,7 @@
 /**
  * 🎨 FRONTEND ASSET: GLOBAL CORE STYLESHEET
  * File: assets/css/frontend.css
- * Enqueued: stateless-wa-commerce.php -> wp_enqueue_scripts ('wa-frontend-style')
+ * Enqueued: woocommerce-whatsapp-commerce.php -> wp_enqueue_scripts ('swac-frontend-style')
  * Scope: Complete core frontend styling: product loop badges, price hierarchies,
  *        action rows & quantity controls, delivery cutoff notices, and layout utilities.
  *
@@ -26,8 +26,7 @@
    ========================================= */
 
 /* Brand Name Display */
-.swac-loop-brand-title,
-.wa-product-brand {
+.swac-loop-brand-title {
     font-size: 0.70rem;
     color: var(--wa-ink-muted);
     text-transform: uppercase;
@@ -37,8 +36,7 @@
 }
 
 /* Custom Out of Stock Loop Button */
-.swac-out-of-stock-btn,
-.wa-out-of-stock-btn {
+.swac-out-of-stock-btn {
     display: block;
     padding: 8px 10px;
     background-color: #f5f5f5;
@@ -55,8 +53,7 @@
    2. WHATSAPP ACTION BUTTONS ([swac_button])
    ========================================= */
 .swac-button,
-.swac-btn,
-.wa-button {
+.swac-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -77,8 +74,7 @@
 }
 
 .swac-button:hover,
-.swac-btn:hover,
-.wa-button:hover {
+.swac-btn:hover {
     background-color: var(--wa-brand-darker);
     border-color: var(--wa-brand-darker);
     color: #ffffff !important;
@@ -88,15 +84,13 @@
 }
 
 .swac-button:focus-visible,
-.swac-btn:focus-visible,
-.wa-button:focus-visible {
+.swac-btn:focus-visible {
     outline: 2px solid var(--wa-brand);
     outline-offset: 2px;
 }
 
 .swac-button:active,
-.swac-btn:active,
-.wa-button:active {
+.swac-btn:active {
     background-color: var(--wa-brand-darker);
     border-color: var(--wa-brand-darker);
     transform: translateY(0);
@@ -104,16 +98,14 @@
 }
 
 .swac-button--fullwidth,
-.swac-btn--fullwidth,
-.wa-button--fullwidth {
+.swac-btn--fullwidth {
     display: flex;
     width: 100%;
     box-sizing: border-box;
 }
 
 .swac-button svg,
-.swac-btn svg,
-.wa-button svg {
+.swac-btn svg {
     width: 20px;
     height: 20px;
     fill: currentColor;
@@ -123,7 +115,8 @@
 /* =========================================
    3. PRICING BLOCK (SHARED & SINGLE HIERARCHY)
    ========================================= */
-.pd-price-container {
+.swac-price-block,
+.swac-price-container {
     display: flex;
     align-items: baseline;
     gap: 8px;
@@ -131,22 +124,32 @@
     margin-bottom: 8px;
 }
 
-.wa-price-now,
-.pd-price-now,
-.pd-price-now .woocommerce-Price-amount {
+.swac-price-current,
+.swac-price-now,
+.swac-price-current .woocommerce-Price-amount,
+.swac-price-now .woocommerce-Price-amount {
     font-weight: 700;
     color: var(--wa-ink);
     line-height: 1.2;
 }
 
-.pd-price-mrp {
+.swac-price-mrp-wrap,
+.swac-price-mrp {
     font-size: 0.9em;
     font-weight: 500;
     color: var(--wa-ink-muted);
     display: inline;
 }
 
-.pd-price-mrp .pd-mrp-strike {
+.swac-mrp-label {
+    font-size: 0.85em;
+    font-weight: 600;
+    color: var(--wa-ink-muted);
+    margin-right: 4px;
+}
+
+.swac-price-regular,
+.swac-price-mrp-strike {
     display: inline;
     text-decoration: line-through;
     color: var(--wa-ink-muted);
@@ -154,9 +157,9 @@
     font-weight: 500;
 }
 
-.pd-price-mrp .pd-mrp-strike .woocommerce-Price-amount,
-.pd-price-mrp .pd-mrp-strike .woocommerce-Price-currencySymbol,
-.pd-price-mrp .pd-mrp-strike bdi {
+.swac-price-regular .woocommerce-Price-amount,
+.swac-price-regular .woocommerce-Price-currencySymbol,
+.swac-price-regular bdi {
     font-size: 1em;
     font-weight: 500;
     color: var(--wa-ink-muted);
@@ -164,7 +167,8 @@
     text-decoration-color: var(--wa-ink-muted);
 }
 
-.pd-price-off {
+.swac-discount-badge,
+.swac-price-off {
     font-size: 11px;
     font-weight: 700;
     color: var(--wa-save);
@@ -177,8 +181,8 @@
 }
 
 /* 🛍️ Archive Grid Cards (Compact) */
-:is(.pd-card, .related.products, ul.products li.product, .woocommerce ul.products li.product, .products .product) .pd-price-container,
-.pd-card-price-container {
+:is(.swac-card, .related.products, ul.products li.product, .woocommerce ul.products li.product, .products .product) :is(.swac-price-block, .swac-price-container),
+.swac-card-price-container {
     display: flex !important;
     align-items: baseline;
     gap: 6px;
@@ -186,14 +190,14 @@
     margin-bottom: 8px;
 }
 
-:is(.pd-card, .pd-card-price-container, .related.products, ul.products li.product, .woocommerce ul.products li.product, .products .product) .pd-price-now {
+:is(.swac-card, .swac-card-price-container, .related.products, ul.products li.product, .woocommerce ul.products li.product, .products .product) :is(.swac-price-current, .swac-price-now) {
     font-size: 13.5px !important;
     font-weight: 700 !important;
     color: var(--wa-ink) !important;
     line-height: 1.2;
 }
 
-:is(.pd-card, .pd-card-price-container, .related.products, ul.products li.product, .woocommerce ul.products li.product, .products .product) :is(.pd-price-mrp, .pd-price-mrp .pd-mrp-strike) {
+:is(.swac-card, .swac-card-price-container, .related.products, ul.products li.product, .woocommerce ul.products li.product, .products .product) :is(.swac-price-mrp-wrap, .swac-price-regular) {
     font-size: 13.5px !important;
     font-weight: 400 !important;
     color: #64748b !important;
@@ -203,22 +207,7 @@
     display: inline;
 }
 
-.pd-card-price-container .pd-price-mrp,
-.pd-card-price-container .pd-price-mrp .pd-mrp-strike,
-.pd-card-price-container .pd-price-mrp .woocommerce-Price-amount {
-    font-size: 13.5px !important;
-    font-weight: 400 !important;
-    color: #64748b !important;
-    line-height: 1.2;
-}
-
-.pd-card-price-container .pd-price-mrp :is(bdi, .woocommerce-Price-currencySymbol) {
-    font-size: inherit !important;
-    font-weight: inherit !important;
-    color: inherit !important;
-}
-
-:is(.pd-card, .pd-card-price-container, ul.products li.product, .woocommerce ul.products li.product, .products .product) .pd-price-off {
+:is(.swac-card, .swac-card-price-container, ul.products li.product, .woocommerce ul.products li.product, .products .product) :is(.swac-discount-badge, .swac-price-off) {
     font-size: 12px !important;
     font-weight: 700;
     color: var(--wa-save) !important;
@@ -232,15 +221,14 @@
 }
 
 /* 🏷️ Single Product Price & Pack Hierarchy Hero Styling */
-.wa-price-pack-wrap,
-.wa-pd-price-wrapper {
+.swac-price-pack-wrap {
     display: flex;
     flex-direction: column;
     gap: 4px;
     margin-bottom: 16px;
 }
 
-:is(.wa-price-pack-wrap, .wa-pd-price-wrapper) .pd-price-container {
+.swac-price-pack-wrap :is(.swac-price-block, .swac-price-container) {
     display: flex;
     align-items: baseline;
     gap: 12px;
@@ -248,14 +236,14 @@
     margin-bottom: 12px;
 }
 
-:is(.wa-price-pack-wrap, .wa-pd-price-wrapper) :is(.pd-price-now, .pd-price-now .woocommerce-Price-amount, .pd-price-now .woocommerce-Price-currencySymbol, .pd-price-now bdi) {
+.swac-price-pack-wrap :is(.swac-price-current, .swac-price-now, .swac-price-current .woocommerce-Price-amount, .swac-price-now .woocommerce-Price-amount, .swac-price-current .woocommerce-Price-currencySymbol, .swac-price-now .woocommerce-Price-currencySymbol, .swac-price-current bdi, .swac-price-now bdi) {
     font-size: 32px !important;
     font-weight: 700 !important;
     color: var(--wa-accent) !important;
     line-height: 1;
 }
 
-:is(.wa-price-pack-wrap, .wa-pd-price-wrapper) :is(.pd-price-mrp, .pd-price-mrp .pd-mrp-strike, .pd-price-mrp .pd-mrp-strike .woocommerce-Price-amount, .pd-price-mrp .pd-mrp-strike .woocommerce-Price-currencySymbol, .pd-price-mrp .pd-mrp-strike bdi) {
+.swac-price-pack-wrap :is(.swac-price-mrp-wrap, .swac-price-regular, .swac-price-regular .woocommerce-Price-amount, .swac-price-regular .woocommerce-Price-currencySymbol, .swac-price-regular bdi) {
     font-size: 15px !important;
     font-weight: 500 !important;
     color: var(--wa-ink-muted) !important;
@@ -264,7 +252,7 @@
     text-decoration-color: var(--wa-ink-muted);
 }
 
-:is(.wa-price-pack-wrap, .wa-pd-price-wrapper) .pd-price-off {
+.swac-price-pack-wrap :is(.swac-discount-badge, .swac-price-off) {
     font-size: 12px;
     font-weight: 700;
     color: var(--wa-save);
@@ -276,14 +264,13 @@
     letter-spacing: 0.03em;
 }
 
-.wa-pack-size,
-.pd-pack-size {
+.swac-pack-size {
     font-size: 13.5px;
     color: var(--wa-ink-muted);
     margin-bottom: 16px;
 }
 
-:is(.wa-pack-size, .pd-pack-size) strong {
+.swac-pack-size strong {
     color: var(--wa-ink);
     font-weight: 600;
     margin-left: 4px;
@@ -292,9 +279,7 @@
 /* =========================================
    4. ACTION ROW & QUANTITY CONTROLS ([swac_action_row])
    ========================================= */
-.swac-action-row,
-.wa-action-row,
-.pd-action-row {
+.swac-action-row {
     width: 100%;
     margin-bottom: 20px;
     display: flex;
@@ -304,9 +289,7 @@
     flex-wrap: wrap !important;
 }
 
-.swac-qty-selector,
-.wa-qty-selector,
-.pd-qty-selector {
+.swac-qty-selector {
     display: inline-flex;
     align-items: center;
     border: 1px solid var(--wa-line);
@@ -317,9 +300,8 @@
 }
 
 .swac-qty-btn,
-.wa-qty-btn,
-.pd-qty-minus,
-.pd-qty-plus {
+.swac-qty-minus,
+.swac-qty-plus {
     background: #f8fafc;
     border: none;
     width: 40px;
@@ -335,15 +317,12 @@
 }
 
 .swac-qty-btn:hover,
-.wa-qty-btn:hover,
-.pd-qty-minus:hover,
-.pd-qty-plus:hover {
+.swac-qty-minus:hover,
+.swac-qty-plus:hover {
     background: #e2e8f0;
 }
 
-.swac-qty-input,
-.wa-qty-input,
-.pd-qty-input {
+.swac-qty-input {
     width: 50px;
     height: 100%;
     border: none;
@@ -356,16 +335,12 @@
 }
 
 .swac-qty-input::-webkit-outer-spin-button,
-.swac-qty-input::-webkit-inner-spin-button,
-.wa-qty-input::-webkit-outer-spin-button,
-.wa-qty-input::-webkit-inner-spin-button {
+.swac-qty-input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 
-.swac-single-add-btn,
-.wa-single-add-btn,
-.pd-add-to-order-btn {
+.swac-single-add-btn {
     flex: 1 1 auto;
     display: inline-flex;
     align-items: center;
@@ -388,21 +363,18 @@
     white-space: nowrap;
 }
 
-.swac-single-add-btn:hover,
-.wa-single-add-btn:hover,
-.pd-add-to-order-btn:hover {
+.swac-single-add-btn:hover {
     background: var(--wa-brand-darker);
     transform: translateY(-1px);
 }
 
-:is(.swac-single-add-btn, .wa-single-add-btn).swac-btn-added {
+.swac-single-add-btn.swac-btn-added {
     background: #15803d;
     color: #fff;
     pointer-events: none;
 }
 
-.swac-single-add-btn svg,
-.wa-single-add-btn svg {
+.swac-single-add-btn svg {
     width: 20px;
     height: 20px;
     fill: currentColor;
@@ -412,8 +384,7 @@
 /* =========================================
    5. DELIVERY NOTICE BADGE ([swac_delivery_notice])
    ========================================= */
-.swac-delivery-notice,
-.wa-delivery-notice {
+.swac-delivery-notice {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -431,16 +402,14 @@
     box-sizing: border-box;
 }
 
-.swac-delivery-notice .swac-delivery-icon,
-.wa-delivery-notice .wa-delivery-icon {
+.swac-delivery-notice .swac-delivery-icon {
     font-size: 13px;
     line-height: 1;
     flex-shrink: 0;
     color: #d97706;
 }
 
-.swac-delivery-notice .swac-delivery-text,
-.wa-delivery-notice .wa-delivery-text {
+.swac-delivery-notice .swac-delivery-text {
     font-weight: 500;
     color: #2e3c38;
 }
@@ -508,8 +477,7 @@ div.stock.out-of-stock {
 /* =========================================
    7. LAYOUT UTILITIES
    ========================================= */
-.swac-two-col-layout,
-.wa-two-col-layout {
+.swac-two-col-layout {
     display: flex;
     gap: 40px;
     flex-wrap: wrap;

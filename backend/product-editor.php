@@ -89,7 +89,7 @@ add_action('manage_product_posts_custom_column', function ($column, $post_id) {
 
     if ($discount_percent > 0) {
         echo sprintf(
-            '<span class="swac-admin-discount-badge wa-admin-discount-badge" style="display:inline-block; margin-left:6px; background:#dcfce7; color:#15803d; font-size:11px; font-weight:600; padding:1px 5px; border-radius:3px; vertical-align:middle; line-height:1.2;">%d%% OFF</span>',
+            '<span class="swac-admin-discount-badge" style="display:inline-block; margin-left:6px; background:#dcfce7; color:#15803d; font-size:11px; font-weight:600; padding:1px 5px; border-radius:3px; vertical-align:middle; line-height:1.2;">%d%% OFF</span>',
             esc_html($discount_percent)
         );
     }

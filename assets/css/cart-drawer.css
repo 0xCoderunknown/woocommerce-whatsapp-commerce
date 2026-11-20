@@ -1,7 +1,7 @@
 /**
  * 🛒 FRONTEND ASSET: WHATSAPP CART DRAWER & ADDRESS SUBSYSTEM STYLES
  * File: assets/css/cart-drawer.css
- * Enqueued: stateless-wa-commerce.php -> wp_enqueue_scripts ('swac-cart-drawer-style')
+ * Enqueued: woocommerce-whatsapp-commerce.php -> wp_enqueue_scripts ('swac-cart-drawer-style')
  * Interacts with: assets/js/wa_cart.js & frontend/components/cart-drawer.php
  *
  * @package StatelessWaCommerce

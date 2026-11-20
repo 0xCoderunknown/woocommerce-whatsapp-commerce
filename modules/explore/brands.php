@@ -59,7 +59,7 @@ function swac_explore_brands_shortcode($atts)
     }
 
     if (empty($terms) || is_wp_error($terms)) {
-        return '<p class="swac-no-results">' . esc_html__('No brands found. Please check if brands have associated products, or set hide_empty="false".', 'stateless-wa-commerce') . '</p>';
+        return '<p class="swac-no-results">' . esc_html__('No brands found. Please check if brands have associated products, or set hide_empty="false".', 'woocommerce-whatsapp-commerce') . '</p>';
     }
 
     ob_start();
@@ -72,15 +72,15 @@ function swac_explore_brands_shortcode($atts)
                            id="swac-brand-search"
                            class="swac-cat-search-input swac-live-search"
                            data-target="#swac-brand-list"
-                           placeholder="<?php esc_attr_e('Search brands...', 'stateless-wa-commerce'); ?>"
-                           aria-label="<?php esc_attr_e('Filter brands', 'stateless-wa-commerce'); ?>"
+                           placeholder="<?php esc_attr_e('Search brands...', 'woocommerce-whatsapp-commerce'); ?>"
+                           aria-label="<?php esc_attr_e('Filter brands', 'woocommerce-whatsapp-commerce'); ?>"
                            autocomplete="off">
                     <span class="swac-search-icon">🔍</span>
                 </div>
             </div>
         </div>
         <p id="swac-brands-no-results" class="swac-empty-state" style="display: none;">
-            <?php esc_html_e('No brands found matching your search.', 'stateless-wa-commerce'); ?>
+            <?php esc_html_e('No brands found matching your search.', 'woocommerce-whatsapp-commerce'); ?>
         </p>
     </div>
 

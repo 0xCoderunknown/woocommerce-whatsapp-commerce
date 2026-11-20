@@ -277,9 +277,10 @@ Empowers stockists and distributors with counter-speed rate management, wholesal
 
 - **Aliases**: `[swac_frontend_admin]`
 - **Purpose**: Embeds a zero-admin, mobile-friendly Frontend Distributor Desk on any Breakdance or theme page (e.g. `/distributor/`). Enables wholesalers, sales reps, and dispatch clerks to:
-    1. **Dual-Role Access Control (Owner vs Staff)**:
-        - **Owner**: Authenticated via Master PIN or logged-in WordPress Administrator. Full control over rates (PTR), Retail MRP, MOQ, carton packs, promotional schemes, fast product photo creation, retailer directories, store settings, and CSV synchronization.
+    1. **3-Tier Role Access Control (Owner, Staff & Salesman)**:
+        - **Owner**: Authenticated via Master PIN (`swac_b2b_master_pin`) or logged-in WordPress Administrator. Full control over rates (PTR), Retail MRP, MOQ, carton packs, promotional schemes, fast product photo creation, retailer directories, store settings, and CSV synchronization.
         - **Staff**: Authenticated via shared Staff PIN (`swac_b2b_staff_pin`). Strictly limited to toggling stock pills (`[ 🟢 IN STOCK ]` / `[ 🔴 OUT OF STOCK ]`) and catalog search. All pricing, scheme, MOQ inputs, and administrative tabs are disabled and hidden.
+        - **Salesman**: Authenticated via Salesman PIN (`swac_b2b_salesman_pin`). Authorized for field order booking with read-only catalog browsing and approved retailer route directory viewing (with private retailer PINs stripped). Editing, stock toggles, and administrative tabs are hidden.
     2. **Counter-Speed Quick-Update Grid**: Tab through Rate (PTR), Retail MRP, MOQ, and Scheme inputs with auto-save on blur, plus 1-tap Stock Pill toggling executing in `<100ms` via `/desk/fast-row-update`.
     3. **Shorthand Scheme Notation**: Input single promotional strings (`"10+1"`, `"12+1 FREE"`, `"10:2%"`, `"2% CD"`) automatically parsed into structured wholesale schema.
     4. **Fast Product Entry**: Add new simple products via a single-screen mobile form with direct phone camera / gallery photo upload (Owner only).

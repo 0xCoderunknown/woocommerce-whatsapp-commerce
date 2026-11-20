@@ -84,7 +84,7 @@ function swac_rest_desk_quick_update(WP_REST_Request $request): WP_REST_Response
     $product = wc_get_product($product_id);
 
     if (!$product) {
-        return new WP_REST_Response(['success' => false, 'message' => __('Product not found.', 'stateless-wa-commerce')], 404);
+        return new WP_REST_Response(['success' => false, 'message' => __('Product not found.', 'woocommerce-whatsapp-commerce')], 404);
     }
 
     // 1. Update PTR
@@ -147,7 +147,7 @@ function swac_rest_desk_quick_update(WP_REST_Request $request): WP_REST_Response
 
     return new WP_REST_Response([
         'success' => true,
-        'message' => __('Rate & Scheme updated.', 'stateless-wa-commerce'),
+        'message' => __('Rate & Scheme updated.', 'woocommerce-whatsapp-commerce'),
     ], 200);
 }
 
@@ -173,7 +173,7 @@ function swac_rest_desk_fast_row_update(WP_REST_Request $request): WP_REST_Respo
     if (!$product_id || get_post_type($product_id) !== 'product') {
         return new WP_REST_Response([
             'success' => false,
-            'message' => __('Invalid product ID.', 'stateless-wa-commerce'),
+            'message' => __('Invalid product ID.', 'woocommerce-whatsapp-commerce'),
         ], 404);
     }
 
@@ -190,7 +190,7 @@ function swac_rest_desk_fast_row_update(WP_REST_Request $request): WP_REST_Respo
     if ($role === 'retailer') {
         return new WP_REST_Response([
             'success' => false,
-            'message' => __('Retailer accounts are read-only and cannot modify wholesale catalog.', 'stateless-wa-commerce'),
+            'message' => __('Retailer accounts are read-only and cannot modify wholesale catalog.', 'woocommerce-whatsapp-commerce'),
         ], 403);
     }
     if ($role === 'staff' || $role === 'salesman') {
@@ -199,14 +199,14 @@ function swac_rest_desk_fast_row_update(WP_REST_Request $request): WP_REST_Respo
             if (array_key_exists($key, $params)) {
                 return new WP_REST_Response([
                     'success' => false,
-                    'message' => __('Staff and salesman accounts are authorized for stock toggles only. Price and scheme updates require Owner PIN.', 'stateless-wa-commerce'),
+                    'message' => __('Staff and salesman accounts are authorized for stock toggles only. Price and scheme updates require Owner PIN.', 'woocommerce-whatsapp-commerce'),
                 ], 403);
             }
         }
         if (!array_key_exists('in_stock', $params)) {
             return new WP_REST_Response([
                 'success' => false,
-                'message' => __('No stock update parameter provided.', 'stateless-wa-commerce'),
+                'message' => __('No stock update parameter provided.', 'woocommerce-whatsapp-commerce'),
             ], 400);
         }
     }
@@ -306,7 +306,7 @@ function swac_rest_desk_fast_row_update(WP_REST_Request $request): WP_REST_Respo
         'success' => true,
         'id' => $product_id,
         'updated_fields' => $updated_fields,
-        'message' => __('Row updated.', 'stateless-wa-commerce'),
+        'message' => __('Row updated.', 'woocommerce-whatsapp-commerce'),
     ], 200);
 }
 

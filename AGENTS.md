@@ -42,7 +42,7 @@ Any pull request, refactor, or AI-generated edit **MUST NOT** violate these non-
     - Never introduce un-namespaced or custom third-party prefixed shortcodes. Consult [docs/shortcodes.md](docs/shortcodes.md) before making shortcode edits.
 4. **4-Way Version Synchronization**:
     - When bumping the plugin version, update all four files in tandem:
-        1. [stateless-wa-commerce.php](file:///stateless-wa-commerce.php) (`Version: X.Y.Z`)
+        1. [woocommerce-whatsapp-commerce.php](file:///woocommerce-whatsapp-commerce.php) (`Version: X.Y.Z`)
         2. [core/config.php](file:///core/config.php) (`define('SWAC_VERSION', 'X.Y.Z');`)
         3. [package.json](file:///package.json) (`"version": "X.Y.Z"`)
         4. [CHANGELOG.md](file:///CHANGELOG.md) (`## [X.Y.Z] — DD-MM-YYYY`)
@@ -54,12 +54,20 @@ Any pull request, refactor, or AI-generated edit **MUST NOT** violate these non-
     - This is an open-source GPL v2+ public project on GitHub. Never hardcode private merchant phone numbers, client-specific business names, proprietary tokens, or private delivery routes in source code or documentation. All examples, tests, and defaults must remain generic.
 7. **Single Source of Truth Documentation**:
     - Never scatter duplicate parameter dictionaries or architectural essays across multiple markdown files. Update the single authoritative source of truth file identified in the Documentation Matrix.
+8. **Page Builder Preview Exemption**:
+    - Always preserve `swac_is_page_builder_preview()`. Visual page builders (Breakdance, Elementor, Bricks, Divi, Oxygen, Beaver Builder, Customizer) load previews and editing canvases in iframes. They MUST be exempted from the 302 guest lockdown redirect and null session handler to guarantee visual template editing without canvas crashes.
+9. **Strict Zero-Legacy Policy & Zero Legacy Support**:
+    - Never introduce, maintain, or tolerate backward-compatibility shims, deprecated constant aliases, transitional wrappers, legacy storage keys (e.g. `cdr_*`, `g1_*`), single-token fallbacks (`swac_b2b_master_hash`), or legacy shortcode aliases.
+    - All systems use the canonical `swac_*` architecture natively. Drop legacy code ruthlessly on sight.
 
 ---
 
 ## 3. Delivery Zones & Postal Code Invariants
 
-- **Modes**: Open Mode (accepts all postal codes) vs. Gated Mode (only registered tiers serviceable).
+- **Modes**: Open Mode (`SWAC_DELIVERY_GATED = false`, accepts all postal codes) vs. Gated Mode (`SWAC_DELIVERY_GATED = true`, only registered tiers serviceable).
+- **Configurable Cutoff Hour**:
+    - Constant: `SWAC_DELIVERY_CUTOFF_HOUR` in [core/config.php](file:///core/config.php) (default `12` noon).
+    - Filter: `swac_delivery_cutoff_message` allowing runtime customization of cutoff notices.
 - **Always-Free Postal Codes**:
     - Constant: `SWAC_ALWAYS_FREE_SHIPPING_POSTAL_CODES` in [core/config.php](file:///core/config.php).
     - Filter: `swac_always_free_shipping_postal_codes`.
@@ -89,10 +97,10 @@ run-tests.cmd
     - `shipping-thresholds.test.js`: Free shipping threshold evaluation, flat shipping fees, always-free postal codes.
     - `delivery-cutoff.test.js`: IST timezone cutoff windows (morning same-day, afternoon next-day, weekend Monday cutoff).
     - `delimiter-safety.test.js`: WhatsApp base URL `?`/`&` parameter concatenation, address line-break injection sanitization, emoji encoding.
-    - `wholesale-schemes.test.js`: Wholesale margins, carton conversions, free goods math, and trade order formatting.
+    - `wholesale-schemes.test.js`: Wholesale margins, carton conversions, free goods math, trade order formatting, and 3-tier role boundary tests.
     - `modular-engines.test.js`: Direct isolated validation of delivery-engine.js and cart-math.js without DOM dependencies.
 - **PHP Verification Runner (`tests/php/runner.js`)**:
-    - Validates `stateless-wa-commerce` text domain across all i18n calls.
+    - Validates `woocommerce-whatsapp-commerce` text domain across all i18n calls.
     - Enforces `session_start`, `setcookie`, and `$_SESSION` bans.
     - Enforces 4-way version synchronization.
     - Validates structural PHP token balance and HPOS compatibility.
@@ -111,9 +119,14 @@ The wholesale engine (`modules/wholesale/`) enables B2B trade between stockists 
 2. **Zero-Cost Phone + 4-Digit PIN Authentication**:
     - Never introduce paid third-party SMS OTP gateways (Twilio, MSG91).
     - Authentication verifies against `swac_b2b_approved_retailers` via `/wp-json/swac/v1/retailer-login`.
-3. **Frontend Distributor Desk & CSV Sync**:
+3. **Frontend Distributor Desk & 3-Tier Access Control**:
     - Accessible via `[swac_distributor_portal]` shortcode.
-    - Protected by Master PIN (`swac_b2b_master_pin`) and SHA-256 session token (`X-SWAC-Master-Token`).
+    - Protected by role-specific PINs issuing 30-day session tokens:
+        - 👑 **Owner Role** (`swac_b2b_master_pin`): Full administrative authority over rates, MOQ, schemes, approved retailers, store settings, CSV sync, and product creation.
+        - 📦 **Staff Role** (`swac_b2b_staff_pin`): Warehouse stock toggle authority (`[ 🟢 IN STOCK ]` / `[ 🔴 OUT OF STOCK ]`). Rates and schemes are read-only; administrative features are hidden.
+        - 💼 **Salesman Role** (`swac_b2b_salesman_pin`): Field rep order booking authority. Can browse catalog rates and view approved retailer route directory (with private retailer PINs stripped); editing and admin tools are hidden.
+    - Multi-device sessions tracked in `swac_b2b_desk_tokens` option map with sliding expiration.
+    - Cross-Origin Resource Sharing (CORS) supported for Flutter Web clients via `rest_allowed_cors_headers` (`X-SWAC-Master-Token`, `X-SWAC-Retailer-Token`).
     - CSV export streams with UTF-8 BOM (`\xEF\xBB\xBF`) for Microsoft Excel compatibility.
 4. **Walled Garden & Search Engine Stealth**:
     - `SWAC_CATALOG_MODE = 'walled_garden'`: Hides entire catalog behind Wholesale PIN gate with zero layout flash (FOUC).
@@ -125,25 +138,27 @@ The wholesale engine (`modules/wholesale/`) enables B2B trade between stockists 
 
 | Subsystem | Directory / Files | Primary Responsibility |
 |:---|:---|:---|
-| **Plugin Entry** | `stateless-wa-commerce.php` | Bootstrap, HPOS declaration, rewrite rules, and module loading. |
+| **Plugin Entry** | `woocommerce-whatsapp-commerce.php` | Bootstrap, HPOS declaration, rewrite rules, and module loading. |
 | **Developer Flags** | `features.php` | Single source of truth for toggling lockdown groups and modules. |
-| **Store Config** | `core/config.php` | Merchant WhatsApp number, store name, shipping tiers, city name. |
-| **Core Utilities** | `core/helpers.php` | Shared telephone sanitizer, wa.me URL builder, currency & pincode helpers. |
+| **Store Config** | `core/config.php` | Merchant WhatsApp number, store name, shipping tiers, cutoff hours, city name. |
+| **Core Utilities** | `core/helpers.php` | Shared telephone sanitizer, wa.me URL builder, currency & pincode helpers, page builder preview detection. |
 | **Zero-Session Core** | `core/session-engine.php`, `core/catalog-lockdown.php` | `SWAC_Null_Session_Handler`, `/cart/` 302 redirects, AJAX fragment blocker. |
 | **System Cleanup** | `core/system-cleanup.php` | Tunable bloat cleanups (head bloat, comments, admin menus, script dequeuing). |
 | **Pricing Engine** | `core/pricing-engine.php` | Strike-through MRP HTML formatting, savings calculation, discount %. |
 | **Delivery Engine** | `core/delivery-zones.php`, `core/delivery-cutoff.php` | Pincode zoning, always-free postal codes, Kolkata IST cutoff timers. |
 | **Cache Coordination** | `core/cache-manager.php` | Surgical LiteSpeed / Nginx cache purging for updated products. |
+| **Security & SSL** | `integrations/ssl-security.php` | Canonical HTTPS enforcement, CSP upgrade headers, and local/development environment bypass. |
+| **Backend Utilities** | `backend/admin-tools.php`, `backend/product-editor.php`, `backend/taxonomy-ui.php` | Product image audit report (`[swac_missing_images_finder]`), product editor streamlining, Select2 taxonomy UI. |
 | **Frontend UI / Drawer** | `frontend/components/cart-drawer.php`, `frontend/enqueue.php` | Floating trigger bubble, slide-out drawer markup, asset localization. |
-| **Single Product** | `frontend/single/product-meta.php`, `frontend/single/notices.php` | `[swac_price_block]`, `[swac_action_row]`, `[swac_delivery_notice]`. |
+| **Single Product** | `frontend/single/product-meta.php`, `frontend/single/notices.php` | `[swac_price_block]`, `[swac_action_row]`, `[swac_button]`, `[swac_delivery_notice]`, `[swac_stock_status]`. |
 | **Client Engine** | `assets/js/wa_cart.js`, `assets/js/drawer-ui.js`, `assets/js/delivery-engine.js`, `assets/js/cart-math.js`, `assets/js/order-serializer.js` | 0-dependency cart state machine, drawer presentation, delivery cutoff math, cart totals, DOM price reconciliation, WhatsApp order serialization. |
-| **Wholesale Core** | `modules/wholesale/product-meta.php`, `modules/wholesale/shop-card.php`, `modules/wholesale/walled-garden.php` | PTR meta, margin badge calculation, carton guide, dual-state card gating, walled garden mode. |
+| **Wholesale Core** | `modules/wholesale/product-meta.php`, `modules/wholesale/shop-card.php`, `modules/wholesale/walled-garden.php`, `assets/css/modules/wholesale.css` | PTR meta, margin badge calculation, carton guide, dual-state card gating, walled garden mode, modular wholesale styling. |
 | **Retailer Auth** | `modules/wholesale/retailer-auth.php`, `modules/wholesale/login-modal.php` | Directory registry, 4-digit PIN verification endpoint, login modal. |
-| **Distributor Desk** | `modules/wholesale/frontend-desk.php`, `modules/wholesale/desk-rest.php`, `modules/wholesale/rest/`, `modules/wholesale/desk-template.php`, `modules/wholesale/templates/distributor-desk-view.php`, `assets/js/distributor-desk.js` | `[swac_distributor_portal]`, quick rate sheet, camera upload, CSV sync. |
+| **Distributor Desk** | `modules/wholesale/frontend-desk.php`, `modules/wholesale/desk-rest.php`, `modules/wholesale/rest/`, `modules/wholesale/desk-template.php`, `modules/wholesale/templates/distributor-desk-view.php`, `assets/js/distributor-desk.js` | `[swac_distributor_portal]`, quick rate sheet, camera upload, CSV sync, 3-role access controllers. |
 | **Retailer Auth (JS)** | `assets/js/retailer-auth.js` | Client-side 4-digit PIN verification modal, status pill, and class toggle. |
-| **Pharmacy Module** | `modules/pharmacy/` | Salt composition explorer, prescription flags (`isRx`), pack size badges. |
-| **Explore Module** | `modules/explore/`, `assets/js/explore-search.js` | Brand and category directory grids with live client-side search. |
-| **SEO Module** | `modules/seo/` | Static JSON-LD Product & WebSite schema, canonical tags, OpenGraph meta, XML sitemap. |
+| **Pharmacy Module** | `modules/pharmacy/` | Salt composition explorer (`[swac_explore_salts]`), prescription flags (`isRx`), pack size badges, generic medicine upsell box (`[swac_generic_box]`). |
+| **Explore Module** | `modules/explore/`, `assets/js/explore-search.js` | Brand and category directory grids (`[swac_explore_brands]`, `[swac_categories_grid]`) with live client-side search. |
+| **SEO Module** | `modules/seo/` | Static JSON-LD Product & WebSite schema, canonical tags, OpenGraph meta, independent XML sitemap (`modules/seo/sitemap-generator.php`). |
 
 ---
 
@@ -155,15 +170,16 @@ The wholesale engine (`modules/wholesale/`) enables B2B trade between stockists 
 - `swac_customer_details`: Customer delivery object `{ name, address, landmark, area, pincode }`.
 - `swac_b2b_retailer`: Authenticated retailer session `{ phone, store_name, owner_name, area, token }`.
 - `swac_b2b_master_token`: Master token authorizing Distributor Desk mobile access.
-- `swac_desk_role`: Active role for distributor desk (`owner` | `staff`).
+- `swac_desk_role`: Active role for distributor desk (`owner` | `staff` | `salesman`).
 
 ### 7.2. WordPress `wp_options` Keys
 
 - `swac_b2b_approved_retailers`: Keyed array of registered retailers `[ phone => { phone, pin, store_name, owner_name, area, status, created_at } ]`.
 - `swac_b2b_master_pin`: Plain master passcode for Distributor Desk owner access.
 - `swac_b2b_staff_pin`: Plain staff passcode for Distributor Desk stock-only access.
+- `swac_b2b_salesman_pin`: Plain salesman passcode for Distributor Desk catalog and retailer directory browsing access.
 - `swac_b2b_desk_tokens`: Keyed array of active sessions `[ token_hash => { role, expires, created_at } ]`.
-- `swac_b2b_master_hash`: SHA-256 hash or array `[ hash, expires, role ]` of currently active master session token.
+- `swac_explore_cache_version`: Atomic integer version for directory transients invalidation.
 - `swac_cron_cleaned`: One-time flag indicating obsolete WooCommerce background sessions cron was unregistered.
 - `swac_store_phone`: Overridden WhatsApp business phone number (string).
 - `swac_store_name`: Overridden store display name (string).
@@ -191,19 +207,19 @@ The wholesale engine (`modules/wholesale/`) enables B2B trade between stockists 
 | Endpoint | Method | Permission | Purpose |
 |:---|:---|:---|:---|
 | `/wp-json/swac/v1/retailer-login` | `POST` | Public (Rate-Limited) | Authenticates retailer via Phone + 4-digit PIN. |
-| `/wp-json/swac/v1/desk/auth` | `POST` | Public (Rate-Limited) | Validates Master PIN (Owner) or Staff PIN and issues 30-day token with role. |
+| `/wp-json/swac/v1/desk/auth` | `POST` | Public (Rate-Limited) | Validates Master PIN (Owner), Staff PIN (Staff), or Salesman PIN (Salesman) and issues 30-day token with role. |
 | `/wp-json/swac/v1/desk/logout` | `POST` | Authorized | Invalidates session token immediately. |
-| `/wp-json/swac/v1/desk/products` | `GET` | Authorized (Owner & Staff) | Returns catalog items for rate sheet. |
-| `/wp-json/swac/v1/desk/fast-row-update` | `POST` | Authorized (Role-Filtered) | High-speed (<100ms) update. Staff restricted to stock toggles only; Owner can update rates, schemes, MOQ. |
+| `/wp-json/swac/v1/desk/products` | `GET` | Authorized (Owner, Staff & Salesman) | Returns catalog items for rate sheet. |
+| `/wp-json/swac/v1/desk/fast-row-update` | `POST` | Authorized (Role-Filtered) | High-speed (<100ms) update. Staff restricted strictly to stock toggles; Owner can update rates, schemes, MOQ. |
 | `/wp-json/swac/v1/desk/quick-update` | `POST` | Owner Authorized | Full product save for rates and schemes. |
 | `/wp-json/swac/v1/desk/create-product` | `POST` | Owner Authorized | Creates new simple product with phone camera photo upload. |
-| `/wp-json/swac/v1/desk/retailers` | `GET` | Owner Authorized | Fetches approved retailer directory. |
+| `/wp-json/swac/v1/desk/retailers` | `GET` | Authorized (Owner & Salesman) | Fetches approved retailer directory (private PINs stripped for Salesman role). |
 | `/wp-json/swac/v1/desk/save-retailer` | `POST` | Owner Authorized | Creates or edits approved retailer account and PIN. |
 | `/wp-json/swac/v1/desk/delete-retailer` | `POST` | Owner Authorized | Deletes retailer from approved directory. |
 | `/wp-json/swac/v1/desk/export-csv` | `GET` | Owner Authorized | Streams complete catalog rates as CSV with UTF-8 BOM. |
 | `/wp-json/swac/v1/desk/import-csv` | `POST` | Owner Authorized | Bulk updates catalog rates and stock from uploaded CSV. |
-| `/wp-json/swac/v1/desk/settings` | `GET` | Owner Authorized | Retrieves store contact, delivery charges, and order disclaimer. |
-| `/wp-json/swac/v1/desk/settings` | `POST` | Owner Authorized | Saves store contact, delivery charges, disclaimer, Master PIN, and Staff PIN. |
+| `/wp-json/swac/v1/desk/settings` | `GET` | Owner Authorized | Retrieves store contact, delivery charges, order disclaimer, and configured PIN states. |
+| `/wp-json/swac/v1/desk/settings` | `POST` | Owner Authorized | Saves store contact, delivery charges, disclaimer, Master PIN, Staff PIN, and Salesman PIN. |
 
 ---
 
@@ -219,7 +235,11 @@ When modifying or refactoring this codebase, AI agents MUST avoid these common m
     - Do NOT import jQuery, React, Vue, Alpine, or external CDNs into frontend assets. Keep `assets/js/wa_cart.js` strictly 0-dependency vanilla JavaScript.
 4. ❌ **Do NOT break Breakdance Builder parity**:
     - Store owners use Breakdance Builder visually. All shortcodes (`[swac_action_row]`, `[swac_price_block]`, `[swac_distributor_portal]`) must output self-contained, valid HTML that renders without theme conflicts.
-5. ❌ **Do NOT use unhoisted scoped helpers across functions**:
+5. ❌ **Do NOT remove or bypass page builder preview detection**:
+    - Always keep `swac_is_page_builder_preview()` active in `core/catalog-lockdown.php` and `core/session-engine.php`. Never remove or bypass this helper when modifying redirect logic.
+6. ❌ **Do NOT rely on frontend UI hiding for REST authorization**:
+    - Enforce server-side role validation (`swac_desk_is_owner_authorized`, `swac_desk_can_read_retailers`, and role checks in `/fast-row-update`). Staff tokens must never be permitted to mutate prices, schemes, or settings on the server.
+7. ❌ **Do NOT use unhoisted scoped helpers across functions**:
     - Ensure serialization helpers like `safeStr()` are scoped so they cannot trigger `ReferenceError: Cannot access before initialization`.
-6. ❌ **Do NOT alter Date Format standards**:
+8. ❌ **Do NOT alter Date Format standards**:
     - Releases, changelogs, and docs must strictly use Indian standard `DD-MM-YYYY`.

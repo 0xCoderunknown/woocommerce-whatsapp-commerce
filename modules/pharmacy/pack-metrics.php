@@ -281,7 +281,7 @@ add_filter('swac_product_is_rx', $bridge_rx, 10, 2);
 // Supply default pharmacy prescription note if pharmacy module is active and store hasn't overridden it
 $supply_rx_note = function ($config) {
     if (empty($config['prescription_note'])) {
-        $config['prescription_note'] = __("📋 Note: Doctor's prescription required on WhatsApp for prescription medicines (Rx).", 'stateless-wa-commerce');
+        $config['prescription_note'] = __("📋 Note: Doctor's prescription required on WhatsApp for prescription medicines (Rx).", 'woocommerce-whatsapp-commerce');
     }
     return $config;
 };
@@ -346,7 +346,7 @@ if (!function_exists('swac_render_generic_badge')) {
             $class .= ' ' . trim($extra_class);
         }
 
-        return '<span class="' . esc_attr($class) . '">' . esc_html__('GENERIC', 'stateless-wa-commerce') . '</span>';
+        return '<span class="' . esc_attr($class) . '">' . esc_html__('GENERIC', 'woocommerce-whatsapp-commerce') . '</span>';
     }
 }
 

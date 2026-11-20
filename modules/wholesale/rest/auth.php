@@ -80,18 +80,6 @@ function swac_desk_get_auth_role(?WP_REST_Request $request = null): ?string
             }
         }
 
-        // Backward compatibility fallback for legacy single token
-        $stored = get_option('swac_b2b_master_hash', '');
-        if (is_array($stored)) {
-            $hash = (string)($stored['hash'] ?? '');
-            $expires = (int)($stored['expires'] ?? 0);
-            if (!empty($hash) && ($expires === 0 || time() <= $expires) && hash_equals($hash, $token_hash)) {
-                return (string)($stored['role'] ?? 'owner');
-            }
-        } elseif (is_string($stored) && !empty($stored) && hash_equals($stored, $token_hash)) {
-            return 'owner';
-        }
-
         // If the token in X-SWAC-Master-Token happens to be a valid retailer token
         if (swac_is_valid_retailer_token($token)) {
             return 'retailer';
@@ -151,7 +139,7 @@ function swac_rest_desk_auth(WP_REST_Request $request): WP_REST_Response
     if ($attempts >= 5) {
         return new WP_REST_Response([
             'success' => false,
-            'message' => __('Too many failed login attempts. Please wait 15 minutes before trying again.', 'stateless-wa-commerce'),
+            'message' => __('Too many failed login attempts. Please wait 15 minutes before trying again.', 'woocommerce-whatsapp-commerce'),
         ], 429);
     }
 
@@ -159,7 +147,7 @@ function swac_rest_desk_auth(WP_REST_Request $request): WP_REST_Response
     $pin = sanitize_text_field((string)($params['pin'] ?? ''));
 
     if (empty($pin)) {
-        return new WP_REST_Response(['success' => false, 'message' => __('PIN required.', 'stateless-wa-commerce')], 400);
+        return new WP_REST_Response(['success' => false, 'message' => __('PIN required.', 'woocommerce-whatsapp-commerce')], 400);
     }
 
     $master_pin = (string)get_option('swac_b2b_master_pin', '');
@@ -169,7 +157,7 @@ function swac_rest_desk_auth(WP_REST_Request $request): WP_REST_Response
     if (empty($master_pin) && empty($staff_pin) && empty($salesman_pin)) {
         return new WP_REST_Response([
             'success' => false,
-            'message' => __('Distributor Desk PIN is not configured. Please set the Master or Staff PIN in wp-admin.', 'stateless-wa-commerce'),
+            'message' => __('Distributor Desk PIN is not configured. Please set the Master or Staff PIN in wp-admin.', 'woocommerce-whatsapp-commerce'),
         ], 503);
     }
 
@@ -187,7 +175,7 @@ function swac_rest_desk_auth(WP_REST_Request $request): WP_REST_Response
         set_transient($rate_key, $attempts, 15 * MINUTE_IN_SECONDS);
         return new WP_REST_Response([
             'success' => false,
-            'message' => __('Incorrect PIN. Please try again.', 'stateless-wa-commerce'),
+            'message' => __('Incorrect PIN. Please try again.', 'woocommerce-whatsapp-commerce'),
         ], 403);
     }
 
@@ -218,24 +206,15 @@ function swac_rest_desk_auth(WP_REST_Request $request): WP_REST_Response
     ];
     update_option('swac_b2b_desk_tokens', $tokens, false);
 
-    // Also update legacy single token for backward compatibility
-    if ($role === 'owner') {
-        update_option('swac_b2b_master_hash', [
-            'hash' => $token_hash,
-            'expires' => $expires,
-            'role' => 'owner',
-        ], false);
-    }
-
     return new WP_REST_Response([
         'success' => true,
         'token' => $token,
         'role' => $role,
         'message' => $role === 'owner'
-            ? __('Owner Access Granted.', 'stateless-wa-commerce')
+            ? __('Owner Access Granted.', 'woocommerce-whatsapp-commerce')
             : ($role === 'salesman'
-                ? __('Salesman Access Granted (Route Booking).', 'stateless-wa-commerce')
-                : __('Staff Access Granted (Stock Control).', 'stateless-wa-commerce')),
+                ? __('Salesman Access Granted (Route Booking).', 'woocommerce-whatsapp-commerce')
+                : __('Staff Access Granted (Stock Control).', 'woocommerce-whatsapp-commerce')),
     ], 200);
 }
 
@@ -258,11 +237,9 @@ function swac_rest_desk_logout(WP_REST_Request $request): WP_REST_Response
         }
     }
 
-    delete_option('swac_b2b_master_hash');
-
     return new WP_REST_Response([
         'success' => true,
-        'message' => __('Logged out successfully.', 'stateless-wa-commerce'),
+        'message' => __('Logged out successfully.', 'woocommerce-whatsapp-commerce'),
     ], 200);
 }
 

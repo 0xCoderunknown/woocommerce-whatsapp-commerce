@@ -24,7 +24,7 @@ if (!function_exists('swac_render_missing_images_finder')) {
     function swac_render_missing_images_finder(array $atts = []): string
     {
         if (!current_user_can('manage_woocommerce')) {
-            return '<p class="swac-tax-error">' . esc_html__('Access Denied: Insufficient Privileges.', 'stateless-wa-commerce') . '</p>';
+            return '<p class="swac-tax-error">' . esc_html__('Access Denied: Insufficient Privileges.', 'woocommerce-whatsapp-commerce') . '</p>';
         }
 
         $parsed_atts = shortcode_atts([
@@ -56,7 +56,7 @@ if (!function_exists('swac_render_missing_images_finder')) {
 
         if (empty($product_ids)) {
             return '<p style="color:#16a34a; font-weight:bold; padding:15px; background:#f0fdf4; border-radius:4px;">'
-                . esc_html__('🎉 Catalog in alignment: Zero products are missing featured images.', 'stateless-wa-commerce')
+                . esc_html__('🎉 Catalog in alignment: Zero products are missing featured images.', 'woocommerce-whatsapp-commerce')
                 . '</p>';
         }
 
@@ -73,7 +73,7 @@ if (!function_exists('swac_render_missing_images_finder')) {
             }
 
             $raw_sku = $product->get_sku();
-            $sku = !empty($raw_sku) ? esc_html($raw_sku) : '<span style="color:#94a3b8; font-style:italic;">' . esc_html__('No SKU', 'stateless-wa-commerce') . '</span>';
+            $sku = !empty($raw_sku) ? esc_html($raw_sku) : '<span style="color:#94a3b8; font-style:italic;">' . esc_html__('No SKU', 'woocommerce-whatsapp-commerce') . '</span>';
             $name = $product->get_name();
             $stock_status = $product->get_stock_status();
             $edit_url = get_edit_post_link($id);
@@ -113,8 +113,8 @@ add_action('admin_notices', function () {
         ?>
         <div class="notice notice-error is-dismissible">
             <p>
-                <strong><?php esc_html_e('Stateless WhatsApp Commerce', 'stateless-wa-commerce'); ?></strong>
-                <?php esc_html_e('requires WooCommerce to be installed and active.', 'stateless-wa-commerce'); ?>
+                <strong><?php esc_html_e('Stateless WhatsApp Commerce', 'woocommerce-whatsapp-commerce'); ?></strong>
+                <?php esc_html_e('requires WooCommerce to be installed and active.', 'woocommerce-whatsapp-commerce'); ?>
             </p>
         </div>
         <?php
@@ -130,8 +130,8 @@ add_action('admin_notices', function () {
         ?>
         <div class="notice notice-warning is-dismissible">
             <p>
-                <strong><?php esc_html_e('Stateless WhatsApp Commerce:', 'stateless-wa-commerce'); ?></strong>
-                <?php esc_html_e('No WhatsApp phone number is configured. Customer ordering links and buttons are currently disabled to prevent broken links. Please set SWAC_PHONE in core/config.php or via the swac_commerce_config filter.', 'stateless-wa-commerce'); ?>
+                <strong><?php esc_html_e('Stateless WhatsApp Commerce:', 'woocommerce-whatsapp-commerce'); ?></strong>
+                <?php esc_html_e('No WhatsApp phone number is configured. Customer ordering links and buttons are currently disabled to prevent broken links. Please set SWAC_PHONE in core/config.php or via the swac_commerce_config filter.', 'woocommerce-whatsapp-commerce'); ?>
             </p>
         </div>
         <?php

@@ -1,6 +1,6 @@
 <?php
 /**
- * 🗺️ INTEGRATIONS: NATIVE STREAMING XML SITEMAP GENERATOR
+ * 🗺️ SEO MODULE: NATIVE STREAMING XML SITEMAP GENERATOR
  *
  * High-performance, low-memory XML streaming endpoint (/sitemap.xml) for search engine crawlers.
  * Queries post IDs, modification timestamps, and taxonomy terms directly via $wpdb.

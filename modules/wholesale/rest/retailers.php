@@ -41,9 +41,9 @@ function swac_rest_desk_save_retailer(WP_REST_Request $request): WP_REST_Respons
     $saved = function_exists('swac_save_approved_retailer') ? swac_save_approved_retailer($params) : false;
 
     if ($saved) {
-        return new WP_REST_Response(['success' => true, 'message' => __('Retailer saved.', 'stateless-wa-commerce')], 200);
+        return new WP_REST_Response(['success' => true, 'message' => __('Retailer saved.', 'woocommerce-whatsapp-commerce')], 200);
     }
-    return new WP_REST_Response(['success' => false, 'message' => __('Validation error. Check mobile number.', 'stateless-wa-commerce')], 400);
+    return new WP_REST_Response(['success' => false, 'message' => __('Validation error. Check mobile number.', 'woocommerce-whatsapp-commerce')], 400);
 }
 
 /**
@@ -56,8 +56,8 @@ function swac_rest_desk_delete_retailer(WP_REST_Request $request): WP_REST_Respo
     $deleted = function_exists('swac_delete_approved_retailer') ? swac_delete_approved_retailer($phone) : false;
 
     if ($deleted) {
-        return new WP_REST_Response(['success' => true, 'message' => __('Retailer removed.', 'stateless-wa-commerce')], 200);
+        return new WP_REST_Response(['success' => true, 'message' => __('Retailer removed.', 'woocommerce-whatsapp-commerce')], 200);
     }
-    return new WP_REST_Response(['success' => false, 'message' => __('Retailer not found.', 'stateless-wa-commerce')], 404);
+    return new WP_REST_Response(['success' => false, 'message' => __('Retailer not found.', 'woocommerce-whatsapp-commerce')], 404);
 }
 

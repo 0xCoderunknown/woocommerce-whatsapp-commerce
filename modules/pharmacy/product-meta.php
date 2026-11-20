@@ -47,7 +47,7 @@ function swac_composition_tag_shortcode()
         }
 
         $output .= sprintf(
-            '<a href="%s" class="swac-salt-tag wa-salt-tag pd-salt-tag">%s</a>',
+            '<a href="%s" class="swac-salt-tag swac-composition-tag">%s</a>',
             esc_url($term_link),
             esc_html($term->name)
         );
@@ -75,10 +75,10 @@ function swac_rx_badge_shortcode()
     $is_rx = function_exists('swac_is_prescription_product') && swac_is_prescription_product($product);
 
     if ($is_rx) {
-        return '<span class="swac-rx-badge wa-rx-badge pd-rx-badge" title="' . esc_attr__('Prescription Required', 'stateless-wa-commerce') . '">℞ Rx Required</span>';
+        return '<span class="swac-rx-badge" title="' . esc_attr__('Prescription Required', 'woocommerce-whatsapp-commerce') . '">℞ Rx Required</span>';
     }
 
-    return '<span class="swac-otc-badge wa-otc-badge pd-otc-badge">' . esc_html__('OTC', 'stateless-wa-commerce') . '</span>';
+    return '<span class="swac-otc-badge">' . esc_html__('OTC', 'woocommerce-whatsapp-commerce') . '</span>';
 }
 
 add_shortcode('swac_rx_badge', 'swac_rx_badge_shortcode');
